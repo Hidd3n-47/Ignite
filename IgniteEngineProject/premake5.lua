@@ -29,10 +29,13 @@ project "IgniteEngine"
 
         "$(SolutionDir)IgniteMemProject/",
         "$(SolutionDir)IgniteUtilsProject/",
+
+        "$(SolutionDir)deps/Include/",
     }
 
     libdirs
     {
+        "$(SolutionDir)deps/Lib/",
     }
 
     links
@@ -40,6 +43,13 @@ project "IgniteEngine"
         "Log",
         "IgniteMem",
         "IgniteUtils",
+
+        "SDL3.lib",
+    }
+
+    postbuildcommands
+    {
+        ("{COPYFILE} %[$(SolutionDir)deps/Lib/SDL3.dll] %[" .. outputPath .."IgniteGame/]")
     }
 
     filter "system:windows"

@@ -20,6 +20,8 @@ project "IgniteGame"
         "$(SolutionDir)LogProject/",
 
         "$(SolutionDir)IgniteEngineProject/",
+
+        "$(SolutionDir)IgniteMemProject/",
     }
 
     libdirs
@@ -29,6 +31,8 @@ project "IgniteGame"
     links
     {
         "IgniteEngine",
+
+        "IgniteMem",
     }
 
     filter "system:windows"

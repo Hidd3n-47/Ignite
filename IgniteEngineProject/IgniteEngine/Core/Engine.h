@@ -1,7 +1,15 @@
 #pragma once
 
+#include <IgniteMem/Core/WeakRef.h>
+
+struct SDL_Window;
+struct SDL_Renderer;
+
 namespace ignite
 {
+
+class Scene;
+class InputManager;
 
 /**
  * @class Engine: The engine class is responsible for the game logic and the running of the game.
@@ -16,6 +24,11 @@ public:
     Engine& operator=(Engine&&)       = delete;
     Engine& operator=(const Engine&)  = delete;
 
+    /**
+     * @brief Create an instance of the engine.
+     * @note This should only happen once per application lifetime. Returns existing instance if called multiple times.
+     * @return The instance of the engine that is created.
+     */
     static Engine* CreateEngine();
 
     /**
@@ -25,11 +38,11 @@ public:
     /**
      * @brief Run the core gameplay loop of the game.
      */
-    void Run();
+    void Run() const;
     /**
      * @brief Destroy and clean up used resources by the engine.
      */
-    void Destroy();
+    void Destroy() const;
 
     /**
      * @brief Update the \c GameObjects and \c Components.
@@ -56,7 +69,15 @@ private:
 
     static Engine* mInstance;
 
-    bool mRunning = true;
+    bool mRunning = false;
+
+    InputManager* mInputManager;
+
+    SDL_Window*   mWindow   = nullptr;
+    SDL_Renderer* mRenderer = nullptr;
+
+    mem::WeakRef<Scene> mActiveScene;
+    mem::WeakRef<Scene> mSceneToChangeTo;
 };
 
 } // Namespace ignite.
