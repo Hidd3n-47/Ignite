@@ -1,5 +1,5 @@
--- ---------------------------- Log Project.
-project "Log"
+-- ---------------------------- IgniteUtils Project.
+project "IgniteUtils"
     location "%{prj.name}"
     kind "StaticLib"
     language "C++"

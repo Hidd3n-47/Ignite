@@ -20,10 +20,15 @@ project "IgniteEngine"
 
     includedirs
     {
+        "$(SolutionDir)IgniteEngineProject/",
+
         "$(SolutionDir)LogProject/",
 
         "$(SolutionDir)IgniteEngineProject/IgniteEngine/",
         "$(SolutionDir)IgniteEngineProject/IgniteEngine/Src/",
+
+        "$(SolutionDir)IgniteMemProject/",
+        "$(SolutionDir)IgniteUtilsProject/",
     }
 
     libdirs
@@ -33,6 +38,8 @@ project "IgniteEngine"
     links
     {
         "Log",
+        "IgniteMem",
+        "IgniteUtils",
     }
 
     filter "system:windows"

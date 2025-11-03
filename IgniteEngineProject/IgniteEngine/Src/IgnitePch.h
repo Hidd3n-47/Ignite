@@ -15,3 +15,10 @@
 #include <Log/Log.h>
 
 #include "Src/Defines.h"
+
+#include "Math/Vec2.h"
+
+#include <IgniteMem/Core/WeakRef.h>
+#include <IgniteMem/Core/WeakRefHash.h>
+
+#include <IgniteUtils/Core/Ulid.h>
