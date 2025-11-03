@@ -1,16 +1,13 @@
--- ---------------------------- IgniteEngine Project.
-project "IgniteEngine"
+-- ---------------------------- IgniteGame Project.
+project "IgniteGame"
     location "%{prj.name}"
-    kind "StaticLib"
+    kind "ConsoleApp"
     language "C++"
     staticruntime "Off"
     cppdialect "C++latest"
 
     targetdir(outputPath .. "%{prj.name}")
     objdir(outputIntPath .. "%{prj.name}")
-
-    pchheader "IgnitePch.h"
-    pchsource "%{prj.name}/Src/IgnitePch.cpp"
 
     files
     {
@@ -22,8 +19,7 @@ project "IgniteEngine"
     {
         "$(SolutionDir)LogProject/",
 
-        "$(SolutionDir)IgniteEngineProject/IgniteEngine/",
-        "$(SolutionDir)IgniteEngineProject/IgniteEngine/Src/",
+        "$(SolutionDir)IgniteEngineProject/",
     }
 
     libdirs
@@ -32,7 +28,7 @@ project "IgniteEngine"
 
     links
     {
-        "Log",
+        "IgniteEngine",
     }
 
     filter "system:windows"
@@ -40,7 +36,7 @@ project "IgniteEngine"
 
     filter "configurations:Dev"
         runtime "Debug"
-        defines { "ENGINE_DEBUG", "DEV_CONFIGURATION" }
+        defines "DEV_CONFIGURATION"
         symbols "on"
 
     filter "configurations:Release"

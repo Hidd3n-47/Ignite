@@ -12,5 +12,6 @@ outputPath    = "$(SolutionDir)Scratch/Bin/" .. outputName .. "/"
 outputIntPath = "$(SolutionDir)Scratch/Int/" .. outputName .. "/"
 
 include "IgniteEngineProject/"
+include "IgniteGameProject/"
 
 include "LogProject/"
