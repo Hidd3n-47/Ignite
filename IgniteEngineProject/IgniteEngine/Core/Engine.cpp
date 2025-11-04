@@ -6,11 +6,14 @@
 #include "EC/Scene.h"
 #include "Core/Input/InputManager.h"
 #include "Core/Rendering/Renderer.h"
+#include "Core/Rendering/TextureManager.h"
 
 namespace ignite
 {
 
 Engine* Engine::mInstance = nullptr;
+
+static uint16_t i;
 
 Engine* Engine::CreateEngine()
 {
@@ -50,6 +53,9 @@ void Engine::Init()
 
     mRenderer = new Renderer(mWindow);
 
+    mTextureManager = new TextureManager(mRenderer->GetRendererBackend());
+    i = mTextureManager->Load("E:/Programming/Ignite/Assets/car_24px_8way_blue_1.png", 24, 24);
+
     mRunning = true;
 }
 
@@ -66,10 +72,12 @@ void Engine::Run() const
 
 void Engine::Destroy() const
 {
-    delete mInputManager;
+    delete mTextureManager;
 
     delete mRenderer;
     SDL_DestroyWindow(mWindow);
+
+    delete mInputManager;
 
     delete mInstance;
 
@@ -100,6 +108,7 @@ void Engine::Render() const
     {
         mActiveScene->Render();
     }
+    mTextureManager->RenderSingle(i, Vec2{ 0.0f, 0.0f }, Vec2{ 1.0f, 1.0f }, Vec2{ 24.0f, 24.0f }, 0, 0.0f, false);
 
     mRenderer->EndRender();
 }

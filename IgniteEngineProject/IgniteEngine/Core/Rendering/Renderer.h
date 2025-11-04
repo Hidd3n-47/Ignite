@@ -16,6 +16,7 @@ public:
     void Render();
     void EndRender() const;
 
+    [[nodiscard]] inline SDL_Renderer* GetRendererBackend() const { return mRenderer; }
 private:
     SDL_Renderer* mRenderer;
 };

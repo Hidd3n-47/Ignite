@@ -10,6 +10,7 @@ namespace ignite
 class Scene;
 class Renderer;
 class InputManager;
+class TextureManager;
 
 /**
  * @class Engine: The engine class is responsible for the game logic and the running of the game.
@@ -71,7 +72,8 @@ private:
 
     bool mRunning = false;
 
-    InputManager* mInputManager;
+    InputManager*   mInputManager;
+    TextureManager* mTextureManager;
 
     SDL_Window*   mWindow   = nullptr;
     Renderer*     mRenderer = nullptr;

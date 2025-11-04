@@ -45,11 +45,13 @@ project "IgniteEngine"
         "IgniteUtils",
 
         "SDL3.lib",
+        "SDL3_image.lib",
     }
 
     postbuildcommands
     {
-        ("{COPYFILE} %[$(SolutionDir)deps/Lib/SDL3.dll] %[" .. outputPath .."IgniteGame/]")
+        ("{COPYFILE} %[$(SolutionDir)deps/Lib/SDL3.dll] %[" .. outputPath .."IgniteGame/]"),
+        ("{COPYFILE} %[$(SolutionDir)deps/Lib/SDL3_image.dll] %[" .. outputPath .."IgniteGame/]"),
     }
 
     filter "system:windows"
