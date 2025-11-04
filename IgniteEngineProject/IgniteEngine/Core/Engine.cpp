@@ -43,7 +43,17 @@ void Engine::Init()
 
     mInputManager = new InputManager();
 
-    mWindow   = SDL_CreateWindow("Ignite", 1080, 720, 0);
+    const OrthoCameraValues cameraSize
+    {
+        .left   = -8.0f,
+        .right  =  8.0f,
+        .top    =  4.5f,
+        .bottom = -4.5f,
+        .screenDimensions = DEFAULT_SCREEN_SIZE
+    };
+    mCamera = OrthoCamera(cameraSize);
+
+    mWindow   = SDL_CreateWindow("Ignite", static_cast<int>(DEFAULT_SCREEN_SIZE.x), static_cast<int>(DEFAULT_SCREEN_SIZE.y), 0);
 
     if (!mWindow)
     {
@@ -108,6 +118,7 @@ void Engine::Render() const
     {
         mActiveScene->Render();
     }
+
     mTextureManager->RenderSingle(i, Vec2{ 0.0f, 0.0f }, Vec2{ 1.0f, 1.0f }, Vec2{ 24.0f, 24.0f }, 0, 0.0f, false);
 
     mRenderer->EndRender();

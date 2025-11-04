@@ -10,7 +10,19 @@ namespace ignite
 TextureManager::TextureManager(SDL_Renderer* rendererBackend)
     : mRendererBackend(rendererBackend)
 {
-    // Empty.
+    // Create the invalid texture. This texture will be created manually from a 1x1 pixel that is pink.
+    SDL_Surface* surface = SDL_CreateSurface(1, 1, SDL_PIXELFORMAT_RGBA32);
+
+    const uint32_t pixelColor = SDL_MapRGBA(SDL_GetPixelFormatDetails(surface->format), nullptr, 255, 0, 255, 255);
+
+    uint32_t* pixels = static_cast<uint32_t*>(surface->pixels);
+    *pixels = pixelColor;
+
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(mRendererBackend, surface);
+    mTextureMap[mId++] = texture;
+
+    SDL_DestroySurface(surface);
+
 }
 
 TextureManager::~TextureManager()
@@ -18,14 +30,13 @@ TextureManager::~TextureManager()
     RemoveAllTextures();
 }
 
-//todo make 0 the invalid texture.
 uint16_t TextureManager::Load(const std::string& filePath, int width, int height)
 {
     SDL_Surface* surface = IMG_Load(filePath.c_str());
     if (!surface)
     {
         DEBUG_ERROR("Failed to load image at path: {}. Error: ", filePath, SDL_GetError());
-        return 0;
+        return INVALID_ID;
     }
 
     SDL_Texture* texture = SDL_CreateTextureFromSurface(mRendererBackend, surface);
@@ -34,7 +45,7 @@ uint16_t TextureManager::Load(const std::string& filePath, int width, int height
     if (!texture)
     {
         DEBUG_ERROR("Failed to create texture from surface. Error: ", SDL_GetError());
-        return 0;
+        return INVALID_ID;
     }
 
     mTextureMap[mId] = texture;
@@ -51,7 +62,7 @@ void TextureManager::RenderSingle(const uint16_t id, Vec2 world, Vec2 scale, con
     SDL_FRect r = { floor(world.x), floor(world.y), dimensions.x * scale.x, dimensions.y * scale.y };
     destRect = r;
 
-    bool err = SDL_RenderTextureRotated(mRendererBackend, mTextureMap[id], &srcRect, &destRect, angle, nullptr, SDL_FLIP_NONE);
+    const bool err = SDL_RenderTextureRotated(mRendererBackend, mTextureMap[id], &srcRect, &destRect, angle, nullptr, SDL_FLIP_NONE);
 
     DEBUG(if (!err))
         DEBUG_ERROR("Failed to render texture with ID: {}. Error: {}", id, SDL_GetError());

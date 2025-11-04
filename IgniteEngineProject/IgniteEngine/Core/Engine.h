@@ -2,6 +2,9 @@
 
 #include <IgniteMem/Core/WeakRef.h>
 
+#include "IgniteEngine/Math/Vec2.h"
+#include "IgniteEngine/Core/OrthoCamera.h"
+
 struct SDL_Window;
 
 namespace ignite
@@ -63,7 +66,7 @@ public:
     //static constexpr uint32_t TARGET_FRAMES = 120;
     //static constexpr std::chrono::duration<float> TARGET_FRAME_TIME{ 1.0f / TARGET_FRAMES };
 
-    //const Vec2 DEFAULT_SCREEN_SIZE{ 1920.0f, 1080.0f };
+    const Vec2 DEFAULT_SCREEN_SIZE{ 1920.0f, 1080.0f };
 private:
     Engine()  = default;
     ~Engine() = default;
@@ -80,6 +83,8 @@ private:
 
     mem::WeakRef<Scene> mActiveScene;
     mem::WeakRef<Scene> mSceneToChangeTo;
+
+    OrthoCamera mCamera;
 };
 
 } // Namespace ignite.

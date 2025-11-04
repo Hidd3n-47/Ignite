@@ -18,6 +18,8 @@ public:
 
     void RemoveTexture(const uint16_t id);
     void RemoveAllTextures();
+
+    inline static constexpr uint16_t INVALID_ID{ 0 };
 private:
     SDL_Renderer* mRendererBackend;
 

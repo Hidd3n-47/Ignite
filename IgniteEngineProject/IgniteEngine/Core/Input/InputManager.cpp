@@ -32,6 +32,9 @@ void InputManager::Poll()
         case SDL_EVENT_MOUSE_BUTTON_UP:
             MouseUp(e.button.button);
             break;
+        case SDL_EVENT_MOUSE_MOTION:
+            SetMousePosition(Vec2{ e.motion.x, e.motion.y });
+            break;
         default:
             break;
         }
