@@ -4,7 +4,8 @@
 #include <SDL3/SDL.h>
 
 #include "EC/Scene.h"
-#include "InputManager.h"
+#include "Core/Input/InputManager.h"
+#include "Core/Rendering/Renderer.h"
 
 namespace ignite
 {
@@ -40,13 +41,14 @@ void Engine::Init()
     mInputManager = new InputManager();
 
     mWindow   = SDL_CreateWindow("Ignite", 1080, 720, 0);
-    mRenderer = SDL_CreateRenderer(mWindow, nullptr);
 
-    if (!mWindow || !mRenderer)
+    if (!mWindow)
     {
-        DEBUG_ERROR("Failed to create SDL3 window or renderer.");
+        DEBUG_ERROR("Failed to create SDL3 window");
         return;
     }
+
+    mRenderer = new Renderer(mWindow);
 
     mRunning = true;
 }
@@ -66,7 +68,7 @@ void Engine::Destroy() const
 {
     delete mInputManager;
 
-    SDL_DestroyRenderer(mRenderer);
+    delete mRenderer;
     SDL_DestroyWindow(mWindow);
 
     delete mInstance;
@@ -92,6 +94,14 @@ void Engine::PostUpdate()
 
 void Engine::Render() const
 {
+    mRenderer->StartRender();
+
+    if (mActiveScene.IsRefValid())
+    {
+        mActiveScene->Render();
+    }
+
+    mRenderer->EndRender();
 }
 
 } // Namespace ignite.

@@ -3,12 +3,12 @@
 #include <IgniteMem/Core/WeakRef.h>
 
 struct SDL_Window;
-struct SDL_Renderer;
 
 namespace ignite
 {
 
 class Scene;
+class Renderer;
 class InputManager;
 
 /**
@@ -74,7 +74,7 @@ private:
     InputManager* mInputManager;
 
     SDL_Window*   mWindow   = nullptr;
-    SDL_Renderer* mRenderer = nullptr;
+    Renderer*     mRenderer = nullptr;
 
     mem::WeakRef<Scene> mActiveScene;
     mem::WeakRef<Scene> mSceneToChangeTo;
