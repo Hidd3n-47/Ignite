@@ -3,12 +3,12 @@
 #include "IgniteEngine/Src/IgnitePch.h"
 
 #include "IgniteEngine/EC/IComponent.h"
+#include "IgniteEngine/EC/Components/Transform.h"
 
 namespace ignite
 {
 
 class Scene;
-class Transform;
 
 /**
  * @class GameObject: A class representing the abstract idea of a 'Game Object'. A game object is a collection of \c Components.
@@ -110,7 +110,7 @@ inline mem::WeakRef<Component> GameObject::GetComponent() const
 {
     for (IComponent* comp : mComponents)
     {
-        if (Component* castComponent = static_cast<Component*>(comp); castComponent != nullptr)
+        if (Component* castComponent = dynamic_cast<Component*>(comp); castComponent != nullptr)
         {
             return mem::WeakRef{ castComponent };
         }
@@ -122,7 +122,7 @@ inline mem::WeakRef<Component> GameObject::GetComponent() const
 template <>
 inline mem::WeakRef<Transform> GameObject::GetComponent() const
 {
-    return mem::WeakRef{ reinterpret_cast<Transform*>(mComponents[0]) };
+    return mem::WeakRef{ dynamic_cast<Transform*>(mComponents[0]) };
 }
 
 } // Namespace ignite.

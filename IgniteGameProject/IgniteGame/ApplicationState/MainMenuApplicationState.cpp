@@ -8,6 +8,7 @@
 #include <IgniteEngine/EC/Components/Transform.h>
 
 #include "Core/GameManager.h"
+#include "IgniteEngine/Src/Defines.h"
 
 namespace ignite
 {
@@ -16,11 +17,22 @@ void MainMenuApplicationState::InitScene()
 
     mem::WeakRef<GameObject> playButtonObject = CreateGameObject();
     playButtonObject->GetComponent<Transform>()->translation = Vec2{ 0.0f, 2.0f };
-    playButtonObject->AddComponent<UiButton>(std::filesystem::path{ "E:/Programming/Ignite/Assets/PlayButton.png" }, [] { GameManager::Instance()->ChangeState(ApplicationStates::GAME); });
+    mem::WeakRef<UiButton> playButton = playButtonObject->AddComponent<UiButton>(std::filesystem::path{ "E:/Programming/Ignite/Assets/PlayButton.png" });
+    playButton->SetOnButtonPressedEvent([] { GameManager::Instance()->ChangeState(ApplicationStates::GAME); });
+    playButton->SetOnHoveredEvent(
+        [](mem::WeakRef<GameObject> gameObject)
+        {
+            gameObject->GetComponent<Transform>()->scale = Vec2{ 1.2f };
+        });
+    playButton->SetOnRestingStateEvent(
+        [](mem::WeakRef<GameObject> gameObject)
+        {
+            gameObject->GetComponent<Transform>()->scale = Vec2{ 1.0f };
+        });
 
     mem::WeakRef<GameObject> exitButtonObject = CreateGameObject();
     exitButtonObject->GetComponent<Transform>()->translation = Vec2{ 0.0f, -2.0f };
-    exitButtonObject->AddComponent<UiButton>(std::filesystem::path{ "E:/Programming/Ignite/Assets/QuitButton.png" }, [] { Engine::Instance()->CloseGame(); });
+    exitButtonObject->AddComponent<UiButton>(std::filesystem::path{ "E:/Programming/Ignite/Assets/QuitButton.png" });
 }
 
 void MainMenuApplicationState::SceneUpdate() const
