@@ -78,7 +78,7 @@ public:
     [[nodiscard]] inline const OrthoCamera& GetCamera() const { return mCamera; }
 
     static constexpr uint32_t TARGET_FRAMES = 120;
-    static constexpr uint64_t TARGET_FRAME_TIME_MS { static_cast<uint64_t>(1000.0 / static_cast<double>(TARGET_FRAMES)) };
+    static constexpr uint64_t TARGET_FRAME_TIME_MS{ static_cast<uint64_t>(1000.0 / static_cast<double>(TARGET_FRAMES)) };
 
     const Vec2 DEFAULT_SCREEN_SIZE{ 1280.0f, 720.0f };
 private:
@@ -100,7 +100,9 @@ private:
 
     OrthoCamera mCamera;
 
-    uint64_t mTime;
+    void StartFrame();
+    void EndFrame();
+    uint64_t mStart;
     float mDeltaTime { TARGET_FRAME_TIME_MS / 1000.0f };
 };
 

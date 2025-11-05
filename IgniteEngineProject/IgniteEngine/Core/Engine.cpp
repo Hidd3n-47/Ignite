@@ -71,29 +71,20 @@ void Engine::Run()
 {
     while (mRunning)
     {
+        StartFrame();
+
         mInputManager->Poll();
 
         Update();
         PostUpdate();
         Render();
 
-        const uint64_t now = SDL_GetPerformanceCounter();
-        const uint64_t deltaTimeMs = (now - mTime) / SDL_GetPerformanceFrequency() * 1000;
-
-        const long long deltaFromTargetFrameTime = TARGET_FRAME_TIME_MS - deltaTimeMs;
-
-        if (deltaFromTargetFrameTime > 0)
-        {
-            SDL_Delay(static_cast<uint32_t>(deltaFromTargetFrameTime));
-        }
-
-        mTime = now;
-        mDeltaTime = static_cast<float>(deltaTimeMs + deltaFromTargetFrameTime) / 1000.0f;
-
 #ifdef DEV_CONFIGURATION
-        std::string title = std::to_string( 1.0 / mDeltaTime);
+        std::string title = std::to_string(1.0 / mDeltaTime);
         SDL_SetWindowTitle(mWindow, title.c_str());
 #endif // DEV_CONFIGURATION.
+
+        EndFrame();
     }
 }
 
@@ -142,6 +133,27 @@ void Engine::Render() const
     }
 
     mRenderer->EndRender();
+}
+
+void Engine::StartFrame()
+{
+    mStart = SDL_GetPerformanceCounter();
+}
+
+void Engine::EndFrame()
+{
+    const uint64_t now = SDL_GetPerformanceCounter();
+    const uint64_t startEndDelta = (now - mStart) / SDL_GetPerformanceFrequency() ;
+
+    const uint64_t targetDelta = TARGET_FRAME_TIME_MS - startEndDelta;
+
+    if (targetDelta > 0)
+    {
+        SDL_Delay(static_cast<uint32_t>(targetDelta));
+    }
+
+    const uint64_t afterDelay = SDL_GetPerformanceCounter();
+    mDeltaTime = static_cast<float>(afterDelay - mStart) / static_cast<float>(SDL_GetPerformanceFrequency());
 }
 
 } // Namespace ignite.

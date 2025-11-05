@@ -76,7 +76,7 @@ void TextureManager::RenderSingle(const Texture texture, mem::WeakRef<Transform>
     const Vec2 screenPosition = camera.PositionToScreenSpace(transform->translation);
 
     const SDL_FRect srcRect { 0.0f, 0.0f, texture.width, texture.height };
-    const SDL_FRect destRect{ screenPosition.x - texture.width * 0.5f, screenPosition.y - texture.height * 0.5f, texture.width * transform->scale.x, texture.height * transform->scale.y };
+    const SDL_FRect destRect{ screenPosition.x - texture.width * 0.5f * transform->scale.x, screenPosition.y - texture.height * 0.5f * transform->scale.y, texture.width * transform->scale.x, texture.height * transform->scale.y };
 
     const bool err = SDL_RenderTextureRotated(mRendererBackend, mTextureMap[texture.id], &srcRect, &destRect, transform->rotation, nullptr, SDL_FLIP_NONE);
 
@@ -92,7 +92,7 @@ void TextureManager::RenderSingleFromSpriteSheet(const Texture texture, mem::Wea
     const float textureWidth  = texture.width  / xMax;
     const float textureHeight = texture.height / yMax;
     const SDL_FRect srcRect{ textureWidth * x, textureHeight * y, textureWidth, textureHeight };
-    const SDL_FRect destRect{ screenPosition.x - textureWidth * 0.5f, screenPosition.y - textureHeight * 0.5f, textureWidth * transform->scale.x, textureHeight * transform->scale.y };
+    const SDL_FRect destRect{ screenPosition.x - textureWidth * 0.5f * transform->scale.x, screenPosition.y - textureHeight * 0.5f * transform->scale.y, textureWidth * transform->scale.x, textureHeight * transform->scale.y };
 
     const bool err = SDL_RenderTextureRotated(mRendererBackend, mTextureMap[texture.id], &srcRect, &destRect, transform->rotation, nullptr, SDL_FLIP_NONE);
 
