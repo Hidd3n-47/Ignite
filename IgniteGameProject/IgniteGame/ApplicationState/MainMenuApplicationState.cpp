@@ -7,6 +7,8 @@
 #include <IgniteEngine/EC/Components/UiButton.h>
 #include <IgniteEngine/EC/Components/Transform.h>
 
+#include "Core/GameManager.h"
+
 namespace ignite
 {
 void MainMenuApplicationState::InitScene()
@@ -14,7 +16,7 @@ void MainMenuApplicationState::InitScene()
 
     mem::WeakRef<GameObject> playButtonObject = CreateGameObject();
     playButtonObject->GetComponent<Transform>()->translation = Vec2{ 0.0f, 2.0f };
-    playButtonObject->AddComponent<UiButton>(std::filesystem::path{ "E:/Programming/Ignite/Assets/PlayButton.png" });
+    playButtonObject->AddComponent<UiButton>(std::filesystem::path{ "E:/Programming/Ignite/Assets/PlayButton.png" }, [] { GameManager::Instance()->ChangeState(ApplicationStates::GAME); });
 
     mem::WeakRef<GameObject> exitButtonObject = CreateGameObject();
     exitButtonObject->GetComponent<Transform>()->translation = Vec2{ 0.0f, -2.0f };

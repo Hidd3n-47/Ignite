@@ -5,6 +5,7 @@
 
 #include "Src/Defines.h"
 
+#include "ApplicationState/GameApplicationState.h"
 #include "ApplicationState/MainMenuApplicationState.h"
 
 namespace ignite
@@ -55,7 +56,7 @@ void GameManager::ChangeState(const ApplicationStates state)
         break;
     case ApplicationStates::GAME:
         GAME_LOG("Updated Application State: GAME");
-        mCurrentScene = new MainMenuApplicationState();
+        mCurrentScene = new GameApplicationState();
         break;
     default:
         GAME_ERROR("Trying to change game state to an unhandled state with ID: {}", static_cast<uint32_t>(state));

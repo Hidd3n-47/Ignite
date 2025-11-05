@@ -77,10 +77,10 @@ public:
     [[nodiscard]] inline mem::WeakRef<TextureManager> GetTextureManager() const { return mem::WeakRef{ mTextureManager }; }
     [[nodiscard]] inline const OrthoCamera& GetCamera() const { return mCamera; }
 
-    //static constexpr uint32_t TARGET_FRAMES = 120;
-    //static constexpr std::chrono::duration<float> TARGET_FRAME_TIME{ 1.0f / TARGET_FRAMES };
+    static constexpr uint32_t TARGET_FRAMES = 120;
+    static constexpr uint64_t TARGET_FRAME_TIME_MS { static_cast<uint64_t>(1000.0 / static_cast<double>(TARGET_FRAMES)) };
 
-    const Vec2 DEFAULT_SCREEN_SIZE{ 1920.0f, 1080.0f };
+    const Vec2 DEFAULT_SCREEN_SIZE{ 1280.0f, 720.0f };
 private:
     Engine()  = default;
     ~Engine() = default;
@@ -99,6 +99,9 @@ private:
     mem::WeakRef<Scene> mSceneToChangeTo;
 
     OrthoCamera mCamera;
+
+    uint64_t mTime;
+    float mDeltaTime { TARGET_FRAME_TIME_MS / 1000.0f };
 };
 
 } // Namespace ignite.
