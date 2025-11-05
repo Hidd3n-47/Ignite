@@ -13,8 +13,8 @@ class TextureManager;
 class UiButton : public IComponent
 {
 public:
-    UiButton(const std::filesystem::path& filePath, const uint32_t spritesheetIndexNonHover = 0, const uint32_t spritesheetIndexOnHover = 0);
-    UiButton(const Texture texture, const uint32_t spritesheetIndexNonHover = 0, const uint32_t spritesheetIndexOnHover = 0);
+    UiButton(const std::filesystem::path& filePath, const std::function<void()>& onClickedEvent = nullptr);
+    UiButton(const Texture texture);
 
     void Update(const float dt) override;
     void Render(const OrthoCamera& camera) override;
@@ -22,9 +22,8 @@ public:
     [[nodiscard]] inline Texture GetTexture() const { return mTexture; }
 private:
     Texture mTexture;
+    std::function<void()> mOnClickedEvent;
 
-    uint32_t mSpritesheetIndexNonHover{ 0 };
-    uint32_t mSpritesheetIndexOnHover{ 0 };
     bool mHovered{ false };
 
     mem::WeakRef<InputManager>   mInputManagerRef;

@@ -1,19 +1,17 @@
 #include "IgnitePch.h"
 #include "UiButton.h"
 
-#include "Defines.h"
 #include "Core/Engine.h"
 #include "EC/GameObject.h"
+#include "Core/Input/Keycode.h"
 #include "Core/Input/InputManager.h"
 #include "Core/Rendering/TextureManager.h"
-
 
 namespace ignite
 {
 
-UiButton::UiButton(const std::filesystem::path& filePath, const uint32_t spritesheetIndexNonHover /*= 0*/, const uint32_t spritesheetIndexOnHover /*= 0*/)
-    : mSpritesheetIndexNonHover(spritesheetIndexNonHover)
-    , mSpritesheetIndexOnHover(spritesheetIndexOnHover)
+UiButton::UiButton(const std::filesystem::path& filePath, const std::function<void()>& onClickedEvent /*= nullptr*/)
+    : mOnClickedEvent(onClickedEvent)
 {
     mTexture = Engine::Instance()->GetTextureManager()->Load(filePath);
 
@@ -21,10 +19,8 @@ UiButton::UiButton(const std::filesystem::path& filePath, const uint32_t sprites
     mTextureManagerRef = Engine::Instance()->GetTextureManager();
 }
 
-UiButton::UiButton(const Texture texture, const uint32_t spritesheetIndexNonHover, const uint32_t spritesheetIndexOnHover)
+UiButton::UiButton(const Texture texture)
     : mTexture(texture)
-    , mSpritesheetIndexNonHover(spritesheetIndexNonHover)
-    , mSpritesheetIndexOnHover(spritesheetIndexOnHover)
 {
     mInputManagerRef   = Engine::Instance()->GetInputManager();
     mTextureManagerRef = Engine::Instance()->GetTextureManager();
@@ -39,6 +35,11 @@ void UiButton::Update(const float dt)
     const Vec2 delta = Vec2::Abs(mousePosition - positionScreenSpace);
 
     mHovered = delta.x <= mTexture.width * 0.5f && delta.y <= mTexture.height * 0.5f;
+
+    if (mHovered && mInputManagerRef->IsMouseDown(Mouse::BUTTON_LEFT) && mOnClickedEvent)
+    {
+        mOnClickedEvent();
+    }
 }
 
 void UiButton::Render(const OrthoCamera& camera)
