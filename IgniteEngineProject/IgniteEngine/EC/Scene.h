@@ -18,7 +18,7 @@ public:
     inline virtual void SceneUpdate() const { }
 
     void Update(const float dt) const;
-    void Render() const;
+    void Render(const OrthoCamera& camera) const;
 
     [[nodiscard]] mem::WeakRef<GameObject> CreateGameObject();
 private:

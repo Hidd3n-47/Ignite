@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Texture.h"
+#include "IgniteEngine/Core/OrthoCamera.h"
+#include "IgniteEngine/EC/Components/Transform.h"
+
 struct SDL_Texture;
 struct SDL_Renderer;
 
@@ -12,9 +16,16 @@ public:
     TextureManager(SDL_Renderer* rendererBackend);
     ~TextureManager();
 
-    [[nodiscard]] uint16_t Load(const std::string& filePath, int width, int height);
+    TextureManager(const TextureManager&)             = delete;
+    TextureManager(TextureManager&&)                  = delete;
+    TextureManager& operator=(TextureManager&&)       = delete;
+    TextureManager& operator=(const TextureManager&)  = delete;
 
-    void RenderSingle(const uint16_t id, Vec2 world, Vec2 scale, const Vec2& dimensions, int sheetX, float angle, bool flip);
+    [[nodiscard]] Texture Load(const std::filesystem::path& filePath);
+
+    void RenderSingle(const Texture texture, mem::WeakRef<Transform> transform, const OrthoCamera& camera);
+    void RenderSingleFromSpriteSheet(const Texture texture, mem::WeakRef<Transform> transform, const OrthoCamera& camera,
+                                     const float x, const float y, const float xMax, const float yMax);
 
     void RemoveTexture(const uint16_t id);
     void RemoveAllTextures();

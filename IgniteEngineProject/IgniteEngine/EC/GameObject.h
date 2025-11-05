@@ -1,5 +1,7 @@
 #pragma once
 
+#include "IgniteEngine/Src/IgnitePch.h"
+
 #include "IgniteEngine/EC/IComponent.h"
 
 namespace ignite
@@ -18,7 +20,7 @@ public:
     ~GameObject();
 
     void Update(const float dt) const;
-    void Render() const;
+    void Render(const OrthoCamera& camera) const;
 
     [[nodiscard]] inline mem::WeakRef<Scene> GetScene() const { return mParent; }
 

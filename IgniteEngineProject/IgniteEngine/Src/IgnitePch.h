@@ -4,6 +4,8 @@
 
 #include <cstdint>
 
+#include <filesystem>
+
 #include <string>
 #include <vector>
 
@@ -20,6 +22,4 @@
 
 #include <IgniteUtils/Core/Ulid.h>
 
-#include "Src/Defines.h"
-
-#include "Math/Vec2.h"
+#include "IgniteEngine/Math/Vec2.h"

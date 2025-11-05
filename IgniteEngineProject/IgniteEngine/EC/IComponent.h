@@ -1,5 +1,9 @@
 #pragma once
 
+#include <IgniteMem/Core/WeakRef.h>
+
+#include "IgniteEngine/Core/OrthoCamera.h"
+
 namespace ignite
 {
 
@@ -18,7 +22,7 @@ public:
     virtual void OnComponentRemoved() { }
 
     virtual void Update(const float dt) { }
-    virtual void Render() { }
+    virtual void Render(const OrthoCamera& camera) { }
 
 protected:
     mem::WeakRef<GameObject> mParent;

@@ -5,6 +5,8 @@
 #include <SDL3/SDL_render.h>
 #include <SDL3_image/SDL_image.h>
 
+#include "Defines.h"
+
 namespace ignite
 {
 TextureManager::TextureManager(SDL_Renderer* rendererBackend)
@@ -30,13 +32,20 @@ TextureManager::~TextureManager()
     RemoveAllTextures();
 }
 
-uint16_t TextureManager::Load(const std::string& filePath, int width, int height)
+Texture TextureManager::Load(const std::filesystem::path& filePath)
 {
-    SDL_Surface* surface = IMG_Load(filePath.c_str());
+    Texture t
+    {
+        .id     = INVALID_ID,
+        .width  = 1.0f,
+        .height = 1.0f
+    };
+
+    SDL_Surface* surface = IMG_Load(filePath.string().c_str());
     if (!surface)
     {
-        DEBUG_ERROR("Failed to load image at path: {}. Error: ", filePath, SDL_GetError());
-        return INVALID_ID;
+        DEBUG_ERROR("Failed to load image at path: {}. Error: {}", filePath.string(), SDL_GetError());
+        return t;
     }
 
     SDL_Texture* texture = SDL_CreateTextureFromSurface(mRendererBackend, surface);
@@ -44,28 +53,46 @@ uint16_t TextureManager::Load(const std::string& filePath, int width, int height
 
     if (!texture)
     {
-        DEBUG_ERROR("Failed to create texture from surface. Error: ", SDL_GetError());
-        return INVALID_ID;
+        DEBUG_ERROR("Failed to create texture from surface. Error: {}", SDL_GetError());
+        return t;
     }
 
     mTextureMap[mId] = texture;
 
-    return mId++;
+    t.id     = mId++;
+    t.width  = static_cast<float>(texture->w);
+    t.height = static_cast<float>(texture->h);
+
+    return t;
 }
 
-void TextureManager::RenderSingle(const uint16_t id, Vec2 world, Vec2 scale, const Vec2& dimensions, int sheetX, float angle, bool flip)
+void TextureManager::RenderSingle(const Texture texture, mem::WeakRef<Transform> transform, const OrthoCamera& camera)
 {
-    SDL_FRect srcRect;
-    SDL_FRect destRect;
+    const Vec2 screenPosition = camera.PositionToScreenSpace(transform->translation);
 
-    srcRect = { 0.0f, 0.0f, dimensions.x, dimensions.y };
-    SDL_FRect r = { floor(world.x), floor(world.y), dimensions.x * scale.x, dimensions.y * scale.y };
-    destRect = r;
+    const SDL_FRect srcRect { 0.0f, 0.0f, texture.width, texture.height };
+    const SDL_FRect destRect{ screenPosition.x - texture.width * 0.5f, screenPosition.y - texture.height * 0.5f, texture.width, texture.height };
 
-    const bool err = SDL_RenderTextureRotated(mRendererBackend, mTextureMap[id], &srcRect, &destRect, angle, nullptr, SDL_FLIP_NONE);
+    const bool err = SDL_RenderTextureRotated(mRendererBackend, mTextureMap[texture.id], &srcRect, &destRect, transform->rotation, nullptr, SDL_FLIP_NONE);
 
     DEBUG(if (!err))
-        DEBUG_ERROR("Failed to render texture with ID: {}. Error: {}", id, SDL_GetError());
+        DEBUG_ERROR("Failed to render texture with ID: {}. Error: {}", texture.id, SDL_GetError());
+}
+
+void TextureManager::RenderSingleFromSpriteSheet(const Texture texture, mem::WeakRef<Transform> transform,
+    const OrthoCamera& camera, const float x, const float y, const float xMax, const float yMax)
+{
+    const Vec2 screenPosition = camera.PositionToScreenSpace(transform->translation);
+
+    const float textureWidth  = texture.width  / xMax;
+    const float textureHeight = texture.height / yMax;
+    const SDL_FRect srcRect{ textureWidth * x, textureHeight * y, textureWidth, textureHeight };
+    const SDL_FRect destRect{ screenPosition.x - textureWidth * 0.5f, screenPosition.y - textureHeight * 0.5f, textureWidth, textureHeight };
+
+    const bool err = SDL_RenderTextureRotated(mRendererBackend, mTextureMap[texture.id], &srcRect, &destRect, transform->rotation, nullptr, SDL_FLIP_NONE);
+
+    DEBUG(if (!err))
+        DEBUG_ERROR("Failed to render texture with ID: {}. Error: {}", texture.id, SDL_GetError());
 }
 
 void TextureManager::RemoveTexture(const uint16_t id)

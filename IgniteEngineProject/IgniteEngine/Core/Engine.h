@@ -21,7 +21,7 @@ class TextureManager;
 class Engine
 {
 public:
-    [[nodiscard]] inline static Engine* Instance() { return mInstance; }
+    [[nodiscard]] inline static mem::WeakRef<Engine> Instance() { return mem::WeakRef{ mInstance }; }
 
     Engine(const Engine&)             = delete;
     Engine(Engine&&)                  = delete;
@@ -33,7 +33,7 @@ public:
      * @note This should only happen once per application lifetime. Returns existing instance if called multiple times.
      * @return The instance of the engine that is created.
      */
-    static Engine* CreateEngine();
+    static mem::WeakRef<Engine> CreateEngine();
 
     /**
      * @brief Initialize the engine and its requirements.
@@ -42,7 +42,7 @@ public:
     /**
      * @brief Run the core gameplay loop of the game.
      */
-    void Run() const;
+    void Run();
     /**
      * @brief Destroy and clean up used resources by the engine.
      */
@@ -61,7 +61,21 @@ public:
      */
     void Render() const;
 
+    /**
+     * @brief Close the game by stopping running of the main run loop.
+     */
     inline void CloseGame() { mRunning = false; }
+
+    /**
+     * @brief Set the scene that will become active in the next frame.
+     * @note: This occurs next frame as the current game object in the scene could be used, therefore only change next frame once nothing is using them.
+     * @param scene A weak reference to the scene that will become active next frame.
+     */
+    inline void SetSceneToChangeTo(const mem::WeakRef<Scene> scene) { mSceneToChangeTo = scene; }
+
+    [[nodiscard]] inline mem::WeakRef<InputManager>   GetInputManager()   const { return mem::WeakRef{ mInputManager }; }
+    [[nodiscard]] inline mem::WeakRef<TextureManager> GetTextureManager() const { return mem::WeakRef{ mTextureManager }; }
+    [[nodiscard]] inline const OrthoCamera& GetCamera() const { return mCamera; }
 
     //static constexpr uint32_t TARGET_FRAMES = 120;
     //static constexpr std::chrono::duration<float> TARGET_FRAME_TIME{ 1.0f / TARGET_FRAMES };

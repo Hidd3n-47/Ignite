@@ -14,6 +14,11 @@ public:
 
     float x = 0.0f, y = 0.0f;
 
+    [[nodiscard]] inline static Vec2 Abs(const Vec2 vec)
+    {
+        return Vec2{ abs(vec.x), abs(vec.y) };
+    }
+
     [[nodiscard]] inline float Magnitude() const
     {
         return sqrt(x * x + y * y);

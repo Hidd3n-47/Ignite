@@ -3,6 +3,8 @@
 
 #include <SDL3/SDL_render.h>
 
+#include "Defines.h"
+
 namespace ignite
 {
 

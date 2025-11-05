@@ -3,6 +3,7 @@
 
 #include <SDL3/SDL.h>
 
+#include "Defines.h"
 #include "EC/Scene.h"
 #include "Core/Input/InputManager.h"
 #include "Core/Rendering/Renderer.h"
@@ -13,22 +14,20 @@ namespace ignite
 
 Engine* Engine::mInstance = nullptr;
 
-static uint16_t i;
-
-Engine* Engine::CreateEngine()
+mem::WeakRef<Engine> Engine::CreateEngine()
 {
     if (mInstance)
     {
         DEBUG_ERROR("Failed to create engine as engine has already been created!");
         DEBUG_BREAK();
 
-        return mInstance;
+        return mem::WeakRef{ mInstance };
     }
 
     mInstance = new Engine();
     DEBUG_INFO("Successfully created Ignite Engine.");
 
-    return mInstance;
+    return mem::WeakRef{ mInstance };
 }
 
 void Engine::Init()
@@ -64,18 +63,18 @@ void Engine::Init()
     mRenderer = new Renderer(mWindow);
 
     mTextureManager = new TextureManager(mRenderer->GetRendererBackend());
-    i = mTextureManager->Load("E:/Programming/Ignite/Assets/car_24px_8way_blue_1.png", 24, 24);
 
     mRunning = true;
 }
 
-void Engine::Run() const
+void Engine::Run()
 {
     while (mRunning)
     {
         mInputManager->Poll();
 
         Update();
+        PostUpdate();
         Render();
     }
 }
@@ -90,6 +89,7 @@ void Engine::Destroy() const
     delete mInputManager;
 
     delete mInstance;
+    mInstance = nullptr;
 
     DEBUG_INFO("Successfully destroyed Ignite Engine.");
 }
@@ -107,6 +107,9 @@ void Engine::PostUpdate()
     if (mSceneToChangeTo.IsRefValid())
     {
         mActiveScene = mSceneToChangeTo;
+        mActiveScene->InitScene();
+
+        mSceneToChangeTo.Invalidate();
     }
 }
 
@@ -116,10 +119,8 @@ void Engine::Render() const
 
     if (mActiveScene.IsRefValid())
     {
-        mActiveScene->Render();
+        mActiveScene->Render(mCamera);
     }
-
-    mTextureManager->RenderSingle(i, Vec2{ 0.0f, 0.0f }, Vec2{ 1.0f, 1.0f }, Vec2{ 24.0f, 24.0f }, 0, 0.0f, false);
 
     mRenderer->EndRender();
 }

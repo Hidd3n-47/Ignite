@@ -31,11 +31,11 @@ void GameObject::Update(const float dt) const
     }
 }
 
-void GameObject::Render() const
+void GameObject::Render(const OrthoCamera& camera) const
 {
     for (IComponent* component : mComponents)
     {
-        component->Render();
+        component->Render(camera);
     }
 }
 
