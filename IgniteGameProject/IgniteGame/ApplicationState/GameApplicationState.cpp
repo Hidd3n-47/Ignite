@@ -5,10 +5,12 @@
 #include <IgniteEngine/Core/Input/Keycode.h>
 #include <IgniteEngine/Core/Input/InputManager.h>
 
+#include <IgniteEngine/EC/Components/UiText.h>
 #include <IgniteEngine/EC/Components/Transform.h>
+#include <IgniteEngine/EC/Components/RaceTimer.h>
+#include <IgniteEngine/EC/Components/BoxCollider.h>
 #include <IgniteEngine/EC/Components/SpriteRenderer.h>
 #include <IgniteEngine/EC/Components/RaceStartCountdown.h>
-#include <IgniteEngine/EC/Components/BoxCollider.h>
 
 #include "Src/Defines.h"
 #include "Level/LevelParser.h"
@@ -33,7 +35,14 @@ void GameApplicationState::InitScene()
     mPlayer->AddComponent<SpriteRenderer>("E:/Programming/Ignite/Assets/car_24px_8way_blue_1.png", 2);
     mPlayer->AddComponent<BoxCollider>(Vec2{0.2f, 0.1f }, true)->SetOffset(Vec2{0, -0.05f});
 
-    mRaceCountdown = CreateGameObject()->AddComponent<RaceStartCountdown>(3.9f, [&] { ChangeGameState(GameState::RACING); });
+    mem::WeakRef<GameObject> raceCountdownObject = CreateGameObject();
+    mem::WeakRef<UiText> raceCountdownText = raceCountdownObject->AddComponent<UiText>("Testing", 600.0f);
+    mRaceCountdown = raceCountdownObject->AddComponent<RaceStartCountdown>(raceCountdownText, 3.9f, [&] { ChangeGameState(GameState::RACING); });
+
+    mem::WeakRef<GameObject> raceTimerObject = CreateGameObject();
+    raceTimerObject->GetComponent<Transform>()->translation = Vec2{ -7.5f, 4.2f };
+
+    mRaceTimer = raceTimerObject->AddComponent<RaceTimer>(50.0);
 
     ChangeGameState(GameState::RACE_COUNTDOWN);
 }
@@ -81,6 +90,7 @@ void GameApplicationState::ChangeGameState(const GameState state)
     case GameState::RACING:
         GAME_LOG("Changed to game state: RACING");
         input = true;
+        mRaceTimer->StartTimer();
         break;
     default:
         GAME_ERROR("Trying to change game state to unprocessed state.");

@@ -1,0 +1,50 @@
+#include "IgnitePch.h"
+#include "RaceTimer.h"
+
+#include "Core/Engine.h"
+#include "EC/GameObject.h"
+#include "Core/Rendering/FontRenderer.h"
+
+namespace ignite
+{
+
+RaceTimer::RaceTimer(const float size)
+    : mSize(size)
+{
+    mFontRendererRef = Engine::Instance()->GetFontRenderer();
+}
+
+void RaceTimer::OnComponentAdded(const mem::WeakRef<GameObject> parent)
+{
+    IComponent::OnComponentAdded(parent);
+
+    mId = mFontRendererRef->CreateFont("E:/Programming/Ignite/Assets/Fonts/ThaleahFat.ttf", mSize, "0.0", mParent->GetComponent<Transform>());
+}
+
+void RaceTimer::OnComponentRemoved()
+{
+    mFontRendererRef->RemoveFont(mId);
+}
+
+void RaceTimer::Update(const float dt)
+{
+    if (!mTimerStarted)
+    {
+        return;
+    }
+
+    mTimer += dt;
+
+    const uint32_t t10 = static_cast<uint32_t>(mTimer * 10.0f);
+
+    mFontRendererRef->UpdateFont(mId, std::format("{:1}", static_cast<float>(t10) / 10.0f));
+}
+
+void RaceTimer::StartTimer()
+{
+    mTimer = 0.0f;
+
+    mTimerStarted = true;
+}
+
+} // Namespace ignite.

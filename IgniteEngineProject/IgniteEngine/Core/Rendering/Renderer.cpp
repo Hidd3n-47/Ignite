@@ -35,7 +35,6 @@ void Renderer::StartRender() const
 
 void Renderer::Render(const OrthoCamera& camera)
 {
-    // loop through and render the commands.
     for (const std::vector<mem::WeakRef<RenderCommand>>& layerCommands : mCommands | std::views::values)
     {
         for (const mem::WeakRef<RenderCommand> command : layerCommands)

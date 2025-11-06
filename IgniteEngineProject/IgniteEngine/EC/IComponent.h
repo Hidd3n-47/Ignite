@@ -24,6 +24,7 @@ public:
     virtual void Update(const float dt) { }
     virtual void Render(mem::WeakRef<Renderer> renderer) { }
 
+    [[nodiscard]] inline mem::WeakRef<GameObject> GetParent() const { return mParent; }
 protected:
     mem::WeakRef<GameObject> mParent;
 };

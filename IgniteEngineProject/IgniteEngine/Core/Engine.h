@@ -12,6 +12,7 @@ namespace ignite
 
 class Scene;
 class Renderer;
+class FontRenderer;
 class InputManager;
 class TextureManager;
 class CollisionHandler;
@@ -75,6 +76,7 @@ public:
     inline void SetSceneToChangeTo(const mem::WeakRef<Scene> scene) { mSceneToChangeTo = scene; }
 
     [[nodiscard]] inline mem::WeakRef<InputManager>     GetInputManager()     const { return mem::WeakRef{ mInputManager }; }
+    [[nodiscard]] inline mem::WeakRef<FontRenderer>     GetFontRenderer()     const { return mem::WeakRef{ mFontRenderer }; }
     [[nodiscard]] inline mem::WeakRef<TextureManager>   GetTextureManager()   const { return mem::WeakRef{ mTextureManager }; }
     [[nodiscard]] inline mem::WeakRef<CollisionHandler> GetCollisionHandler() const { return mem::WeakRef{ mCollisionHandler }; }
     [[nodiscard]] inline const OrthoCamera& GetCamera() const { return mCamera; }
@@ -92,6 +94,7 @@ private:
 
     bool mRunning = false;
 
+    FontRenderer*     mFontRenderer;
     InputManager*     mInputManager;
     TextureManager*   mTextureManager;
     CollisionHandler* mCollisionHandler;

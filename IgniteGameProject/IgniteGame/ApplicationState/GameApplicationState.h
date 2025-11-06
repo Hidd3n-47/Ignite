@@ -7,6 +7,8 @@
 
 namespace ignite
 {
+
+class RaceTimer;
 class InputManager;
 class RaceStartCountdown;
 
@@ -37,10 +39,10 @@ public:
 private:
     LevelState mCurrentLevel;
 
-    mem::WeakRef<GameObject> mPlayer;
+    mem::WeakRef<GameObject>         mPlayer;
     mem::WeakRef<RaceStartCountdown> mRaceCountdown;
-
-    mem::WeakRef<InputManager> mInputManager;
+    mem::WeakRef<RaceTimer>          mRaceTimer;
+    mem::WeakRef<InputManager>       mInputManager;
 };
 
 } // Namespace ignite.
