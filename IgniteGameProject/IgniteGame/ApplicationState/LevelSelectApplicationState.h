@@ -5,10 +5,11 @@
 namespace ignite
 {
 
-class MainMenuApplicationState : public Scene
+class LevelSelectApplicationState : public Scene
 {
 public:
     void InitScene() override;
+    void SceneUpdate() const override;
 };
 
 } // Namespace ignite.

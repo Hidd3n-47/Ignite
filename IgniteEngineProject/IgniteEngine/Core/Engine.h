@@ -80,7 +80,8 @@ public:
     static constexpr uint32_t TARGET_FRAMES = 120;
     static constexpr uint64_t TARGET_FRAME_TIME_MS{ static_cast<uint64_t>(1000.0 / static_cast<double>(TARGET_FRAMES)) };
 
-    const Vec2 DEFAULT_SCREEN_SIZE{ 1280.0f, 720.0f };
+    //const Vec2 DEFAULT_SCREEN_SIZE{ 1280.0f, 720.0f };
+    const Vec2 DEFAULT_SCREEN_SIZE{ 1920.0f, 1080.0f };
 private:
     Engine()  = default;
     ~Engine() = default;

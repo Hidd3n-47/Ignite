@@ -7,6 +7,7 @@
 
 #include "ApplicationState/GameApplicationState.h"
 #include "ApplicationState/MainMenuApplicationState.h"
+#include "ApplicationState/LevelSelectApplicationState.h"
 
 namespace ignite
 {
@@ -53,6 +54,10 @@ void GameManager::ChangeState(const ApplicationStates state)
     case ApplicationStates::MAIN_MENU:
         GAME_LOG("Updated Application State: MAIN_MENU");
         mCurrentScene = new MainMenuApplicationState();
+        break;
+    case ApplicationStates::LEVE_SELECT:
+        GAME_LOG("Updated Application State: LEVEL_SELECT");
+        mCurrentScene = new LevelSelectApplicationState();
         break;
     case ApplicationStates::GAME:
         GAME_LOG("Updated Application State: GAME");

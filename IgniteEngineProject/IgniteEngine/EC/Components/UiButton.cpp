@@ -10,10 +10,10 @@
 namespace ignite
 {
 
-UiButton::UiButton(const std::filesystem::path& filePath)
+UiButton::UiButton(const std::filesystem::path& filePath, const bool hasPressedAnimation)
 {
     mRenderCommand.texture         = Engine::Instance()->GetTextureManager()->Load(filePath);
-    mRenderCommand.spritesheetMaxX = 2;
+    mRenderCommand.spritesheetMaxX = hasPressedAnimation ? 2 : 1;
 
     mInputManagerRef   = Engine::Instance()->GetInputManager();
 }
@@ -67,7 +67,7 @@ void UiButton::Update(const float dt)
 
 void UiButton::Render(mem::WeakRef<Renderer> renderer)
 {
-    mRenderCommand.spritesheetPosX = static_cast<float>(mMouseDown);
+    mRenderCommand.spritesheetPosX = std::min(static_cast<float>(mMouseDown),mRenderCommand.spritesheetMaxX - 1);
     renderer->AddRenderCommand(0, mem::WeakRef{ &mRenderCommand });
 }
 

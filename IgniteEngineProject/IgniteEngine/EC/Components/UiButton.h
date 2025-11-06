@@ -13,7 +13,7 @@ class TextureManager;
 class UiButton : public IComponent
 {
 public:
-    UiButton(const std::filesystem::path& filePath);
+    UiButton(const std::filesystem::path& filePath, const bool hasPressedAnimation = false);
 
     void OnComponentAdded(const mem::WeakRef<GameObject> parent) override;
 
