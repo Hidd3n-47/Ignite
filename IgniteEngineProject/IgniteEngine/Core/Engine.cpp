@@ -7,6 +7,7 @@
 #include "EC/Scene.h"
 #include "Core/Input/InputManager.h"
 #include "Core/Rendering/Renderer.h"
+#include "Physics/CollisionHandler.h"
 #include "Core/Rendering/TextureManager.h"
 
 namespace ignite
@@ -64,6 +65,8 @@ void Engine::Init()
     mTextureManager = new TextureManager(mRenderer->GetRendererBackend());
     mRenderer->SetTextureManagerRef(mem::WeakRef{ mTextureManager });
 
+    mCollisionHandler = new CollisionHandler();
+
     mRunning = true;
 }
 
@@ -77,6 +80,9 @@ void Engine::Run()
 
         Update();
         PostUpdate();
+
+        mCollisionHandler->Update();
+
         Render();
 
 #ifdef DEV_CONFIGURATION
@@ -90,6 +96,8 @@ void Engine::Run()
 
 void Engine::Destroy() const
 {
+    delete mCollisionHandler;
+
     delete mTextureManager;
     delete mRenderer;
 
@@ -139,13 +147,13 @@ void Engine::Render() const
 
 void Engine::StartFrame()
 {
-    mStart = SDL_GetPerformanceCounter();
+    mStartFrameTime = SDL_GetPerformanceCounter();
 }
 
 void Engine::EndFrame()
 {
     const uint64_t now = SDL_GetPerformanceCounter();
-    const uint64_t startEndDelta = (now - mStart) / SDL_GetPerformanceFrequency() ;
+    const uint64_t startEndDelta = (now - mStartFrameTime) / SDL_GetPerformanceFrequency() ;
 
     const uint64_t targetDelta = TARGET_FRAME_TIME_MS - startEndDelta;
 
@@ -155,7 +163,7 @@ void Engine::EndFrame()
     }
 
     const uint64_t afterDelay = SDL_GetPerformanceCounter();
-    mDeltaTime = static_cast<float>(afterDelay - mStart) / static_cast<float>(SDL_GetPerformanceFrequency());
+    mDeltaTime = static_cast<float>(afterDelay - mStartFrameTime) / static_cast<float>(SDL_GetPerformanceFrequency());
 }
 
 } // Namespace ignite.

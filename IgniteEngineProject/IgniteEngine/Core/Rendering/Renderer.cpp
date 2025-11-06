@@ -40,11 +40,32 @@ void Renderer::Render(const OrthoCamera& camera)
     {
         for (const mem::WeakRef<RenderCommand> command : layerCommands)
         {
+
+#ifdef DEV_CONFIGURATION
+            if (command->debugSquare)
+            {
+                const Vec2 debugScreenPos = camera.PositionToScreenSpace(command->transform->translation + command->debugSquareOffset);
+                const Vec2 debugBoxHalfExtentsScreen = camera.SizeInScreenSpace(command->debugSquareHalfExtents);
+
+                const SDL_FRect destRect =
+                {
+                    .x = debugScreenPos.x - debugBoxHalfExtentsScreen.x,
+                    .y = debugScreenPos.y - debugBoxHalfExtentsScreen.y,
+                    .w = 2.0f * debugBoxHalfExtentsScreen.x,
+                    .h = 2.0f * debugBoxHalfExtentsScreen.y
+                };
+
+                SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
+                SDL_RenderRect(mRenderer, &destRect);
+
+                continue;
+            }
+#endif // DEV_CONFIGURATION.
+
             const Vec2 screenPosition = camera.PositionToScreenSpace(command->transform->translation);
 
-            // todo look at possibly storing this info into texture to prevent per frame calculations below.
-            const float srcTextureWidth  = command->texture.width  / command->spritesheetMaxX;
-            const float srcTextureHeight = command->texture.height / command->spritesheetMaxY;
+            const float srcTextureWidth  = command->texture.width;
+            const float srcTextureHeight = command->texture.height;
             const float textureWidth     = srcTextureWidth  * command->transform->scale.x;
             const float textureHeight    = srcTextureHeight * command->transform->scale.y;
 

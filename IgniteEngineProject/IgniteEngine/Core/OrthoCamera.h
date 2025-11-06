@@ -5,7 +5,7 @@ namespace ignite
 
 struct OrthoCameraValues
 {
-    float left, right, top, bottom;
+    float left = -8.0f, right = 8.0f, top = 4.5f, bottom = 4.5f;
     Vec2 screenDimensions;
 };
 

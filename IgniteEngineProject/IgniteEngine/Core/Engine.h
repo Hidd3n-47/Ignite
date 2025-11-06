@@ -14,6 +14,7 @@ class Scene;
 class Renderer;
 class InputManager;
 class TextureManager;
+class CollisionHandler;
 
 /**
  * @class Engine: The engine class is responsible for the game logic and the running of the game.
@@ -73,8 +74,9 @@ public:
      */
     inline void SetSceneToChangeTo(const mem::WeakRef<Scene> scene) { mSceneToChangeTo = scene; }
 
-    [[nodiscard]] inline mem::WeakRef<InputManager>   GetInputManager()   const { return mem::WeakRef{ mInputManager }; }
-    [[nodiscard]] inline mem::WeakRef<TextureManager> GetTextureManager() const { return mem::WeakRef{ mTextureManager }; }
+    [[nodiscard]] inline mem::WeakRef<InputManager>     GetInputManager()     const { return mem::WeakRef{ mInputManager }; }
+    [[nodiscard]] inline mem::WeakRef<TextureManager>   GetTextureManager()   const { return mem::WeakRef{ mTextureManager }; }
+    [[nodiscard]] inline mem::WeakRef<CollisionHandler> GetCollisionHandler() const { return mem::WeakRef{ mCollisionHandler }; }
     [[nodiscard]] inline const OrthoCamera& GetCamera() const { return mCamera; }
 
     static constexpr uint32_t TARGET_FRAMES = 120;
@@ -90,8 +92,9 @@ private:
 
     bool mRunning = false;
 
-    InputManager*   mInputManager;
-    TextureManager* mTextureManager;
+    InputManager*     mInputManager;
+    TextureManager*   mTextureManager;
+    CollisionHandler* mCollisionHandler;
 
     SDL_Window*   mWindow   = nullptr;
     Renderer*     mRenderer = nullptr;
@@ -103,8 +106,9 @@ private:
 
     void StartFrame();
     void EndFrame();
-    uint64_t mStart;
-    float mDeltaTime { TARGET_FRAME_TIME_MS / 1000.0f };
+
+    uint64_t mStartFrameTime{ 0 };
+    float    mDeltaTime { TARGET_FRAME_TIME_MS / 1000.0f };
 };
 
 } // Namespace ignite.

@@ -17,6 +17,12 @@ public:
     {
         return abs(lhs - rhs) < epsilon;
     }
+
+    template <typename T>
+    inline static T Sign(const T value)
+    {
+        return value < static_cast<T>(0) ? static_cast<T>(-1) : static_cast<T>(1);
+    }
 };
 
 } // Namespace ignite.

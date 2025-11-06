@@ -43,6 +43,11 @@ public:
         return lhs.x * rhs.x + lhs.y * rhs.y;
     }
 
+    [[nodiscard]] constexpr inline bool operator>(const Vec2& rhs) const
+    {
+        return x > rhs.x && y > rhs.y;
+    }
+
     [[nodiscard]] constexpr inline Vec2 operator+(const Vec2 rhs) const
     {
         return Vec2{ x + rhs.x, y + rhs.y };

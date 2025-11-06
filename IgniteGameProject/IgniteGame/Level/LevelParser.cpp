@@ -4,6 +4,7 @@
 
 #include <IgniteEngine/EC/Scene.h>
 #include <IgniteEngine/EC/Components/Transform.h>
+#include <IgniteEngine/EC/Components/BoxCollider.h>
 #include <IgniteEngine/EC/Components/SpriteRenderer.h>
 
 #include <IgniteEngine/Core/Engine.h>
@@ -50,7 +51,9 @@ void LevelParser::LoadLevel(mem::WeakRef<Scene> scene, mem::WeakRef<GameObject> 
     std::vector<std::string> lines;
     std::string line;
 
-    std::string levelFiles[2] = { "Track.csv", "BG.csv" };
+    const std::string levelFiles[2] = { "Track.csv", "BG.csv" };
+
+    const OrthoCamera& camera = Engine::Instance()->GetCamera();
 
     uint32_t layer = 0;
     for (const std::string& levelFile : levelFiles)
@@ -109,9 +112,24 @@ void LevelParser::LoadLevel(mem::WeakRef<Scene> scene, mem::WeakRef<GameObject> 
                 transform->scale = Vec2{ scalingFactor, scalingFactor };
                 transform->translation = position;
 
-                if (tileId == START_LINE_TEXTURE_ID)
+                const bool startLine = tileId == START_LINE_TEXTURE_ID;
+
+                if (startLine)
                 {
                     player->GetComponent<Transform>()->translation = position;
+                }
+
+                if (mSpritesheetIdToCollisionInfo.contains(tileId))
+                {
+                    CollisionInfoRect rect = mSpritesheetIdToCollisionInfo[tileId];
+
+                    const Vec2 centre = Vec2{ rect.x + rect.w * 0.5f, rect.y + rect.h * 0.5f };
+                    const Vec2 offset = centre - Vec2{ tileSize * 0.5f };
+                    const Vec2 centreWorld = camera.ScreenSizeToWorldSize(offset);
+
+                    const Vec2 sizeWorld = camera.ScreenSizeToWorldSize(Vec2{ rect.w, rect.h });
+
+                    gameObject->AddComponent<BoxCollider>(sizeWorld, false, startLine)->SetOffset(Vec2{ centreWorld.x, -centreWorld.y });
                 }
             }
             ++y;

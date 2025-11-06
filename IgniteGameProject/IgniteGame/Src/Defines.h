@@ -9,10 +9,10 @@
 #define GAME_WARN(...)  ignite::Log::Warn("IgniteGame", __VA_ARGS__)
 #define GAME_ERROR(...) ignite::Log::Error("IgniteGame", __VA_ARGS__)
 #else  // DEV_CONFIGURATION.
-#define GAME_DEBUG_BREAK()
+#define GAME_BREAK()
 #define GAME_DEBUG(...)
-#define DEBUG_LOG(...)
-#define DEBUG_INFO(...)
-#define DEBUG_WARN(...)
-#define DEBUG_ERROR(...)
+#define GAME_LOG(...)
+#define GAME_INFO(...)
+#define GAME_WARN(...)
+#define GAME_ERROR(...)
 #endif // ! DEV_CONFIGURATION.

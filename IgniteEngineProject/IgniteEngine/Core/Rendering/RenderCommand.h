@@ -17,6 +17,12 @@ struct RenderCommand
     float spritesheetMaxY = 1;
 
     mem::WeakRef<Transform> transform;
+
+#ifdef DEV_CONFIGURATION
+    bool debugSquare;
+    Vec2 debugSquareOffset;
+    Vec2 debugSquareHalfExtents;
+#endif // DEV_CONFIGURATION.
 };
 
 } // Namespace ignite.

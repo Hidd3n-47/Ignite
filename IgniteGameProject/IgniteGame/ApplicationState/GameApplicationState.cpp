@@ -8,6 +8,7 @@
 #include <IgniteEngine/EC/Components/Transform.h>
 #include <IgniteEngine/EC/Components/SpriteRenderer.h>
 #include <IgniteEngine/EC/Components/RaceStartCountdown.h>
+#include <IgniteEngine/EC/Components/BoxCollider.h>
 
 #include "Src/Defines.h"
 #include "Level/LevelParser.h"
@@ -30,6 +31,7 @@ void GameApplicationState::InitScene()
 
     mPlayer->GetComponent<Transform>()->scale = Vec2{ 2.0f };
     mPlayer->AddComponent<SpriteRenderer>("E:/Programming/Ignite/Assets/car_24px_8way_blue_1.png", 2);
+    mPlayer->AddComponent<BoxCollider>(Vec2{0.2f, 0.1f }, true)->SetOffset(Vec2{0, -0.05f});
 
     mRaceCountdown = CreateGameObject()->AddComponent<RaceStartCountdown>(3.9f, [&] { ChangeGameState(GameState::RACING); });
 

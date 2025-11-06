@@ -207,9 +207,8 @@ uint32_t XmlSerializer::RecursivelyDeserializeDocument(const std::vector<std::st
             (*previousElement)->AddChild(tag, attributeString);
             break;
         case LineType::VERSION_LINE:
-            // Nothing needs to happen with version number so just pop out and increment i.
-            // Return 'i' here so when we pop out of the recursion, the '++i' of the for-loop will move to the line after the closing tag.
-            return i;
+            // The version line is the first line. Since its just like a comment, recursively search from the next starting index.
+            return RecursivelyDeserializeDocument(lines, previousElement, startingIndex + 1);
         default:
             break;
         }
@@ -236,7 +235,7 @@ XmlSerializer::LineType XmlSerializer::GetLineType(const std::string& line, std:
     const size_t lessThanPosition       = line.find(LESS_THAN_CHARACTER);
     const size_t greaterThanPosition    = line.find(GREATER_THAN_CHARACTER);
 
-    if (line[lessThanPosition + 1] == line[greaterThanPosition - 1] == QUESTION_MARK_CHARACTER)
+    if (line[lessThanPosition + 1] == line[greaterThanPosition - 1] && line[greaterThanPosition - 1] == QUESTION_MARK_CHARACTER)
     {
         return LineType::VERSION_LINE;
     }
