@@ -14,6 +14,7 @@ enum class ApplicationStates : uint8_t
     MAIN_MENU,
     LEVE_SELECT,
     GAME,
+    REWARDS
 };
 
 class GameManager

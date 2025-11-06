@@ -7,7 +7,9 @@
 
 #include <IgniteEngine/EC/Components/Transform.h>
 #include <IgniteEngine/EC/Components/SpriteRenderer.h>
+#include <IgniteEngine/EC/Components/RaceStartCountdown.h>
 
+#include "Src/Defines.h"
 #include "Level/LevelParser.h"
 
 namespace ignite
@@ -23,10 +25,19 @@ void GameApplicationState::InitScene()
 
     mPlayer->GetComponent<Transform>()->scale = Vec2{ 2.0f };
     mPlayer->AddComponent<SpriteRenderer>("E:/Programming/Ignite/Assets/car_24px_8way_blue_1.png");
+
+    mRaceCountdown = CreateGameObject()->AddComponent<RaceStartCountdown>(3.9f, [&] { ChangeGameState(GameState::RACING); });
+
+    ChangeGameState(GameState::RACE_COUNTDOWN);
 }
 
 void GameApplicationState::SceneUpdate() const
 {
+    if (!input)
+    {
+        return;
+    }
+
     Vec2 direction;
     if (mInputManager->IsKeyDown(Keycode::KEY_W))
     {
@@ -52,4 +63,22 @@ void GameApplicationState::SceneUpdate() const
     mPlayer->GetComponent<Transform>()->translation += direction * speed;
 }
 
+void GameApplicationState::ChangeGameState(const GameState state)
+{
+    switch (state)
+    {
+    case GameState::RACE_COUNTDOWN:
+        GAME_LOG("Changed to game state: RACE_COUNTDOWN");
+        mRaceCountdown->StartTimer();
+        break;
+    case GameState::RACING:
+        GAME_LOG("Changed to game state: RACING");
+        input = true;
+        break;
+    default:
+        GAME_ERROR("Trying to change game state to unprocessed state.");
+        GAME_BREAK();
+        break;
+    }
+}
 } // Namespace ignite.

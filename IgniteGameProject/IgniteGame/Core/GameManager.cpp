@@ -63,6 +63,9 @@ void GameManager::ChangeState(const ApplicationStates state)
         GAME_LOG("Updated Application State: GAME");
         mCurrentScene = new GameApplicationState();
         break;
+    case ApplicationStates::REWARDS:
+
+        break;
     default:
         GAME_ERROR("Trying to change game state to an unhandled state with ID: {}", static_cast<uint32_t>(state));
         break;
