@@ -57,10 +57,10 @@ void Renderer::Render(const OrthoCamera& camera)
             };
             const SDL_FRect destRect
             {
-                .x = screenPosition.x - textureWidth  * 0.5f * command->transform->scale.x,
-                .y = screenPosition.y - textureHeight * 0.5f * command->transform->scale.y,
-                .w = textureWidth  * command->transform->scale.x,
-                .h = textureHeight * command->transform->scale.y
+                .x = screenPosition.x - textureWidth  * 0.5f,
+                .y = screenPosition.y - textureHeight * 0.5f,
+                .w = textureWidth,
+                .h = textureHeight
             };
 
             const bool err = SDL_RenderTextureRotated(mRenderer, mTextureManagerRef->mTextureMap[command->texture.id], &srcRect, &destRect, command->transform->rotation, nullptr, SDL_FLIP_NONE);
