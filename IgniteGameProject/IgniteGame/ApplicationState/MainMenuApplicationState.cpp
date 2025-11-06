@@ -8,7 +8,6 @@
 #include <IgniteEngine/EC/Components/Transform.h>
 
 #include "Core/GameManager.h"
-#include "IgniteEngine/Src/Defines.h"
 
 namespace ignite
 {

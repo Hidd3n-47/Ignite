@@ -2,7 +2,7 @@
 
 #include "IgniteEngine/EC/IComponent.h"
 
-#include "IgniteEngine/Core/Rendering/Texture.h"
+#include "IgniteEngine/Core/Rendering/RenderCommand.h"
 
 namespace ignite
 {
@@ -15,17 +15,17 @@ class UiButton : public IComponent
 public:
     UiButton(const std::filesystem::path& filePath);
 
+    void OnComponentAdded(const mem::WeakRef<GameObject> parent) override;
+
     void Update(const float dt) override;
-    void Render(const OrthoCamera& camera) override;
+    void Render(mem::WeakRef<Renderer> renderer) override;
 
     inline void SetOnHoveredEvent(const std::function<void(mem::WeakRef<GameObject>)>& onHoveredCallback)           { mOnHoveredEvent       = onHoveredCallback; }
     inline void SetOnRestingStateEvent(const std::function<void(mem::WeakRef<GameObject>)>& onRestingStateCallback) { mOnRestingStateEvent  = onRestingStateCallback; }
     inline void SetOnButtonPressedEvent(const std::function<void()>& onButtonPressedCallback)                       { mOnButtonPressedEvent = onButtonPressedCallback; }
 
-    [[nodiscard]] inline Texture GetTexture() const { return mTexture; }
-    int index = 0;
 private:
-    Texture mTexture;
+    RenderCommand mRenderCommand{ };
 
     std::function<void(mem::WeakRef<GameObject>)> mOnHoveredEvent;
     std::function<void(mem::WeakRef<GameObject>)> mOnRestingStateEvent;
@@ -35,7 +35,6 @@ private:
     bool mMouseDown{ false };
 
     mem::WeakRef<InputManager>   mInputManagerRef;
-    mem::WeakRef<TextureManager> mTextureManagerRef;
 };
 
 } // Namespace ignite.

@@ -12,6 +12,7 @@ namespace ignite
 
 class TextureManager
 {
+    friend class Renderer;
 public:
     TextureManager(SDL_Renderer* rendererBackend);
     ~TextureManager();
@@ -22,10 +23,6 @@ public:
     TextureManager& operator=(const TextureManager&)  = delete;
 
     [[nodiscard]] Texture Load(const std::filesystem::path& filePath);
-
-    void RenderSingle(const Texture texture, mem::WeakRef<Transform> transform, const OrthoCamera& camera);
-    void RenderSingleFromSpriteSheet(const Texture texture, mem::WeakRef<Transform> transform, const OrthoCamera& camera,
-                                     const float x, const float y, const float xMax, const float yMax);
 
     void RemoveTexture(const uint16_t id);
     void RemoveAllTextures();

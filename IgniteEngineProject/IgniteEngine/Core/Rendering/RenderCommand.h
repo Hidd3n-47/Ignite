@@ -1,0 +1,22 @@
+#pragma once
+
+#include "IgniteEngine/Core/Rendering/Texture.h"
+
+namespace ignite
+{
+
+class Transform;
+
+struct RenderCommand
+{
+    Texture texture{ };
+
+    float spritesheetPosX = 0;
+    float spritesheetPosY = 0;
+    float spritesheetMaxX = 1;
+    float spritesheetMaxY = 1;
+
+    mem::WeakRef<Transform> transform;
+};
+
+} // Namespace ignite.

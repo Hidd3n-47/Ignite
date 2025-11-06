@@ -10,14 +10,19 @@ namespace ignite
 
 SpriteRenderer::SpriteRenderer(const std::filesystem::path& filePath)
 {
-    mTexture = Engine::Instance()->GetTextureManager()->Load(filePath);
-
-    mTextureManagerRef = Engine::Instance()->GetTextureManager();
+    mRenderCommand.texture = Engine::Instance()->GetTextureManager()->Load(filePath);
 }
 
-void SpriteRenderer::Render(const OrthoCamera& camera)
+void SpriteRenderer::OnComponentAdded(const mem::WeakRef<GameObject> parent)
 {
-    mTextureManagerRef->RenderSingle(mTexture, mParent->GetComponent<Transform>(), camera);
+    IComponent::OnComponentAdded(parent);
+
+    mRenderCommand.transform = mParent->GetComponent<Transform>();
+}
+
+void SpriteRenderer::Render(mem::WeakRef<Renderer> renderer)
+{
+    renderer->AddRenderCommand(0, mem::WeakRef{ &mRenderCommand });
 }
 
 } // Namespace ignite.

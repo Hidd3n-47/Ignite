@@ -20,11 +20,11 @@ void Scene::Update(const float dt) const
     }
 }
 
-void Scene::Render(const OrthoCamera& camera) const
+void Scene::Render(mem::WeakRef<Renderer> renderer) const
 {
     for (const GameObject* gameObject : mGameObjects)
     {
-        gameObject->Render(camera);
+        gameObject->Render(renderer);
     }
 }
 

@@ -34,6 +34,7 @@ TextureManager::~TextureManager()
 
 Texture TextureManager::Load(const std::filesystem::path& filePath)
 {
+    //todo need to make it that texture manager maps filepath to texture id to prevent reloading same texture.
     Texture t
     {
         .id     = INVALID_ID,
@@ -64,40 +65,6 @@ Texture TextureManager::Load(const std::filesystem::path& filePath)
     t.height = static_cast<float>(texture->h);
 
     return t;
-}
-
-
-// todo change this to be render commands
-    // render commands will be a class that just contains information about the render, such as spritesheet info,
-    // location, rotation, scale, LAYER. this can then be added to a queue and processed from there.
-
-void TextureManager::RenderSingle(const Texture texture, mem::WeakRef<Transform> transform, const OrthoCamera& camera)
-{
-    const Vec2 screenPosition = camera.PositionToScreenSpace(transform->translation);
-
-    const SDL_FRect srcRect { 0.0f, 0.0f, texture.width, texture.height };
-    const SDL_FRect destRect{ screenPosition.x - texture.width * 0.5f * transform->scale.x, screenPosition.y - texture.height * 0.5f * transform->scale.y, texture.width * transform->scale.x, texture.height * transform->scale.y };
-
-    const bool err = SDL_RenderTextureRotated(mRendererBackend, mTextureMap[texture.id], &srcRect, &destRect, transform->rotation, nullptr, SDL_FLIP_NONE);
-
-    DEBUG(if (!err))
-        DEBUG_ERROR("Failed to render texture with ID: {}. Error: {}", texture.id, SDL_GetError());
-}
-
-void TextureManager::RenderSingleFromSpriteSheet(const Texture texture, mem::WeakRef<Transform> transform,
-    const OrthoCamera& camera, const float x, const float y, const float xMax, const float yMax)
-{
-    const Vec2 screenPosition = camera.PositionToScreenSpace(transform->translation);
-
-    const float textureWidth  = texture.width  / xMax;
-    const float textureHeight = texture.height / yMax;
-    const SDL_FRect srcRect{ textureWidth * x, textureHeight * y, textureWidth, textureHeight };
-    const SDL_FRect destRect{ screenPosition.x - textureWidth * 0.5f * transform->scale.x, screenPosition.y - textureHeight * 0.5f * transform->scale.y, textureWidth * transform->scale.x, textureHeight * transform->scale.y };
-
-    const bool err = SDL_RenderTextureRotated(mRendererBackend, mTextureMap[texture.id], &srcRect, &destRect, transform->rotation, nullptr, SDL_FLIP_NONE);
-
-    DEBUG(if (!err))
-        DEBUG_ERROR("Failed to render texture with ID: {}. Error: {}", texture.id, SDL_GetError());
 }
 
 void TextureManager::RemoveTexture(const uint16_t id)

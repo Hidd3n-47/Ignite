@@ -12,10 +12,17 @@ namespace ignite
 
 UiButton::UiButton(const std::filesystem::path& filePath)
 {
-    mTexture = Engine::Instance()->GetTextureManager()->Load(filePath);
+    mRenderCommand.texture         = Engine::Instance()->GetTextureManager()->Load(filePath);
+    mRenderCommand.spritesheetMaxX = 2;
 
     mInputManagerRef   = Engine::Instance()->GetInputManager();
-    mTextureManagerRef = Engine::Instance()->GetTextureManager();
+}
+
+void UiButton::OnComponentAdded(const mem::WeakRef<GameObject> parent)
+{
+    IComponent::OnComponentAdded(parent);
+
+    mRenderCommand.transform = mParent->GetComponent<Transform>();
 }
 
 void UiButton::Update(const float dt)
@@ -28,7 +35,7 @@ void UiButton::Update(const float dt)
     const Vec2 delta = Vec2::Abs(mousePosition - positionScreenSpace);
 
     const bool wasHoveredPreviousFrame = mHovered;
-    mHovered = delta.x <= mTexture.width * 0.5f && delta.y <= mTexture.height * 0.5f;
+    mHovered = delta.x <= mRenderCommand.texture.width * 0.5f && delta.y <= mRenderCommand.texture.height * 0.5f;
 
     // If the button isn't hovered and was hovered, call resting state callback and early exit.
     if (!mHovered)
@@ -58,9 +65,10 @@ void UiButton::Update(const float dt)
     }
 }
 
-void UiButton::Render(const OrthoCamera& camera)
+void UiButton::Render(mem::WeakRef<Renderer> renderer)
 {
-    mTextureManagerRef->RenderSingleFromSpriteSheet(mTexture, mParent->GetComponent<Transform>(), camera, mMouseDown, 0, 2, 1);
+    mRenderCommand.spritesheetPosX = static_cast<float>(mMouseDown);
+    renderer->AddRenderCommand(0, mem::WeakRef{ &mRenderCommand });
 }
 
 } // Namespace ignite.

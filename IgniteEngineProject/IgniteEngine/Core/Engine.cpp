@@ -61,8 +61,8 @@ void Engine::Init()
     }
 
     mRenderer = new Renderer(mWindow);
-
     mTextureManager = new TextureManager(mRenderer->GetRendererBackend());
+    mRenderer->SetTextureManagerRef(mem::WeakRef{ mTextureManager });
 
     mRunning = true;
 }
@@ -91,8 +91,8 @@ void Engine::Run()
 void Engine::Destroy() const
 {
     delete mTextureManager;
-
     delete mRenderer;
+
     SDL_DestroyWindow(mWindow);
 
     delete mInputManager;
@@ -129,8 +129,10 @@ void Engine::Render() const
 
     if (mActiveScene.IsRefValid())
     {
-        mActiveScene->Render(mCamera);
+        mActiveScene->Render(mem::WeakRef{ mRenderer });
     }
+
+    mRenderer->Render(mCamera);
 
     mRenderer->EndRender();
 }

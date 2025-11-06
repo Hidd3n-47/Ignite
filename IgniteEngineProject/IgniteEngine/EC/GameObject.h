@@ -10,6 +10,8 @@ namespace ignite
 
 class Scene;
 
+class Renderer;
+
 /**
  * @class GameObject: A class representing the abstract idea of a 'Game Object'. A game object is a collection of \c Components.
  */
@@ -20,7 +22,7 @@ public:
     ~GameObject();
 
     void Update(const float dt) const;
-    void Render(const OrthoCamera& camera) const;
+    void Render(mem::WeakRef<Renderer> renderer) const;
 
     [[nodiscard]] inline mem::WeakRef<Scene> GetScene() const { return mParent; }
 

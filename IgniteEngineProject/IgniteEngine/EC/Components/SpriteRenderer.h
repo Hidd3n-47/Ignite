@@ -2,7 +2,7 @@
 
 #include "IgniteEngine/EC/IComponent.h"
 
-#include "IgniteEngine/Core/Rendering/Texture.h"
+#include "IgniteEngine/Core/Rendering/RenderCommand.h"
 
 namespace ignite
 {
@@ -15,13 +15,10 @@ class SpriteRenderer : public IComponent
 public:
     SpriteRenderer(const std::filesystem::path& filePath);
 
-    void Render(const OrthoCamera& camera) override;
-
-    [[nodiscard]] inline Texture GetTexture() const { return mTexture; }
+    void OnComponentAdded(const mem::WeakRef<GameObject> parent) override;
+    void Render(mem::WeakRef<Renderer> renderer) override;
 private:
-    Texture mTexture;
-
-    mem::WeakRef<TextureManager> mTextureManagerRef;
+    RenderCommand mRenderCommand{ };
 };
 
 } // Namespace ignite.

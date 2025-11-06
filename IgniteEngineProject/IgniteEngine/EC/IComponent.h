@@ -2,7 +2,7 @@
 
 #include <IgniteMem/Core/WeakRef.h>
 
-#include "IgniteEngine/Core/OrthoCamera.h"
+#include "IgniteEngine/Core/Rendering/Renderer.h"
 
 namespace ignite
 {
@@ -22,7 +22,7 @@ public:
     virtual void OnComponentRemoved() { }
 
     virtual void Update(const float dt) { }
-    virtual void Render(const OrthoCamera& camera) { }
+    virtual void Render(mem::WeakRef<Renderer> renderer) { }
 
 protected:
     mem::WeakRef<GameObject> mParent;

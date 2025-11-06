@@ -4,6 +4,9 @@
 
 namespace ignite
 {
+
+class Renderer;
+
 /**
  * @class Scene: A class that represents an abstract idea of a 'Scene'.
  * A \c Scene is a collection of \c GameObjects.
@@ -18,7 +21,7 @@ public:
     inline virtual void SceneUpdate() const { }
 
     void Update(const float dt) const;
-    void Render(const OrthoCamera& camera) const;
+    void Render(mem::WeakRef<Renderer> renderer) const;
 
     [[nodiscard]] mem::WeakRef<GameObject> CreateGameObject();
 private:
