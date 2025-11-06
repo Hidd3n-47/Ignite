@@ -26,7 +26,7 @@ void GameApplicationState::InitScene()
 
     mPlayer = CreateGameObject();
 
-    LevelParser::LoadLevel(mem::WeakRef{ this }.Cast<Scene>(), mCurrentLevel);
+    LevelParser::LoadLevel(mem::WeakRef{ this }.Cast<Scene>(), mPlayer, mCurrentLevel);
 
     mPlayer->GetComponent<Transform>()->scale = Vec2{ 2.0f };
     mPlayer->AddComponent<SpriteRenderer>("E:/Programming/Ignite/Assets/car_24px_8way_blue_1.png", 2);
