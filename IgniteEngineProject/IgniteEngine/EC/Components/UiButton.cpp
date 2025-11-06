@@ -12,8 +12,7 @@ namespace ignite
 
 UiButton::UiButton(const std::filesystem::path& filePath, const bool hasPressedAnimation)
 {
-    mRenderCommand.texture         = Engine::Instance()->GetTextureManager()->Load(filePath);
-    mRenderCommand.spritesheetMaxX = hasPressedAnimation ? 2 : 1;
+    Engine::Instance()->GetTextureManager()->Load(mRenderCommand.texture, filePath, hasPressedAnimation ? 2 : 1);
 
     mInputManagerRef   = Engine::Instance()->GetInputManager();
 }

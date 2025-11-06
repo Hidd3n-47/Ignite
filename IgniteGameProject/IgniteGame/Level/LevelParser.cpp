@@ -6,86 +6,95 @@
 #include <IgniteEngine/EC/Components/Transform.h>
 #include <IgniteEngine/EC/Components/SpriteRenderer.h>
 
-#include "IgniteEngine/Core/Engine.h"
 #include "Src/Defines.h"
+#include "IgniteEngine/Core/Engine.h"
+#include "IgniteEngine/Core/Rendering/TextureManager.h"
 
 namespace ignite
 {
 
-void LevelParser::LoadLevel(mem::WeakRef<Scene> scene, const std::filesystem::path& levelPath)
+Texture LevelParser::mLevelSpritesheet{};
+
+void LevelParser::Init()
 {
+    Engine::Instance()->GetTextureManager()->Load(mLevelSpritesheet, "E:/Programming/Ignite/Assets/EnvironmentSpritesheet.png", 7, 7);
+}
+
+void LevelParser::LoadLevel(mem::WeakRef<Scene> scene, const LevelState state)
+{
+    const std::filesystem::path levelPath{ "E:/Programming/Ignite/Assets/Levels/Level" + std::to_string(static_cast<uint8_t>(state)) };
+
     std::vector<std::string> lines;
     std::string line;
 
-    std::ifstream fileInput;
-    fileInput.open(levelPath, std::ios::in);
+    std::string levelFiles[2] = { "Track.csv", "BG.csv" };
 
-    if (fileInput.fail())
+    uint32_t layer = 0;
+    for (const std::string& levelFile : levelFiles)
     {
-        GAME_DEBUG(std::string path = levelPath.string());
-        GAME_ERROR("Failed to parse level file: {}", path.c_str());
-    }
+        std::ifstream fileInput;
+        fileInput.open(levelPath / levelFile, std::ios::in);
 
-    while (std::getline(fileInput, line, '\n'))
-    {
-        lines.push_back(line);
-    }
-
-    fileInput.close();
-
-    // Ensure that the file is the correct size.
-    // todo.
-    // Should be 12 rows, and each row shouldn't be longer than 16 characters.
-
-    // todo
-    // What would be really ideal is if the parsed level map has characters that are the
-    // spritesheet index, that way we only load one texture, and we render the spritesheet instead.
-
-    // Parse
-    constexpr float tileSize = 64.0f;
-    const float a = Engine::Instance()->GetCamera().SizeInScreenSpace(Vec2{ 1.0f, 0.0f }).x;
-
-    const float scalingFactor = a / tileSize;
-    for (int y{ 0 }; y < 10; ++y)
-    {
-        for (int x{ 0 }; x <17; ++x)
+        if (fileInput.fail())
         {
-            mem::WeakRef<GameObject> gameObject = scene->CreateGameObject();
-
-            switch (lines[y][x])
-            {
-            case '*':
-                // Nothingness.
-                break;
-            case 'F':
-                gameObject->AddComponent<SpriteRenderer>("E:/Programming/Ignite/Assets/png/road/road_64px_a_11.png");
-                break;
-            case '=':
-                gameObject->AddComponent<SpriteRenderer>("E:/Programming/Ignite/Assets/png/road/road_64px_a_2.png");
-                break;
-            case 'L':
-                gameObject->AddComponent<SpriteRenderer>("E:/Programming/Ignite/Assets/png/road/road_64px_a_11.png");
-                gameObject->GetComponent<Transform>()->rotation = 270.0f;
-                break;
-            case '7':
-                gameObject->AddComponent<SpriteRenderer>("E:/Programming/Ignite/Assets/png/road/road_64px_a_11.png");
-                gameObject->GetComponent<Transform>()->rotation = 90;
-                break;
-            case 'U':
-                gameObject->AddComponent<SpriteRenderer>("E:/Programming/Ignite/Assets/png/road/road_64px_a_11.png");
-                gameObject->GetComponent<Transform>()->rotation = 180.0f;
-                break;
-            case '|':
-                gameObject->AddComponent<SpriteRenderer>("E:/Programming/Ignite/Assets/png/road/road_64px_a_3.png");
-                break;
-            }
-
-            //gameObject->AddComponent<SpriteRenderer>("E:/Programming/Ignite/Assets/png/road/road_64px_a_2.png");
-            gameObject->GetComponent<Transform>()->scale = Vec2{ scalingFactor, scalingFactor };
-            gameObject->GetComponent<Transform>()->translation = Vec2{ static_cast<float>(x) - 8.0f, -static_cast<float>(y) + 4.5f };
+            GAME_DEBUG(std::string path = levelPath.string());
+            GAME_ERROR("Failed to parse level file: {}", path.c_str());
         }
+
+        while (std::getline(fileInput, line, '\n'))
+        {
+            lines.push_back(line);
+        }
+
+        fileInput.close();
+
+        // Parse
+        const float tileSize = mLevelSpritesheet.width;
+        const float tileSizeScreenspace = Engine::Instance()->GetCamera().SizeInScreenSpace(Vec2{ 1.0f, 0.0f }).x;
+        const float scalingFactor = tileSizeScreenspace / tileSize;
+
+        float y = 0;
+        for (const std::string& l : lines)
+        {
+            float x = -1;
+            std::size_t delimiterPos = 0;
+            while (delimiterPos != std::string::npos)
+            {
+                x++;
+
+                const std::size_t nextPos = l.find(',', delimiterPos + 1);
+
+                const uint32_t delimiterOffset = delimiterPos == 0 ? 0 : 1;
+                const std::string tileString = nextPos == std::string::npos ? l.substr(delimiterPos + 1) : l.substr(delimiterPos + delimiterOffset, nextPos - delimiterPos - delimiterOffset);
+                const int tileId = std::stod(tileString);
+
+                delimiterPos = nextPos;
+
+                if (tileId == -1)
+                {
+                    continue;
+                }
+
+                float spritesheetX = static_cast<float>(tileId % 7);
+                float spritesheetY = static_cast<float>(tileId / 7);
+
+                mem::WeakRef<GameObject> gameObject = scene->CreateGameObject();
+                gameObject->AddComponent<SpriteRenderer>(mLevelSpritesheet, spritesheetX, spritesheetY, layer);
+                gameObject->GetComponent<Transform>()->scale = Vec2{ scalingFactor, scalingFactor };
+                gameObject->GetComponent<Transform>()->translation = Vec2{ x - 7.5f, -y + 4.5f };
+
+            }
+            ++y;
+        }
+
+        lines.clear();
+        ++layer;
     }
 }
 
+void LevelParser::Destroy()
+{
+    Engine::Instance()->GetTextureManager()->RemoveTexture(mLevelSpritesheet.id);
+}
 
 } // Namespace ignite.

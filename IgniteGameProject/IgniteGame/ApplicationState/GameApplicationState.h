@@ -2,9 +2,11 @@
 
 #include <IgniteEngine/EC/Scene.h>
 
+#include "ApplicationState.h"
+#include "Level/LevelState.h"
+
 namespace ignite
 {
-
 class InputManager;
 class RaceStartCountdown;
 
@@ -14,15 +16,27 @@ enum class GameState : uint8_t
     RACING
 };
 
+class GameApplicationStateInitInfo : public IApplicationStateInitInfo
+{
+public:
+    GameApplicationStateInitInfo(const LevelState level) : level(level) { }
+
+    LevelState level;
+};
+
 class GameApplicationState : public Scene
 {
 public:
+    GameApplicationState(const mem::WeakRef<GameApplicationStateInitInfo> info);
+
     void InitScene() override;
     void SceneUpdate() const override;
 
     void ChangeGameState(const GameState state);
     bool input = false;
 private:
+    LevelState mCurrentLevel;
+
     mem::WeakRef<GameObject> mPlayer;
     mem::WeakRef<RaceStartCountdown> mRaceCountdown;
 

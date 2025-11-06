@@ -1,21 +1,13 @@
 #pragma once
 
-#include <cstdint>
+#include <IgniteMem/Core/WeakRef.h>
 
-#include "IgniteMem/Core/WeakRef.h"
+#include "ApplicationState/ApplicationState.h"
 
 namespace ignite
 {
 
 class Scene;
-
-enum class ApplicationStates : uint8_t
-{
-    MAIN_MENU,
-    LEVE_SELECT,
-    GAME,
-    REWARDS
-};
 
 class GameManager
 {
@@ -32,7 +24,7 @@ public:
     void Init();
     void Destroy() const;
 
-    void ChangeState(const ApplicationStates state);
+    void ChangeState(const ApplicationStates state, IApplicationStateInitInfo* initInfo = nullptr);
 private:
     GameManager()  = default;
     ~GameManager() = default;

@@ -4,6 +4,7 @@
 #include <IgniteEngine/EC/Scene.h>
 
 #include "Src/Defines.h"
+#include "Level/LevelParser.h"
 
 #include "ApplicationState/GameApplicationState.h"
 #include "ApplicationState/MainMenuApplicationState.h"
@@ -32,18 +33,22 @@ mem::WeakRef<GameManager> GameManager::CreateGameManager()
 
 void GameManager::Init()
 {
+    LevelParser::Init();
+
     ChangeState(ApplicationStates::MAIN_MENU);
 }
 
 void GameManager::Destroy() const
 {
+    LevelParser::Destroy();
+
     delete mInstance;
     mInstance = nullptr;
 
     GAME_INFO("Successfully destroyed Ignite Game.");
 }
 
-void GameManager::ChangeState(const ApplicationStates state)
+void GameManager::ChangeState(const ApplicationStates state, IApplicationStateInitInfo* initInfo)
 {
     delete mPreviousScene;
 
@@ -60,9 +65,12 @@ void GameManager::ChangeState(const ApplicationStates state)
         mCurrentScene = new LevelSelectApplicationState();
         break;
     case ApplicationStates::GAME:
+    {
         GAME_LOG("Updated Application State: GAME");
-        mCurrentScene = new GameApplicationState();
+        GameApplicationStateInitInfo* info = dynamic_cast<GameApplicationStateInitInfo*>(initInfo);
+        mCurrentScene = new GameApplicationState(mem::WeakRef{ info });
         break;
+    }
     case ApplicationStates::REWARDS:
 
         break;
@@ -70,6 +78,8 @@ void GameManager::ChangeState(const ApplicationStates state)
         GAME_ERROR("Trying to change game state to an unhandled state with ID: {}", static_cast<uint32_t>(state));
         break;
     }
+
+    delete initInfo;
 
     Engine::Instance()->SetSceneToChangeTo(mem::WeakRef{ mCurrentScene });
 }

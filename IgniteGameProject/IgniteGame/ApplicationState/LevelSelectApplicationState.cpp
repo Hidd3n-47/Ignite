@@ -3,6 +3,7 @@
 #include <IgniteEngine/EC/Components/UiButton.h>
 
 #include "Core/GameManager.h"
+#include "GameApplicationState.h"
 
 namespace ignite
 {
@@ -16,7 +17,7 @@ void LevelSelectApplicationState::InitScene()
     transform->scale       = Vec2{ 0.5f };
 
     mem::WeakRef<UiButton> playButton = playButtonObject->AddComponent<UiButton>(std::filesystem::path{ "E:/Programming/Ignite/Assets/Levels/Level1/Level1Track.png" });
-    playButton->SetOnButtonPressedEvent([] { GameManager::Instance()->ChangeState(ApplicationStates::GAME); });
+    playButton->SetOnButtonPressedEvent([] { GameManager::Instance()->ChangeState(ApplicationStates::GAME, new GameApplicationStateInitInfo(LevelState::ONE)); });
     playButton->SetOnHoveredEvent(
         [](mem::WeakRef<GameObject> gameObject)
         {

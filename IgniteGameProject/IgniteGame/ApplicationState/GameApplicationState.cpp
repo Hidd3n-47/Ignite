@@ -15,16 +15,21 @@
 namespace ignite
 {
 
+GameApplicationState::GameApplicationState(const mem::WeakRef<GameApplicationStateInitInfo> info)
+{
+    mCurrentLevel = info->level;
+}
+
 void GameApplicationState::InitScene()
 {
     mInputManager = Engine::Instance()->GetInputManager();
 
     mPlayer = CreateGameObject();
 
-    LevelParser::LoadLevel(mem::WeakRef{ this }.Cast<Scene>(), "E:/Programming/Ignite/Assets/Levels/Simple.lvl");
+    LevelParser::LoadLevel(mem::WeakRef{ this }.Cast<Scene>(), mCurrentLevel);
 
     mPlayer->GetComponent<Transform>()->scale = Vec2{ 2.0f };
-    mPlayer->AddComponent<SpriteRenderer>("E:/Programming/Ignite/Assets/car_24px_8way_blue_1.png");
+    mPlayer->AddComponent<SpriteRenderer>("E:/Programming/Ignite/Assets/car_24px_8way_blue_1.png", 2);
 
     mRaceCountdown = CreateGameObject()->AddComponent<RaceStartCountdown>(3.9f, [&] { ChangeGameState(GameState::RACING); });
 

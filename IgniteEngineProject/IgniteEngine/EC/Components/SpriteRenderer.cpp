@@ -8,9 +8,19 @@
 namespace ignite
 {
 
-SpriteRenderer::SpriteRenderer(const std::filesystem::path& filePath)
+SpriteRenderer::SpriteRenderer(const std::filesystem::path& filePath, const uint32_t layer)
+    : mLayer(layer)
 {
-    mRenderCommand.texture = Engine::Instance()->GetTextureManager()->Load(filePath);
+    Engine::Instance()->GetTextureManager()->Load(mRenderCommand.texture, filePath);
+}
+
+SpriteRenderer::SpriteRenderer(const Texture& texture, const float xSpritesheet, const float ySpritesheet, const uint32_t layer)
+{
+    mRenderCommand.texture         = texture;
+    mRenderCommand.spritesheetPosX = xSpritesheet;
+    mRenderCommand.spritesheetPosY = ySpritesheet;
+
+    mLayer = layer;
 }
 
 void SpriteRenderer::OnComponentAdded(const mem::WeakRef<GameObject> parent)
@@ -22,7 +32,7 @@ void SpriteRenderer::OnComponentAdded(const mem::WeakRef<GameObject> parent)
 
 void SpriteRenderer::Render(mem::WeakRef<Renderer> renderer)
 {
-    renderer->AddRenderCommand(0, mem::WeakRef{ &mRenderCommand });
+    renderer->AddRenderCommand(mLayer, mem::WeakRef{ &mRenderCommand });
 }
 
 } // Namespace ignite.

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Texture.h"
-#include "IgniteEngine/Core/OrthoCamera.h"
 #include "IgniteEngine/EC/Components/Transform.h"
 
 struct SDL_Texture;
@@ -22,12 +21,10 @@ public:
     TextureManager& operator=(TextureManager&&)       = delete;
     TextureManager& operator=(const TextureManager&)  = delete;
 
-    [[nodiscard]] Texture Load(const std::filesystem::path& filePath);
+    void Load(Texture& texture, const std::filesystem::path& filePath, const uint32_t spritesheetMaxX = 1, const uint32_t spritesheetMaxY = 1);
 
     void RemoveTexture(const uint16_t id);
     void RemoveAllTextures();
-
-    inline static constexpr uint16_t INVALID_ID{ 0 };
 private:
     SDL_Renderer* mRendererBackend;
 

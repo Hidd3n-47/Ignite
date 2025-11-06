@@ -32,39 +32,36 @@ TextureManager::~TextureManager()
     RemoveAllTextures();
 }
 
-Texture TextureManager::Load(const std::filesystem::path& filePath)
+void TextureManager::Load(Texture& texture, const std::filesystem::path& filePath, const uint32_t spritesheetMaxX, const uint32_t spritesheetMaxY)
 {
     //todo need to make it that texture manager maps filepath to texture id to prevent reloading same texture.
-    Texture t
-    {
-        .id     = INVALID_ID,
-        .width  = 1.0f,
-        .height = 1.0f
-    };
 
     SDL_Surface* surface = IMG_Load(filePath.string().c_str());
     if (!surface)
     {
         DEBUG_ERROR("Failed to load image at path: {}. Error: {}", filePath.string(), SDL_GetError());
-        return t;
+        return;
     }
 
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(mRendererBackend, surface);
+    SDL_Texture* sdlTexture = SDL_CreateTextureFromSurface(mRendererBackend, surface);
     SDL_DestroySurface(surface);
 
-    if (!texture)
+    if (!sdlTexture)
     {
         DEBUG_ERROR("Failed to create texture from surface. Error: {}", SDL_GetError());
-        return t;
+        return;
     }
 
-    mTextureMap[mId] = texture;
+    SDL_SetTextureScaleMode(sdlTexture, SDL_SCALEMODE_NEAREST);
 
-    t.id     = mId++;
-    t.width  = static_cast<float>(texture->w);
-    t.height = static_cast<float>(texture->h);
+    mTextureMap[mId] = sdlTexture;
 
-    return t;
+    texture.id = mId++;
+    texture.spritesheetMaxX = static_cast<float>(spritesheetMaxX);
+    texture.spritesheetMaxY = static_cast<float>(spritesheetMaxY);
+    texture.width           = static_cast<float>(sdlTexture->w) / texture.spritesheetMaxX;
+    texture.height          = static_cast<float>(sdlTexture->h) / texture.spritesheetMaxY;
+
 }
 
 void TextureManager::RemoveTexture(const uint16_t id)
