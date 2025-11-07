@@ -32,10 +32,8 @@ public:
     GameApplicationState(const mem::WeakRef<GameApplicationStateInitInfo> info);
 
     void InitScene() override;
-    void SceneUpdate() const override;
 
     void ChangeGameState(const GameState state);
-    bool input = false;
 private:
     LevelState mCurrentLevel;
 

@@ -116,7 +116,7 @@ void LevelParser::LoadLevel(mem::WeakRef<Scene> scene, mem::WeakRef<GameObject> 
 
                 if (startLine)
                 {
-                    player->GetComponent<Transform>()->translation = position;
+                    player->GetComponent<Transform>()->translation = position - Vec2{ 0.4f, 0.0f };
                 }
 
                 if (mSpritesheetIdToCollisionInfo.contains(tileId))
