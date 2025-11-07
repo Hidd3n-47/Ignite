@@ -30,7 +30,7 @@ void RewardsApplicationState::InitScene()
     else
     {
         Texture texture;
-        Engine::Instance()->GetTextureManager()->Load(texture, "E:/Programming/Ignite/Assets/TrophySpritesheet.png", 3);
+        Engine::Instance()->GetTextureManager()->Load(texture, "Assets/TrophySpritesheet.png", 3);
 
         rewardVisual->AddComponent<SpriteRenderer>(texture, static_cast<float>(mPlayerRanking), 0.0f, 100);
 
@@ -42,7 +42,7 @@ void RewardsApplicationState::InitScene()
 
     mem::WeakRef<GameObject> backButtonObject = CreateGameObject();
     backButtonObject->GetComponent<Transform>()->translation = Vec2{ 0.0f, -2.0f };
-    mem::WeakRef<UiButton> backButton = backButtonObject->AddComponent<UiButton>(std::filesystem::path{ "E:/Programming/Ignite/Assets/BackButton.png" }, true);
+    mem::WeakRef<UiButton> backButton = backButtonObject->AddComponent<UiButton>(std::filesystem::path{ "Assets/BackButton.png" }, true);
     backButton->SetOnButtonPressedEvent([&] { mTextObject->RemoveComponent<UiText>(); GameManager::Instance()->ChangeState(ApplicationStates::MAIN_MENU); });
     backButton->SetOnHoveredEvent(
         [](mem::WeakRef<GameObject> gameObject)

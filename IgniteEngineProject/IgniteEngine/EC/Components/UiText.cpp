@@ -19,7 +19,7 @@ void UiText::OnComponentAdded(const mem::WeakRef<GameObject> parent)
 {
     IComponent::OnComponentAdded(parent);
 
-    mId = mFontRendererRef->CreateFont("E:/Programming/Ignite/Assets/Fonts/ThaleahFat.ttf", mSize, mText, mParent->GetComponent<Transform>());
+    mId = mFontRendererRef->CreateFont("Assets/Fonts/ThaleahFat.ttf", mSize, mText, mParent->GetComponent<Transform>());
 }
 
 void UiText::OnComponentRemoved()

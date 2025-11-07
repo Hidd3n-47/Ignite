@@ -17,7 +17,7 @@ void LevelSelectApplicationState::InitScene()
         transform->translation = Vec2{ -4.0f, 1.0f };
         transform->scale = Vec2{ 0.3f };
 
-        mem::WeakRef<UiButton> playButton = levelOneObject->AddComponent<UiButton>(std::filesystem::path{ "E:/Programming/Ignite/Assets/Levels/Level1/Track.png" });
+        mem::WeakRef<UiButton> playButton = levelOneObject->AddComponent<UiButton>(std::filesystem::path{ "Assets/Levels/Level1/Track.png" });
         playButton->SetOnButtonPressedEvent([] { GameManager::Instance()->ChangeState(ApplicationStates::GAME, new GameApplicationStateInitInfo(LevelState::ONE)); });
         playButton->SetOnHoveredEvent(
             [](mem::WeakRef<GameObject> gameObject)
@@ -38,7 +38,7 @@ void LevelSelectApplicationState::InitScene()
         transform->translation = Vec2{ 4.0f, 1.0f };
         transform->scale = Vec2{ 0.3f };
 
-        mem::WeakRef<UiButton> playButton = levelTwoObject->AddComponent<UiButton>(std::filesystem::path{ "E:/Programming/Ignite/Assets/Levels/Level2/Track.png" });
+        mem::WeakRef<UiButton> playButton = levelTwoObject->AddComponent<UiButton>(std::filesystem::path{ "Assets/Levels/Level2/Track.png" });
         playButton->SetOnButtonPressedEvent([] { GameManager::Instance()->ChangeState(ApplicationStates::GAME, new GameApplicationStateInitInfo(LevelState::TWO)); });
         playButton->SetOnHoveredEvent(
             [](mem::WeakRef<GameObject> gameObject)
@@ -54,7 +54,7 @@ void LevelSelectApplicationState::InitScene()
 
     mem::WeakRef<GameObject> backButtonObject = CreateGameObject();
     backButtonObject->GetComponent<Transform>()->translation = Vec2{ 0.0f, -2.0f };
-    mem::WeakRef<UiButton> backButton = backButtonObject->AddComponent<UiButton>(std::filesystem::path{ "E:/Programming/Ignite/Assets/BackButton.png" }, true);
+    mem::WeakRef<UiButton> backButton = backButtonObject->AddComponent<UiButton>(std::filesystem::path{ "Assets/BackButton.png" }, true);
     backButton->SetOnButtonPressedEvent([] { GameManager::Instance()->ChangeState(ApplicationStates::MAIN_MENU); });
     backButton->SetOnHoveredEvent(
         [](mem::WeakRef<GameObject> gameObject)

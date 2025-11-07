@@ -24,9 +24,9 @@ std::unordered_map<uint32_t, CollisionInfoRect> LevelParser::mSpritesheetIdToCol
 
 void LevelParser::Init()
 {
-    Engine::Instance()->GetTextureManager()->Load(mLevelSpritesheet, "E:/Programming/Ignite/Assets/EnvironmentSpritesheet.png", 7, 7);
+    Engine::Instance()->GetTextureManager()->Load(mLevelSpritesheet, "Assets/EnvironmentSpritesheet.png", 7, 7);
 
-    const XmlDocument xml = XmlSerializer::Deserialize("E:/Programming/Ignite/Assets/EnvironmentSpritesheet.tsx");
+    const XmlDocument xml = XmlSerializer::Deserialize("Assets/EnvironmentSpritesheet.tsx");
 
     for (const XmlElement& child : xml.GetRootElement()->GetChildElements())
     {
@@ -48,7 +48,7 @@ void LevelParser::Init()
 
 void LevelParser::LoadLevel(mem::WeakRef<Scene> scene, mem::WeakRef<GameObject> player, const LevelState state)
 {
-    const std::filesystem::path levelPath{ "E:/Programming/Ignite/Assets/Levels/Level" + std::to_string(static_cast<uint8_t>(state)) };
+    const std::filesystem::path levelPath{ "Assets/Levels/Level" + std::to_string(static_cast<uint8_t>(state)) };
 
     std::vector<std::string> lines;
     std::string line;

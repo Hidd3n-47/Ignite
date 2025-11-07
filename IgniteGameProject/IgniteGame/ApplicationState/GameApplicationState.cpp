@@ -34,8 +34,8 @@ void GameApplicationState::InitScene()
 
     mPlayer->GetComponent<Transform>()->scale = Vec2{ 2.0f };
     mPlayer->AddComponent<CarMovement>();
-    mPlayer->AddComponent<SpriteRenderer>("E:/Programming/Ignite/Assets/CarBlue.png", 2);
-    mPlayer->AddComponent<BoxCollider>(Vec2{0.2f, 0.1f }, true)->SetOffset(Vec2{0, -0.05f});
+    mPlayer->AddComponent<SpriteRenderer>("Assets/CarBlue.png", 2);
+    mPlayer->AddComponent<BoxCollider>(Vec2{0.2f, 0.1f }, true)->SetOffset(Vec2{0.0f, -0.05f});
     mPlayer->AddComponent<RaceManagerComponent>([&] { ChangeGameState(GameState::RACE_COMPLETED); });
 
     mem::WeakRef<GameObject>   raceCountdownObject = CreateGameObject();
@@ -45,7 +45,7 @@ void GameApplicationState::InitScene()
     mem::WeakRef<GameObject> raceTimerObject = CreateGameObject();
     raceTimerObject->GetComponent<Transform>()->translation = Vec2{ -7.5f, 4.2f };
 
-    mRaceTimer = raceTimerObject->AddComponent<RaceTimer>(50.0);
+    mRaceTimer = raceTimerObject->AddComponent<RaceTimer>(50.0f);
 
     ChangeGameState(GameState::RACE_COUNTDOWN);
 }

@@ -18,7 +18,7 @@ void RaceTimer::OnComponentAdded(const mem::WeakRef<GameObject> parent)
 {
     IComponent::OnComponentAdded(parent);
 
-    mId = mFontRendererRef->CreateFont("E:/Programming/Ignite/Assets/Fonts/ThaleahFat.ttf", mSize, "0.0", mParent->GetComponent<Transform>());
+    mId = mFontRendererRef->CreateFont("Assets/Fonts/ThaleahFat.ttf", mSize, "0.0", mParent->GetComponent<Transform>());
 }
 
 void RaceTimer::OnComponentRemoved()
