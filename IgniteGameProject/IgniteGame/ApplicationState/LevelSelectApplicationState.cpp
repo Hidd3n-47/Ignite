@@ -68,9 +68,4 @@ void LevelSelectApplicationState::InitScene()
         });
 }
 
-void LevelSelectApplicationState::SceneUpdate() const
-{
-
-}
-
 } // Namespace ignite.

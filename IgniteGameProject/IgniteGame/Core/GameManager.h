@@ -6,9 +6,10 @@
 
 namespace ignite
 {
-    enum class TrophyRanking : uint8_t;
+enum class TrophyRanking : uint8_t;
 
-    class Scene;
+class Scene;
+class LevelParser;
 
 class GameManager
 {
@@ -29,6 +30,8 @@ public:
 
     inline void SetLevelRankTimes(const float gold, const float silver, const float bronze) { mTimeForGold = gold; mTimeForSilver = silver; mTimeForBronze = bronze; }
     TrophyRanking GetTrophyRanking(const float playerTime) const;
+
+    [[nodiscard]] inline mem::WeakRef<LevelParser> GetLevelParser() const { return mem::WeakRef{ mLevelParser }; }
 private:
     GameManager()  = default;
     ~GameManager() = default;
@@ -37,6 +40,8 @@ private:
     Scene* mPreviousScene;
 
     static GameManager* mInstance;
+
+    LevelParser* mLevelParser;
 
     float mTimeForGold{};
     float mTimeForSilver{};

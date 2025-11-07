@@ -35,14 +35,19 @@ mem::WeakRef<GameManager> GameManager::CreateGameManager()
 
 void GameManager::Init()
 {
-    LevelParser::Init();
+    mLevelParser = new LevelParser();
+    mLevelParser->Init();
 
     ChangeState(ApplicationStates::MAIN_MENU);
 }
 
 void GameManager::Destroy() const
 {
-    LevelParser::Destroy();
+    delete mPreviousScene;
+    delete mCurrentScene;
+
+    mLevelParser->Destroy();
+    delete mLevelParser;
 
     delete mInstance;
     mInstance = nullptr;

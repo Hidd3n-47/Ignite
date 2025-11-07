@@ -22,14 +22,14 @@ struct CollisionInfoRect
 class LevelParser
 {
 public:
-    static void Init();
-    static void LoadLevel(mem::WeakRef<Scene> scene, mem::WeakRef<GameObject> player, const LevelState state);
-    static void Destroy();
+    void Init();
+    void LoadLevel(mem::WeakRef<Scene> scene, mem::WeakRef<GameObject> player, const LevelState state);
+    void Destroy();
 
     inline static constexpr int START_LINE_TEXTURE_ID{ 16 };
 private:
-    static Texture mLevelSpritesheet;
-    static std::unordered_map<uint32_t, CollisionInfoRect> mSpritesheetIdToCollisionInfo;
+    Texture mLevelSpritesheet;
+    std::unordered_map<uint32_t, CollisionInfoRect> mSpritesheetIdToCollisionInfo;
 };
 
 } // Namespace ignite.

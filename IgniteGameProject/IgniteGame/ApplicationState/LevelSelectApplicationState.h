@@ -9,7 +9,6 @@ class LevelSelectApplicationState : public Scene
 {
 public:
     void InitScene() override;
-    void SceneUpdate() const override;
 };
 
 } // Namespace ignite.

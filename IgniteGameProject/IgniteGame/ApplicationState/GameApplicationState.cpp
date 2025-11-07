@@ -30,7 +30,7 @@ void GameApplicationState::InitScene()
 
     mPlayer = CreateGameObject();
 
-    LevelParser::LoadLevel(mem::WeakRef{ this }.Cast<Scene>(), mPlayer, mCurrentLevel);
+    GameManager::Instance()->GetLevelParser()->LoadLevel(mem::WeakRef{ this }.Cast<Scene>(), mPlayer, mCurrentLevel);
 
     mPlayer->GetComponent<Transform>()->scale = Vec2{ 2.0f };
     mPlayer->AddComponent<CarMovement>();

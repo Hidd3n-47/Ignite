@@ -19,9 +19,6 @@
 namespace ignite
 {
 
-Texture LevelParser::mLevelSpritesheet{};
-std::unordered_map<uint32_t, CollisionInfoRect> LevelParser::mSpritesheetIdToCollisionInfo{};
-
 void LevelParser::Init()
 {
     Engine::Instance()->GetTextureManager()->Load(mLevelSpritesheet, "Assets/EnvironmentSpritesheet.png", 7, 7);
