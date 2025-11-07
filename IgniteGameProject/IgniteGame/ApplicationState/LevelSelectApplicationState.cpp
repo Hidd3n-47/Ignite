@@ -10,24 +10,47 @@ namespace ignite
 
 void LevelSelectApplicationState::InitScene()
 {
-    mem::WeakRef<GameObject> playButtonObject = CreateGameObject();
+    {
+        mem::WeakRef<GameObject> levelOneObject = CreateGameObject();
 
-    mem::WeakRef<Transform> transform = playButtonObject->GetComponent<Transform>();
-    transform->translation = Vec2{ 0.0f, 1.0f };
-    transform->scale       = Vec2{ 0.5f };
+        mem::WeakRef<Transform> transform = levelOneObject->GetComponent<Transform>();
+        transform->translation = Vec2{ -4.0f, 1.0f };
+        transform->scale = Vec2{ 0.3f };
 
-    mem::WeakRef<UiButton> playButton = playButtonObject->AddComponent<UiButton>(std::filesystem::path{ "E:/Programming/Ignite/Assets/Levels/Level1/Level1Track.png" });
-    playButton->SetOnButtonPressedEvent([] { GameManager::Instance()->ChangeState(ApplicationStates::GAME, new GameApplicationStateInitInfo(LevelState::ONE)); });
-    playButton->SetOnHoveredEvent(
-        [](mem::WeakRef<GameObject> gameObject)
-        {
-            gameObject->GetComponent<Transform>()->scale = Vec2{ 0.7f };
-        });
-    playButton->SetOnRestingStateEvent(
-        [](mem::WeakRef<GameObject> gameObject)
-        {
-            gameObject->GetComponent<Transform>()->scale = Vec2{ 0.5f };
-        });
+        mem::WeakRef<UiButton> playButton = levelOneObject->AddComponent<UiButton>(std::filesystem::path{ "E:/Programming/Ignite/Assets/Levels/Level1/Track.png" });
+        playButton->SetOnButtonPressedEvent([] { GameManager::Instance()->ChangeState(ApplicationStates::GAME, new GameApplicationStateInitInfo(LevelState::ONE)); });
+        playButton->SetOnHoveredEvent(
+            [](mem::WeakRef<GameObject> gameObject)
+            {
+                gameObject->GetComponent<Transform>()->scale = Vec2{ 0.7f };
+            });
+        playButton->SetOnRestingStateEvent(
+            [](mem::WeakRef<GameObject> gameObject)
+            {
+                gameObject->GetComponent<Transform>()->scale = Vec2{ 0.5f };
+            });
+    }
+
+    {
+        mem::WeakRef<GameObject> levelTwoObject = CreateGameObject();
+
+        mem::WeakRef<Transform> transform = levelTwoObject->GetComponent<Transform>();
+        transform->translation = Vec2{ 4.0f, 1.0f };
+        transform->scale = Vec2{ 0.3f };
+
+        mem::WeakRef<UiButton> playButton = levelTwoObject->AddComponent<UiButton>(std::filesystem::path{ "E:/Programming/Ignite/Assets/Levels/Level2/Track.png" });
+        playButton->SetOnButtonPressedEvent([] { GameManager::Instance()->ChangeState(ApplicationStates::GAME, new GameApplicationStateInitInfo(LevelState::TWO)); });
+        playButton->SetOnHoveredEvent(
+            [](mem::WeakRef<GameObject> gameObject)
+            {
+                gameObject->GetComponent<Transform>()->scale = Vec2{ 0.7f };
+            });
+        playButton->SetOnRestingStateEvent(
+            [](mem::WeakRef<GameObject> gameObject)
+            {
+                gameObject->GetComponent<Transform>()->scale = Vec2{ 0.5f };
+            });
+    }
 
     mem::WeakRef<GameObject> backButtonObject = CreateGameObject();
     backButtonObject->GetComponent<Transform>()->translation = Vec2{ 0.0f, -2.0f };

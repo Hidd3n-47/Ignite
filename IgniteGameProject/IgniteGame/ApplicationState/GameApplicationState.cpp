@@ -9,8 +9,10 @@
 #include <IgniteEngine/EC/Components/BoxCollider.h>
 #include <IgniteEngine/EC/Components/SpriteRenderer.h>
 #include <IgniteEngine/EC/Components/RaceStartCountdown.h>
+#include <IgniteEngine/EC/Components/RaceManagerComponent.h>
 
 #include "Src/Defines.h"
+#include "Core/GameManager.h"
 #include "Level/LevelParser.h"
 
 namespace ignite
@@ -33,6 +35,7 @@ void GameApplicationState::InitScene()
     mPlayer->AddComponent<CarMovement>();
     mPlayer->AddComponent<SpriteRenderer>("E:/Programming/Ignite/Assets/CarBlue.png", 2);
     mPlayer->AddComponent<BoxCollider>(Vec2{0.2f, 0.1f }, true)->SetOffset(Vec2{0, -0.05f});
+    mPlayer->AddComponent<RaceManagerComponent>([&] { ChangeGameState(GameState::RACE_COMPLETED); });
 
     mem::WeakRef<GameObject>   raceCountdownObject = CreateGameObject();
     const mem::WeakRef<UiText> raceCountdownText   = raceCountdownObject->AddComponent<UiText>("3", 600.0f);
@@ -58,6 +61,10 @@ void GameApplicationState::ChangeGameState(const GameState state)
         GAME_LOG("Changed to game state: RACING");
         mPlayer->GetComponent<CarMovement>()->EnableMovement();
         mRaceTimer->StartTimer();
+        break;
+    case GameState::RACE_COMPLETED:
+        GAME_LOG("Changed to game state: RACE_COMPLETED");
+        GameManager::Instance()->ChangeState(ApplicationStates::LEVEL_SELECT);
         break;
     default:
         GAME_ERROR("Trying to change game state to unprocessed state.");

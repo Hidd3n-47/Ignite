@@ -16,7 +16,7 @@ void MainMenuApplicationState::InitScene()
     mem::WeakRef<GameObject> playButtonObject = CreateGameObject();
     playButtonObject->GetComponent<Transform>()->translation = Vec2{ 0.0f, 2.0f };
     mem::WeakRef<UiButton> playButton = playButtonObject->AddComponent<UiButton>(std::filesystem::path{ "E:/Programming/Ignite/Assets/PlayButton.png" }, true);
-    playButton->SetOnButtonPressedEvent([] { GameManager::Instance()->ChangeState(ApplicationStates::LEVE_SELECT); });
+    playButton->SetOnButtonPressedEvent([] { GameManager::Instance()->ChangeState(ApplicationStates::LEVEL_SELECT); });
     playButton->SetOnHoveredEvent(
         [](mem::WeakRef<GameObject> gameObject)
         {

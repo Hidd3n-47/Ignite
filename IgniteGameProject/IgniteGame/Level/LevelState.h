@@ -4,5 +4,6 @@
 
 enum class LevelState : uint8_t
 {
-    ONE = 1
+    ONE = 1,
+    TWO
 };

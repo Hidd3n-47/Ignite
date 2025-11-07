@@ -17,8 +17,9 @@ GameObject::GameObject(const Ulid id, const mem::WeakRef<Scene> parent)
 
 GameObject::~GameObject()
 {
-    for (const auto comp : mComponents)
+    for (IComponent* comp : mComponents)
     {
+        comp->OnComponentRemoved();
         delete comp;
     }
 }

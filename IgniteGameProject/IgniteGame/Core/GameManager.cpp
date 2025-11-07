@@ -60,7 +60,7 @@ void GameManager::ChangeState(const ApplicationStates state, IApplicationStateIn
         GAME_LOG("Updated Application State: MAIN_MENU");
         mCurrentScene = new MainMenuApplicationState();
         break;
-    case ApplicationStates::LEVE_SELECT:
+    case ApplicationStates::LEVEL_SELECT:
         GAME_LOG("Updated Application State: LEVEL_SELECT");
         mCurrentScene = new LevelSelectApplicationState();
         break;

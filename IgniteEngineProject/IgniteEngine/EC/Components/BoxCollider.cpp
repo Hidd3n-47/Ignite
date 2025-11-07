@@ -48,16 +48,20 @@ void BoxCollider::OnComponentRemoved()
     }
 }
 
-void BoxCollider::Update(const float dt)
-{
-
-}
-
 #ifdef DEV_CONFIGURATION
 void BoxCollider::Render(mem::WeakRef<Renderer> renderer)
 {
     renderer->AddRenderCommand(1000, mem::WeakRef{ &mRenderCommand });
 }
 #endif // DEV_CONFIGURATION.
+
+void BoxCollider::SetOffset(const Vec2 offset)
+{
+    mOffset = offset;
+
+#ifdef DEV_CONFIGURATION
+    mRenderCommand.debugSquareOffset = offset;
+#endif // DEV_CONFIGURATION.
+}
 
 } // Namespace ignite.

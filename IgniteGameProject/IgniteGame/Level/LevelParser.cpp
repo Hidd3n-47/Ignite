@@ -6,6 +6,7 @@
 #include <IgniteEngine/EC/Components/Transform.h>
 #include <IgniteEngine/EC/Components/BoxCollider.h>
 #include <IgniteEngine/EC/Components/SpriteRenderer.h>
+#include <IgniteEngine/EC/Components/RaceManagerComponent.h>
 
 #include <IgniteEngine/Core/Engine.h>
 #include <IgniteEngine/Core/Rendering/TextureManager.h>
@@ -129,7 +130,9 @@ void LevelParser::LoadLevel(mem::WeakRef<Scene> scene, mem::WeakRef<GameObject> 
 
                     const Vec2 sizeWorld = camera.ScreenSizeToWorldSize(Vec2{ rect.w, rect.h });
 
-                    gameObject->AddComponent<BoxCollider>(sizeWorld, false, startLine)->SetOffset(Vec2{ centreWorld.x, -centreWorld.y });
+                    mem::WeakRef<BoxCollider> box = gameObject->AddComponent<BoxCollider>(sizeWorld, false, startLine);
+                    box->SetOffset(Vec2{ centreWorld.x, -centreWorld.y });
+                    box->SetOnTriggeredCallback([](mem::WeakRef<GameObject> other) { other->GetComponent<RaceManagerComponent>()->PassedStartFinishLine(); });
                 }
             }
             ++y;

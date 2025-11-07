@@ -1,7 +1,9 @@
 #include "IgnitePch.h"
 #include "CollisionHandler.h"
 
+#include <IgniteMem/Core/WeakRefHash.h>
 
+#include "Defines.h"
 #include "EC/GameObject.h"
 #include "EC/Components/Transform.h"
 #include "EC/Components/BoxCollider.h"
@@ -10,8 +12,10 @@
 
 namespace ignite
 {
-void CollisionHandler::Update() const
+void CollisionHandler::Update()
 {
+    mTriggeredThisFrame.clear();
+
     for (const mem::WeakRef<GameObject> dynamicBox1 : mDynamicBoxColliders)
     {
         for (const mem::WeakRef<GameObject> dynamicBox2 : mDynamicBoxColliders)
@@ -29,10 +33,21 @@ void CollisionHandler::Update() const
     {
         for (const mem::WeakRef<GameObject> staticBox : mStaticBoxColliders)
         {
-
             CheckCollisionBetweenBoxes(dynamicBox1, staticBox, false);
         }
     }
+
+    for (auto& [gameObject, triggerInfo] : mTriggeredThisFrame)
+    {
+        if (mTriggeredPrevFrame.contains(gameObject) && mTriggeredPrevFrame[gameObject].otherBody == triggerInfo.otherBody)
+        {
+            continue;
+        }
+
+        triggerInfo.bodyCollider->OnTriggerEnter(triggerInfo.otherBody);
+    }
+
+    mTriggeredPrevFrame = mTriggeredThisFrame;
 }
 
 void CollisionHandler::AddDynamicBox(const mem::WeakRef<GameObject> box)
@@ -93,11 +108,24 @@ void CollisionHandler::CheckCollisionBetweenBoxes(mem::WeakRef<GameObject> box1,
         return;
     }
 
+// Dev checks for handled and not handled collision.
+#ifdef DEV_CONFIGURATION
+
     if (box1Collider->IsTrigger() || box2Collider->IsTrigger())
     {
+        // Push both bodies mean both are dynamic.
+        if (pushBothBodies && box2Collider->IsTrigger() || box1Collider->IsTrigger())
+        {
+            DEBUG_ERROR("Dynamic collision box is a trigger. This is not currently handled by the engine.");
+            DEBUG_BREAK();
+            return;
+        }
 
+        mTriggeredThisFrame[box2] = { .bodyCollider = box2Collider, .otherBody = box1};
         return;
     }
+
+#endif // DEV_CONFIGURATION.
 
     if (const Vec2 overlap = minDistance - absDelta; overlap.x < overlap.y)
     {

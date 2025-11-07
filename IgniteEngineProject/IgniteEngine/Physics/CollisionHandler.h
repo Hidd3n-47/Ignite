@@ -7,12 +7,18 @@ struct CollisionInfo;
 
 class RigidBody;
 class GameObject;
-class CircleCollider;
+class BoxCollider;
+
+struct TriggeredColliderInfo
+{
+    mem::WeakRef<BoxCollider> bodyCollider;
+    mem::WeakRef<GameObject>  otherBody;
+};
 
 class CollisionHandler
 {
 public:
-    void Update() const;
+    void Update();
 
     void AddDynamicBox(const mem::WeakRef<GameObject> box);
     void AddStaticBox(const mem::WeakRef<GameObject> box);
@@ -23,7 +29,10 @@ private:
     std::vector<mem::WeakRef<GameObject>> mDynamicBoxColliders;
     std::vector<mem::WeakRef<GameObject>> mStaticBoxColliders;
 
-    static void CheckCollisionBetweenBoxes(mem::WeakRef<GameObject> box1, mem::WeakRef<GameObject> box2, const bool pushBothBodies = false);
+    std::unordered_map<mem::WeakRef<GameObject>, TriggeredColliderInfo> mTriggeredPrevFrame;
+    std::unordered_map<mem::WeakRef<GameObject>, TriggeredColliderInfo> mTriggeredThisFrame;
+
+    void CheckCollisionBetweenBoxes(mem::WeakRef<GameObject> box1, mem::WeakRef<GameObject> box2, const bool pushBothBodies = false);
 };
 
 } // Namespace ignite.

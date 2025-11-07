@@ -58,7 +58,9 @@ void CarMovement::Update(const float dt)
         direction -= Vec2{ 0.0f, 1.0f };
     }
 
-    mTransform->translation += forwardVector * direction.x * mSpeed * dt;
+    const float reverseMultiplier = direction.x < 0.0f ? 0.5f : 1.0f;
+
+    mTransform->translation += forwardVector * direction.x * mSpeed * reverseMultiplier * dt;
     mTransform->rotation    += direction.y * mSpeed * mTurnSpeed * direction.x * dt;
 }
 

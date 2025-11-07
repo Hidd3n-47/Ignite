@@ -15,7 +15,8 @@ class RaceStartCountdown;
 enum class GameState : uint8_t
 {
     RACE_COUNTDOWN,
-    RACING
+    RACING,
+    RACE_COMPLETED
 };
 
 class GameApplicationStateInitInfo : public IApplicationStateInitInfo

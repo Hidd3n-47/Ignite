@@ -18,7 +18,7 @@ public:
     void OnComponentAdded(const mem::WeakRef<GameObject> parent) override;
     void OnComponentRemoved() override;
 
-    void Update(const float dt) override;
+    void OnTriggerEnter(const mem::WeakRef<GameObject> other) const { if (mOnTriggeredCallback) mOnTriggeredCallback(other); }
 
 #ifdef DEV_CONFIGURATION
 public:
@@ -32,18 +32,15 @@ public:
     [[nodiscard]] inline Vec2 GetOffset() const { return mOffset; }
     [[nodiscard]] inline Vec2 GetDimensionHalfExtents() const { return mDimensionHalfExtents; }
 
-    inline void SetOffset(const Vec2 offset)
-    {
-        mOffset = offset;
-#ifdef DEV_CONFIGURATION
-        mRenderCommand.debugSquareOffset = offset;
-#endif // DEV_CONFIGURATION.
-    }
+    void SetOnTriggeredCallback(const std::function<void(mem::WeakRef<GameObject>)>& onTriggeredCallback) { mOnTriggeredCallback = onTriggeredCallback; }
+    void SetOffset(const Vec2 offset);
 private:
     Vec2 mDimensionHalfExtents;
     Vec2 mOffset;
     bool mDynamic;
     bool mTrigger;
+
+    std::function<void(mem::WeakRef<GameObject>)> mOnTriggeredCallback;
 };
 
 } // Namespace ignite.
