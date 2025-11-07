@@ -3,12 +3,14 @@
 #include <IgniteEngine/Core/Engine.h>
 #include <IgniteEngine/EC/Scene.h>
 
+#include "TrophyRanking.h"
 #include "Src/Defines.h"
 #include "Level/LevelParser.h"
 
 #include "ApplicationState/GameApplicationState.h"
 #include "ApplicationState/MainMenuApplicationState.h"
 #include "ApplicationState/LevelSelectApplicationState.h"
+#include "ApplicationState/RewardsApplicationState.h"
 
 namespace ignite
 {
@@ -72,8 +74,12 @@ void GameManager::ChangeState(const ApplicationStates state, IApplicationStateIn
         break;
     }
     case ApplicationStates::REWARDS:
-
+    {
+        GAME_LOG("Updated Application State: REWARDS");
+        RewardsApplicationStateInitInfo* info = dynamic_cast<RewardsApplicationStateInitInfo*>(initInfo);
+        mCurrentScene = new RewardsApplicationState(mem::WeakRef{ info });
         break;
+    }
     default:
         GAME_ERROR("Trying to change game state to an unhandled state with ID: {}", static_cast<uint32_t>(state));
         break;
@@ -82,6 +88,26 @@ void GameManager::ChangeState(const ApplicationStates state, IApplicationStateIn
     delete initInfo;
 
     Engine::Instance()->SetSceneToChangeTo(mem::WeakRef{ mCurrentScene });
+}
+
+TrophyRanking GameManager::GetTrophyRanking(const float playerTime) const
+{
+    if (playerTime > mTimeForBronze)
+    {
+        return TrophyRanking::NONE;
+    }
+
+    if (playerTime > mTimeForSilver)
+    {
+        return TrophyRanking::BRONZE;
+    }
+
+    if (playerTime > mTimeForGold)
+    {
+        return TrophyRanking::SILVER;
+    }
+
+    return TrophyRanking::GOLD;
 }
 
 } // Namespace ignite.

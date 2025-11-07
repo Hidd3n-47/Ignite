@@ -14,6 +14,7 @@
 #include "Src/Defines.h"
 #include "Core/GameManager.h"
 #include "Level/LevelParser.h"
+#include "RewardsApplicationState.h"
 
 namespace ignite
 {
@@ -63,9 +64,13 @@ void GameApplicationState::ChangeGameState(const GameState state)
         mRaceTimer->StartTimer();
         break;
     case GameState::RACE_COMPLETED:
+    {
         GAME_LOG("Changed to game state: RACE_COMPLETED");
-        GameManager::Instance()->ChangeState(ApplicationStates::LEVEL_SELECT);
+        const mem::WeakRef<GameManager> gameManager = GameManager::Instance();
+        RewardsApplicationStateInitInfo* initInfo = new RewardsApplicationStateInitInfo(gameManager->GetTrophyRanking(mRaceTimer->Stop()));
+        GameManager::Instance()->ChangeState(ApplicationStates::REWARDS, initInfo);
         break;
+    }
     default:
         GAME_ERROR("Trying to change game state to unprocessed state.");
         GAME_BREAK();

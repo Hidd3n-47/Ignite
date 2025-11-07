@@ -13,6 +13,7 @@
 
 #include <IgniteUtils/Xml/XmlSerializer.h>
 
+#include "Core/GameManager.h"
 #include "Src/Defines.h"
 
 namespace ignite
@@ -140,6 +141,27 @@ void LevelParser::LoadLevel(mem::WeakRef<Scene> scene, mem::WeakRef<GameObject> 
 
         lines.clear();
         ++layer;
+    }
+
+    {
+
+        std::ifstream fileInput;
+        fileInput.open(levelPath / "Ranks.lvl", std::ios::in);
+
+        if (fileInput.fail())
+        {
+            GAME_DEBUG(std::string path = levelPath.string());
+            GAME_ERROR("Failed to parse level file: {}", path.c_str());
+        }
+
+        while (std::getline(fileInput, line, '\n'))
+        {
+            lines.push_back(line);
+        }
+
+        fileInput.close();
+
+        GameManager::Instance()->SetLevelRankTimes(std::stof(lines[0]), std::stof(lines[1]), std::stof(lines[2]));
     }
 }
 

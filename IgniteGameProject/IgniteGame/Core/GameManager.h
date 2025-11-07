@@ -6,8 +6,9 @@
 
 namespace ignite
 {
+    enum class TrophyRanking : uint8_t;
 
-class Scene;
+    class Scene;
 
 class GameManager
 {
@@ -25,6 +26,9 @@ public:
     void Destroy() const;
 
     void ChangeState(const ApplicationStates state, IApplicationStateInitInfo* initInfo = nullptr);
+
+    inline void SetLevelRankTimes(const float gold, const float silver, const float bronze) { mTimeForGold = gold; mTimeForSilver = silver; mTimeForBronze = bronze; }
+    TrophyRanking GetTrophyRanking(const float playerTime) const;
 private:
     GameManager()  = default;
     ~GameManager() = default;
@@ -33,6 +37,10 @@ private:
     Scene* mPreviousScene;
 
     static GameManager* mInstance;
+
+    float mTimeForGold{};
+    float mTimeForSilver{};
+    float mTimeForBronze{};
 };
 
 } // Namespace ignite.

@@ -26,15 +26,13 @@ void UiButton::OnComponentAdded(const mem::WeakRef<GameObject> parent)
 
 void UiButton::Update(const float dt)
 {
-    //todo verify as it seems like x-axis is slightly too much.
-    //todo need to look at this when there is scaling as well.
     const Vec2 mousePosition = mInputManagerRef->GetMousePosition();
-    const Vec2 positionScreenSpace = Engine::Instance()->GetCamera().PositionToScreenSpace(mParent->GetComponent<Transform>()->translation);
+    const Vec2 positionScreenSpace = Engine::Instance()->GetCamera().PositionToScreenSpace(mRenderCommand.transform->translation);
 
     const Vec2 delta = Vec2::Abs(mousePosition - positionScreenSpace);
 
     const bool wasHoveredPreviousFrame = mHovered;
-    mHovered = delta.x <= mRenderCommand.texture.width * 0.5f && delta.y <= mRenderCommand.texture.height * 0.5f;
+    mHovered = delta.x <= mRenderCommand.texture.width * 0.5f * mRenderCommand.transform->scale.x && delta.y <= mRenderCommand.texture.height * 0.5f * mRenderCommand.transform->scale.y;
 
     // If the button isn't hovered and was hovered, call resting state callback and early exit.
     if (!mHovered)

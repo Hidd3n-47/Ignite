@@ -19,6 +19,8 @@ public:
     void Update(const float dt) override;
 
     void StartTimer();
+
+    [[nodiscard]] inline float Stop() { mTimerStarted = false; return mTimer; }
 private:
     mem::WeakRef<FontRenderer> mFontRendererRef;
 

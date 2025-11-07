@@ -2,16 +2,33 @@
 
 #include <IgniteEngine/EC/Scene.h>
 
+#include "ApplicationState.h"
+
+#include "Core/TrophyRanking.h"
+
 namespace ignite
 {
+
+class RewardsApplicationStateInitInfo : public IApplicationStateInitInfo
+{
+public:
+    RewardsApplicationStateInitInfo(const TrophyRanking ranking) : ranking(ranking) {}
+
+    TrophyRanking ranking;
+};
+
 
 class RewardsApplicationState : public Scene
 {
 public:
-    RewardsApplicationState() = default;
+    RewardsApplicationState(mem::WeakRef<RewardsApplicationStateInitInfo> initInfo);
 
     void InitScene() override;
-    void SceneUpdate() const override;
+
+private:
+    TrophyRanking mPlayerRanking;
+
+    mem::WeakRef<GameObject> mTextObject;
 };
 
 } // Namespace ignite.
