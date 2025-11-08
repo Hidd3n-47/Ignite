@@ -127,6 +127,12 @@ void CollisionHandler::CheckCollisionBetweenBoxes(mem::WeakRef<GameObject> box1,
 
 #endif // DEV_CONFIGURATION.
 
+    if (box2Collider->IsTrigger())
+    {
+        mTriggeredThisFrame[box2] = { .bodyCollider = box2Collider, .otherBody = box1 };
+        return;
+    }
+
     if (const Vec2 overlap = minDistance - absDelta; overlap.x < overlap.y)
     {
         if (pushBothBodies)
