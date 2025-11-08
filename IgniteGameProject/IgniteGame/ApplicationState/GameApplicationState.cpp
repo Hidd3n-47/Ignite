@@ -4,6 +4,7 @@
 
 #include <IgniteEngine/EC/Components/UiText.h>
 #include <IgniteEngine/EC/Components/Transform.h>
+#include <IgniteEngine/EC/Components/RigidBody.h>
 #include <IgniteEngine/EC/Components/RaceTimer.h>
 #include <IgniteEngine/EC/Components/CarMovement.h>
 #include <IgniteEngine/EC/Components/BoxCollider.h>
@@ -71,6 +72,8 @@ void GameApplicationState::InitScene()
         .particleSpawnInterval = 0.08f,
     };
     mPlayerWheelParticlesBot = mPlayer->AddComponent<ParticleSystem>(smokeParticleDetails2);
+
+    mPlayer->AddComponent<RigidBody>();
 
     mem::WeakRef<GameObject>   raceCountdownObject = CreateGameObject();
     const mem::WeakRef<UiText> raceCountdownText   = raceCountdownObject->AddComponent<UiText>("3", 600.0f);
