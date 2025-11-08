@@ -2,6 +2,7 @@
 #include "ParticleSystem.h"
 
 #include "Core/Engine.h"
+#include "Core/Rendering/ParticleEffect.h"
 #include "Core/Rendering/ParticleManager.h"
 
 namespace ignite

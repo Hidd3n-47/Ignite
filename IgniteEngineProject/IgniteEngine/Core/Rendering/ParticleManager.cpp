@@ -10,35 +10,24 @@
 
 namespace ignite
 {
-ParticleManager::ParticleManager()
-{
-    /* TODO:
-     * ================================
-     * This could cause a big problem since any re-allocation and move in the vector would result in all the returned
-     * Weak references to be invalid, however, I would like effects to be contiguous as we iterate over them every frame.
-     * In order to keep this here we can manually reserve 10 for now, but should look at adding mem::MoveableRef.
-     * This Ref will store all weak references that need to be updated and in the move constructor update all the references.
-     * Note we need to consider how weak references are just a wrapper, so normal use doesn't care about copy operations
-     * Which would obviously be an issue if the moveable ref keeps a pointer to that weak ref.
-     */
-    mEffects.reserve(MAX_CAPACITY);
-}
 
+/* TODO:
+ * ================================
+ * Ideally this would be better a vector of effects instead of pointer of effects for cache efficiency when iterating.
+ * When moving the effect, there is an issue with copying the pointer of particles causing hanging.
+ * Additionally, if it is non pointers we get an issue when vector reallocated and moves as the returned weak reference would be
+ * invalid after a move. Look at adding a moveable reference that holds references to the weak references, and when moved updates the
+ * weak references.
+ */
 mem::WeakRef<ParticleEffect> ParticleManager::AddEffect(const mem::WeakRef<ParticleSystem> system, const mem::WeakRef<ParticleEffectDetails> details)
 {
-    if (mActiveEffects + 1 >= MAX_CAPACITY)
-    {
-        assert(false);
-        DEBUG_BREAK();
-    }
-
-    mEffects.emplace_back();
-    mEffects.back().InitEffect(details);
+    mEffects.emplace_back(new ParticleEffect());
+    mEffects.back()->InitEffect(details);
 
     mSystemToIndex[system] = mActiveEffects;
     mIndexToSystem[mActiveEffects++] = system;
 
-    return mem::WeakRef{ &mEffects.back() };
+    return mem::WeakRef{ mEffects.back() };
 }
 
 void ParticleManager::RemoveEffect(const mem::WeakRef<ParticleSystem> system)
@@ -47,37 +36,48 @@ void ParticleManager::RemoveEffect(const mem::WeakRef<ParticleSystem> system)
 
     if (deletionIndex == --mActiveEffects)
     {
+        delete mEffects.back();
         mEffects.pop_back();
+        mIndexToSystem.clear();
+        mSystemToIndex.clear();
         return;
     }
 
+    delete mEffects[deletionIndex];
     mEffects[deletionIndex] = mEffects.back();
+    mEffects.pop_back();
     mSystemToIndex[mIndexToSystem[mActiveEffects]] = deletionIndex;
+    mIndexToSystem[deletionIndex] = mIndexToSystem[mActiveEffects];
     mSystemToIndex.erase(system);
     mIndexToSystem.erase(mActiveEffects);
 }
 
 void ParticleManager::ClearEffects()
 {
+    for (const ParticleEffect* effect : mEffects)
+    {
+        delete effect;
+    }
+
     mEffects.clear();
     mIndexToSystem.clear();
     mSystemToIndex.clear();
     mActiveEffects = 0;
 }
 
-void ParticleManager::Update(const float dt)
+void ParticleManager::Update(const float dt) const
 {
-    for (ParticleEffect& effect : mEffects)
+    for (ParticleEffect* effect : mEffects)
     {
-        effect.Update(dt);
+        effect->Update(dt);
     }
 }
 
-void ParticleManager::Render(mem::WeakRef<Renderer> renderer) const
+void ParticleManager::Render(const mem::WeakRef<Renderer> renderer) const
 {
-    for (const ParticleEffect& effect : mEffects)
+    for (const ParticleEffect* effect : mEffects)
     {
-        effect.Render(renderer);
+        effect->Render(renderer);
     }
 }
 

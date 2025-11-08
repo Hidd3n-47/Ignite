@@ -1,12 +1,11 @@
 #pragma once
 
-#include "IgniteEngine/Core/Rendering/ParticleEffect.h"
-
 namespace ignite
 {
 
 class Renderer;
 class ParticleSystem;
+class ParticleEffect;
 
 struct Particle;
 struct ParticleEffectDetails;
@@ -14,7 +13,6 @@ struct ParticleEffectDetails;
 class ParticleManager
 {
 public:
-    ParticleManager();
     inline ~ParticleManager() { ClearEffects(); }
 
     [[nodiscard]] mem::WeakRef<ParticleEffect> AddEffect(const mem::WeakRef<ParticleSystem> system, const mem::WeakRef<ParticleEffectDetails> details);
@@ -22,12 +20,10 @@ public:
 
     void ClearEffects();
 
-    void Update(const float dt);
-    void Render(mem::WeakRef<Renderer> renderer) const;
-
-    inline static constexpr uint32_t MAX_CAPACITY = 10;
+    void Update(const float dt) const;
+    void Render(const mem::WeakRef<Renderer> renderer) const;
 private:
-    std::vector<ParticleEffect> mEffects;
+    std::vector<ParticleEffect*> mEffects;
     std::unordered_map<mem::WeakRef<ParticleSystem>, uint32_t> mSystemToIndex;
     std::unordered_map<uint32_t, mem::WeakRef<ParticleSystem>> mIndexToSystem;
 
