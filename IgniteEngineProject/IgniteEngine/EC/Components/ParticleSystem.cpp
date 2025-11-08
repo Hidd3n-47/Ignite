@@ -16,6 +16,8 @@ ParticleSystem::ParticleSystem(ParticleEffectDetails&& particleEffectDetails)
 
 void ParticleSystem::OnComponentAdded(const mem::WeakRef<GameObject> parent)
 {
+    IComponent::OnComponentAdded(parent);
+
     mEffect = Engine::Instance()->GetParticleManager()->AddEffect(mem::WeakRef{ this }, mem::WeakRef{ &mParticleEffectDetails });
     mEffect->Emmit();
 }
@@ -23,6 +25,11 @@ void ParticleSystem::OnComponentAdded(const mem::WeakRef<GameObject> parent)
 void ParticleSystem::OnComponentRemoved()
 {
     Engine::Instance()->GetParticleManager()->RemoveEffect(mem::WeakRef{ this });
+}
+
+void ParticleSystem::Emmit(const bool emmit)
+{
+    mEffect->Emmit(emmit);
 }
 
 } // Namespace ignite.

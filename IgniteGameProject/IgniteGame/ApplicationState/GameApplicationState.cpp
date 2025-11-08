@@ -35,7 +35,7 @@ void GameApplicationState::InitScene()
 
     mem::WeakRef<Transform> transform = mPlayer->GetComponent<Transform>();
     transform->scale = Vec2{ 2.0f };
-    mPlayer->AddComponent<CarMovement>();
+    mPlayerMovement = mPlayer->AddComponent<CarMovement>();
     mPlayer->AddComponent<SpriteRenderer>("Assets/CarBlue.png", 2);
     mPlayer->AddComponent<BoxCollider>(Vec2{0.2f, 0.1f }, true)->SetOffset(Vec2{0.0f, -0.05f});
     mPlayer->AddComponent<RaceManagerComponent>([&] { ChangeGameState(GameState::RACE_COMPLETED); });
@@ -46,15 +46,31 @@ void GameApplicationState::InitScene()
         .textureLayer       = 2,
         .numberOfParticles  = 10,
         .position           = mem::WeakRef{ &transform->translation },
-        .minPositionOffset  = Vec2{-0.1f, 0.0f },
-        .maxPositionOffset  = Vec2{-0.1f, 0.0f },
+        .minPositionOffset  = Vec2{-0.1f, 0.05f },
+        .maxPositionOffset  = Vec2{-0.1f, 0.05f },
         .minLifetime        = 0.4f,
         .maxLifetime        = 0.4f,
         .minScale           = 0.1f,
         .maxScale           = 0.3f,
         .particleSpawnInterval = 0.08f,
     };
-    mPlayer->AddComponent<ParticleSystem>(smokeParticleDetails);
+    mPlayerWheelParticlesTop = mPlayer->AddComponent<ParticleSystem>(smokeParticleDetails);
+
+    const ParticleEffectDetails smokeParticleDetails2
+    {
+        .textureFilepath = "Assets/Smoke.png",
+        .textureLayer = 2,
+        .numberOfParticles = 10,
+        .position = mem::WeakRef{ &transform->translation },
+        .minPositionOffset = Vec2{-0.1f, -0.05f },
+        .maxPositionOffset = Vec2{-0.1f, -0.05f },
+        .minLifetime = 0.4f,
+        .maxLifetime = 0.4f,
+        .minScale = 0.1f,
+        .maxScale = 0.3f,
+        .particleSpawnInterval = 0.08f,
+    };
+    mPlayerWheelParticlesBot = mPlayer->AddComponent<ParticleSystem>(smokeParticleDetails2);
 
     mem::WeakRef<GameObject>   raceCountdownObject = CreateGameObject();
     const mem::WeakRef<UiText> raceCountdownText   = raceCountdownObject->AddComponent<UiText>("3", 600.0f);
@@ -66,6 +82,13 @@ void GameApplicationState::InitScene()
     mRaceTimer = raceTimerObject->AddComponent<RaceTimer>(50.0f);
 
     ChangeGameState(GameState::RACE_COUNTDOWN);
+}
+
+void GameApplicationState::SceneUpdate()
+{
+    const bool moving = mPlayerMovement->IsMoving();
+    mPlayerWheelParticlesTop->Emmit(moving);
+    mPlayerWheelParticlesBot->Emmit(moving);
 }
 
 void GameApplicationState::ChangeGameState(const GameState state)
@@ -84,6 +107,8 @@ void GameApplicationState::ChangeGameState(const GameState state)
     case GameState::RACE_COMPLETED:
     {
         GAME_LOG("Changed to game state: RACE_COMPLETED");
+        mPlayerWheelParticlesTop->Emmit(false);
+        mPlayerWheelParticlesBot->Emmit(false);
         const mem::WeakRef<GameManager> gameManager = GameManager::Instance();
         RewardsApplicationStateInitInfo* initInfo = new RewardsApplicationStateInitInfo(gameManager->GetTrophyRanking(mRaceTimer->Stop()));
         GameManager::Instance()->ChangeState(ApplicationStates::REWARDS, initInfo);

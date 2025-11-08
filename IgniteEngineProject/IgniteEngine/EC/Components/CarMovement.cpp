@@ -62,6 +62,8 @@ void CarMovement::Update(const float dt)
 
     mTransform->translation += forwardVector * direction.x * mSpeed * reverseMultiplier * dt;
     mTransform->rotation    += direction.y * mSpeed * mTurnSpeed * direction.x * dt;
+
+    mMoving = direction.x != 0.0f;
 }
 
 } // Namespace ignite.

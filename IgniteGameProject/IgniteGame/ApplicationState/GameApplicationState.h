@@ -9,7 +9,9 @@ namespace ignite
 {
 
 class RaceTimer;
+class CarMovement;
 class InputManager;
+class ParticleSystem;
 class RaceStartCountdown;
 
 enum class GameState : uint8_t
@@ -33,12 +35,16 @@ public:
     GameApplicationState(const mem::WeakRef<GameApplicationStateInitInfo> info);
 
     void InitScene() override;
+    void SceneUpdate() override;
 
     void ChangeGameState(const GameState state);
 private:
     LevelState mCurrentLevel;
 
     mem::WeakRef<GameObject>         mPlayer;
+    mem::WeakRef<CarMovement>        mPlayerMovement;
+    mem::WeakRef<ParticleSystem>     mPlayerWheelParticlesTop;
+    mem::WeakRef<ParticleSystem>     mPlayerWheelParticlesBot;
     mem::WeakRef<RaceStartCountdown> mRaceCountdown;
     mem::WeakRef<RaceTimer>          mRaceTimer;
     mem::WeakRef<InputManager>       mInputManager;

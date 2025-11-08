@@ -85,11 +85,10 @@ void Engine::Run()
         mInputManager->Poll();
 
         Update();
-        PostUpdate();
-
         mCollisionHandler->Update();
-
         mParticleManager->Update(mDeltaTime);
+
+        PostUpdate();
 
         Render();
 
@@ -123,7 +122,7 @@ void Engine::Destroy() const
     DEBUG_INFO("Successfully destroyed Ignite Engine.");
 }
 
-void Engine::Update() const
+void Engine::Update()
 {
     if (mActiveScene.IsRefValid())
     {

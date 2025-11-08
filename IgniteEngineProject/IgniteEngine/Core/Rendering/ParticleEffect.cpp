@@ -17,11 +17,12 @@ ParticleEffect::~ParticleEffect()
     Engine::Instance()->GetTextureManager()->RemoveTexture(mTextureId);
 }
 
-void ParticleEffect::InitEffect(const mem::WeakRef<ParticleEffectDetails> details)
+void ParticleEffect::InitEffect(const mem::WeakRef<ParticleEffectDetails> details, const mem::WeakRef<Transform> parentTransform)
 {
     mParticles = new Particle[details->numberOfParticles];
 
     mEffectDetails = details;
+    mParentTransform = parentTransform;
 
     Texture particleTexture;
     Engine::Instance()->GetTextureManager()->Load(particleTexture, details->textureFilepath);
@@ -79,6 +80,7 @@ void ParticleEffect::Render(mem::WeakRef<Renderer> renderer) const
     {
         if (mParticles[i].lifetime > 0)
         {
+            mParticles[i].renderCommand.transform->rotation = mParentTransform->rotation;
             renderer->AddRenderCommand(mEffectDetails->textureLayer, mem::WeakRef{ &mParticles[i].renderCommand });
         }
     }
@@ -87,7 +89,7 @@ void ParticleEffect::Render(mem::WeakRef<Renderer> renderer) const
 void ParticleEffect::Emmit(const bool emmit)
 {
     mEmitting   = emmit;
-    mSpawnTimer = mEffectDetails->particleSpawnInterval;
+    //mSpawnTimer = mEffectDetails->particleSpawnInterval;
 }
 
 } // Namespace ignite.

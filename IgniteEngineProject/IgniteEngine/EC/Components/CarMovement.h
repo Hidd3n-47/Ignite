@@ -16,11 +16,13 @@ public:
     void Update(const float dt) override;
 
     inline void EnableMovement() { mMovementEnabled = true; }
+    [[nodiscard]] inline bool IsMoving() const { return mMoving; }
 private:
     mem::WeakRef<Transform>    mTransform;
     mem::WeakRef<InputManager> mInputManagerRef;
 
-    bool mMovementEnabled = false;
+    bool  mMovementEnabled = false;
+    bool  mMoving    = false;
     float mSpeed     = 4.0f;
     float mTurnSpeed = 40.0f;
 };

@@ -54,7 +54,7 @@ public:
     /**
      * @brief Update the \c GameObjects and \c Components.
      */
-    void Update() const;
+    void Update();
     /**
      * @brief An update that is used to preform actions that affect other objects, example, changing a scene.
      */

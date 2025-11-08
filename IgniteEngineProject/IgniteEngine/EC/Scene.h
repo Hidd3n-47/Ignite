@@ -18,7 +18,7 @@ public:
     virtual ~Scene();
 
     inline virtual void InitScene() { }
-    inline virtual void SceneUpdate() const { }
+    inline virtual void SceneUpdate() { }
 
     void Update(const float dt) const;
     void Render(mem::WeakRef<Renderer> renderer) const;

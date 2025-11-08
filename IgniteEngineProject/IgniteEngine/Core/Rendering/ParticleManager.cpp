@@ -6,6 +6,7 @@
 #include "Defines.h"
 #include "Core/Engine.h"
 #include "ParticleEffect.h"
+#include "EC/GameObject.h"
 #include "EC/Components/ParticleSystem.h"
 
 namespace ignite
@@ -22,7 +23,7 @@ namespace ignite
 mem::WeakRef<ParticleEffect> ParticleManager::AddEffect(const mem::WeakRef<ParticleSystem> system, const mem::WeakRef<ParticleEffectDetails> details)
 {
     mEffects.emplace_back(new ParticleEffect());
-    mEffects.back()->InitEffect(details);
+    mEffects.back()->InitEffect(details, system->GetParent()->GetComponent<Transform>());
 
     mSystemToIndex[system] = mActiveEffects;
     mIndexToSystem[mActiveEffects++] = system;

@@ -18,6 +18,8 @@ public:
 
     void OnComponentAdded(const mem::WeakRef<GameObject> parent) override;
     void OnComponentRemoved() override;
+
+    void Emmit(const bool emmit = true);
 private:
     ParticleEffectDetails mParticleEffectDetails;
     mem::WeakRef<ParticleEffect> mEffect;
