@@ -44,6 +44,7 @@ public:
     template <typename CastType>
     [[nodiscard]] inline WeakRef<CastType> Cast() { return WeakRef<CastType>{ reinterpret_cast<CastType*>(mReferencePtr) }; }
 
+    inline T  operator*()               { return *mReferencePtr; }
     inline T* operator->()              { return mReferencePtr; }
     inline const T* operator->() const  { return mReferencePtr; }
     inline bool operator==(const WeakRef<T>& other) const { return mReferencePtr == other.mReferencePtr; }

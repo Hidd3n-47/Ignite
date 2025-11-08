@@ -60,7 +60,7 @@ void BoxCollider::SetOffset(const Vec2 offset)
     mOffset = offset;
 
 #ifdef DEV_CONFIGURATION
-    mRenderCommand.debugSquareOffset = offset;
+    mRenderCommand.offset = offset;
 #endif // DEV_CONFIGURATION.
 }
 

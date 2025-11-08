@@ -15,6 +15,7 @@ class Renderer;
 class FontRenderer;
 class InputManager;
 class TextureManager;
+class ParticleManager;
 class CollisionHandler;
 
 /**
@@ -79,6 +80,7 @@ public:
     [[nodiscard]] inline mem::WeakRef<FontRenderer>     GetFontRenderer()     const { return mem::WeakRef{ mFontRenderer }; }
     [[nodiscard]] inline mem::WeakRef<TextureManager>   GetTextureManager()   const { return mem::WeakRef{ mTextureManager }; }
     [[nodiscard]] inline mem::WeakRef<CollisionHandler> GetCollisionHandler() const { return mem::WeakRef{ mCollisionHandler }; }
+    [[nodiscard]] inline mem::WeakRef<ParticleManager>  GetParticleManager()  const { return mem::WeakRef{ mParticleManager }; }
     [[nodiscard]] inline const OrthoCamera& GetCamera() const { return mCamera; }
 
     static constexpr uint32_t TARGET_FRAMES = 120;
@@ -98,6 +100,7 @@ private:
     InputManager*     mInputManager;
     TextureManager*   mTextureManager;
     CollisionHandler* mCollisionHandler;
+    ParticleManager*  mParticleManager;
 
     SDL_Window*   mWindow   = nullptr;
     Renderer*     mRenderer = nullptr;

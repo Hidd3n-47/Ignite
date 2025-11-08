@@ -17,10 +17,12 @@ struct RenderCommand
     float spritesheetMaxY = 1;
 
     mem::WeakRef<Transform> transform;
+    Vec2 offset;
+
+    uint8_t alpha = 255;
 
 #ifdef DEV_CONFIGURATION
     bool debugSquare;
-    Vec2 debugSquareOffset;
     Vec2 debugSquareHalfExtents;
 #endif // DEV_CONFIGURATION.
 };

@@ -8,7 +8,6 @@ namespace ignite
 {
 
 class InputManager;
-class TextureManager;
 
 class SpriteRenderer : public IComponent
 {

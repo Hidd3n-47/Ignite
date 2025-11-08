@@ -10,6 +10,7 @@
 #include "Physics/CollisionHandler.h"
 #include "Core/Rendering/FontRenderer.h"
 #include "Core/Rendering/TextureManager.h"
+#include "Core/Rendering/ParticleManager.h"
 
 namespace ignite
 {
@@ -70,6 +71,8 @@ void Engine::Init()
 
     mCollisionHandler = new CollisionHandler();
 
+    mParticleManager = new ParticleManager();
+
     mRunning = true;
 }
 
@@ -86,6 +89,8 @@ void Engine::Run()
 
         mCollisionHandler->Update();
 
+        mParticleManager->Update(mDeltaTime);
+
         Render();
 
 #ifdef DEV_CONFIGURATION
@@ -99,6 +104,8 @@ void Engine::Run()
 
 void Engine::Destroy() const
 {
+    delete mParticleManager;
+
     delete mCollisionHandler;
 
     delete mFontRenderer;
@@ -142,7 +149,9 @@ void Engine::Render() const
 
     if (mActiveScene.IsRefValid())
     {
-        mActiveScene->Render(mem::WeakRef{ mRenderer });
+        const mem::WeakRef<Renderer> renderer = mem::WeakRef{ mRenderer };
+        mActiveScene->Render(renderer);
+        mParticleManager->Render(renderer);
     }
 
     mRenderer->Render(mCamera);

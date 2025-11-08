@@ -7,6 +7,7 @@
 #include <IgniteEngine/EC/Components/RaceTimer.h>
 #include <IgniteEngine/EC/Components/CarMovement.h>
 #include <IgniteEngine/EC/Components/BoxCollider.h>
+#include <IgniteEngine/EC/Components/ParticleSystem.h>
 #include <IgniteEngine/EC/Components/SpriteRenderer.h>
 #include <IgniteEngine/EC/Components/RaceStartCountdown.h>
 #include <IgniteEngine/EC/Components/RaceManagerComponent.h>
@@ -32,11 +33,28 @@ void GameApplicationState::InitScene()
 
     GameManager::Instance()->GetLevelParser()->LoadLevel(mem::WeakRef{ this }.Cast<Scene>(), mPlayer, mCurrentLevel);
 
-    mPlayer->GetComponent<Transform>()->scale = Vec2{ 2.0f };
+    mem::WeakRef<Transform> transform = mPlayer->GetComponent<Transform>();
+    transform->scale = Vec2{ 2.0f };
     mPlayer->AddComponent<CarMovement>();
     mPlayer->AddComponent<SpriteRenderer>("Assets/CarBlue.png", 2);
     mPlayer->AddComponent<BoxCollider>(Vec2{0.2f, 0.1f }, true)->SetOffset(Vec2{0.0f, -0.05f});
     mPlayer->AddComponent<RaceManagerComponent>([&] { ChangeGameState(GameState::RACE_COMPLETED); });
+
+    const ParticleEffectDetails smokeParticleDetails
+    {
+        .textureFilepath    = "Assets/Smoke.png",
+        .textureLayer       = 2,
+        .numberOfParticles  = 10,
+        .position           = mem::WeakRef{ &transform->translation },
+        .minPositionOffset  = Vec2{-0.1f, 0.0f },
+        .maxPositionOffset  = Vec2{-0.1f, 0.0f },
+        .minLifetime        = 0.4f,
+        .maxLifetime        = 0.4f,
+        .minScale           = 0.1f,
+        .maxScale           = 0.3f,
+        .particleSpawnInterval = 0.08f,
+    };
+    mPlayer->AddComponent<ParticleSystem>(smokeParticleDetails);
 
     mem::WeakRef<GameObject>   raceCountdownObject = CreateGameObject();
     const mem::WeakRef<UiText> raceCountdownText   = raceCountdownObject->AddComponent<UiText>("3", 600.0f);
