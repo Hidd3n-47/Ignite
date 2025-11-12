@@ -17,4 +17,5 @@ include "IgniteGameProject/"
 include "IgniteMemProject/"
 include "IgniteUtilsProject/"
 
-include "LogProject/"
+include "DebugConsoleProject/"
+include "ConsoleLogProject/"

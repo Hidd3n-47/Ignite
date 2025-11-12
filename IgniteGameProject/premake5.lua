@@ -17,7 +17,7 @@ project "IgniteGame"
 
     includedirs
     {
-        "$(SolutionDir)LogProject/",
+        "$(SolutionDir)ConsoleLogProject/",
 
         "$(SolutionDir)IgniteEngineProject/",
         "$(SolutionDir)IgniteGameProject/IgniteGame/",
@@ -36,6 +36,11 @@ project "IgniteGame"
 
         "IgniteMem",
         "IgniteUtils",
+    }
+
+    postbuildcommands
+    {
+        "call \"$(SolutionDir)copyDeps.bat\""
     }
 
     filter "system:windows"

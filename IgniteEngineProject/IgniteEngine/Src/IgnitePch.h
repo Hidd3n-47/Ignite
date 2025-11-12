@@ -16,7 +16,7 @@
 
 #include <functional>
 
-#include <Log/Log.h>
+#include <ConsoleLog/Log.h>
 
 #include <IgniteMem/Core/WeakRef.h>
 #include <IgniteMem/Core/WeakRefHash.h>

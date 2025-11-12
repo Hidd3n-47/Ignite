@@ -35,6 +35,7 @@ mem::WeakRef<Engine> Engine::CreateEngine()
 
 void Engine::Init()
 {
+    DEBUG(Log::Init();)
     DEBUG_INFO("Successfully initialized Ignite Engine.");
 
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO))
@@ -120,6 +121,7 @@ void Engine::Destroy() const
     mInstance = nullptr;
 
     DEBUG_INFO("Successfully destroyed Ignite Engine.");
+    DEBUG(Log::Destroy();)
 }
 
 void Engine::Update()

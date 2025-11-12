@@ -1,54 +1,29 @@
--- ---------------------------- IgniteEngine Project.
-project "IgniteEngine"
+-- ---------------------------- ConsoleLog Project.
+project "ConsoleLog"
     location "%{prj.name}"
     kind "StaticLib"
     language "C++"
     staticruntime "Off"
     cppdialect "C++latest"
+	clr "On"
 
     targetdir(outputPath .. "%{prj.name}")
     objdir(outputIntPath .. "%{prj.name}")
-
-    pchheader "IgnitePch.h"
-    pchsource "%{prj.name}/Src/IgnitePch.cpp"
 
     files
     {
         "%{prj.name}/**.h",
         "%{prj.name}/**.cpp",
     }
-
-    includedirs
-    {
-        "$(SolutionDir)IgniteEngineProject/",
-
-        "$(SolutionDir)ConsoleLogProject/",
-
-        "$(SolutionDir)IgniteEngineProject/IgniteEngine/",
-        "$(SolutionDir)IgniteEngineProject/IgniteEngine/Src/",
-
-        "$(SolutionDir)IgniteMemProject/",
-        "$(SolutionDir)IgniteUtilsProject/",
-
-        "$(SolutionDir)deps/Include/",
-    }
-
-    libdirs
-    {
-        "$(SolutionDir)deps/Lib/",
-    }
-
-    links
-    {
-        "ConsoleLog",
-        "IgniteMem",
-        "IgniteUtils",
-
-        "SDL3.lib",
-        "SDL3_ttf.lib",
-        "SDL3_image.lib",
-    }
-
+	
+	links
+	{
+		"DebugConsole"
+	}
+	
+	
+    buildoptions ('/AI "' ..outputPath .. 'DebugConsole/"')
+	
     postbuildcommands
     {
         --("{COPYFILE} %[$(SolutionDir)deps/Lib/SDL3.dll] %[" .. outputPath .."IgniteGame/]"),
@@ -62,7 +37,7 @@ project "IgniteEngine"
 
     filter "configurations:Dev"
         runtime "Debug"
-        defines { "ENGINE_DEBUG", "DEV_CONFIGURATION" }
+        defines "DEV_CONFIGURATION"
         symbols "on"
 
     filter "configurations:Release"
