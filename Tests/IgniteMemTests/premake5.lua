@@ -1,11 +1,11 @@
--- ---------------------------- IgniteMem Project.
-project "IgniteMem"
+-- ---------------------------- IgniteMemTests project.
+project "IgniteMemTests"
     location "%{prj.name}"
-    kind "SharedLib"
+    kind "ConsoleApp"
     language "C++"
     staticruntime "Off"
     cppdialect "C++latest"
-
+    
     targetdir(outputPath .. "%{prj.name}")
     objdir(outputIntPath .. "%{prj.name}")
 
@@ -17,25 +17,23 @@ project "IgniteMem"
 
     includedirs
     {
+        "$(SolutionDir)Tests/%{prj.name}/%{prj.name}/",
+        "$(SolutionDir)Tests/TestProject/",
+
         "$(SolutionDir)IgniteMemProject/",
 
-        "$(SolutionDir)deps/include/",
-        "$(SolutionDir)deps/imgui/",
-    }
-
-    libdirs
-    {
-        "$(SolutionDir)deps/Lib/",
+        "$(SolutionDir)deps/Include/",
     }
 
     links
     {
-        "SDL3.lib",
-        "imgui"
+       "TestProject",
+       "IgniteMem",
     }
 
     postbuildcommands
     {
+        ("{COPYFILE} %[$(SolutionDir)deps/Lib/SDL3.dll] %[" .. outputPath .."IgniteMemTests/]"),
         ("{COPYFILE} %[" .. outputPath .. "IgniteMem/IgniteMem.dll] %[" .. outputPath .."IgniteMemTests/]"),
     }
 
@@ -44,15 +42,14 @@ project "IgniteMem"
 
     filter "configurations:Dev"
         runtime "Debug"
-        defines { "MEM_MANAGER", "DEV_CONFIGURATION" }
+        defines "DEV_CONFIGURATION"
         symbols "on"
-        
+
     filter "configurations:Dev_LiveStats"
         runtime "Debug"
-        defines { "MEM_MANAGER", "DEV_CONFIGURATION" }
+        defines { "DEV_CONFIGURATION", "DEV_LIVE_STATS" }
         symbols "on"
 
     filter "configurations:Release"
         runtime "Release"
-        defines "MEM_MANAGER"
         optimize "on"

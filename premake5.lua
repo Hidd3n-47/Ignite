@@ -4,6 +4,7 @@ architecture "x64"
 configurations
 {
     "Dev",
+    "Dev_LiveStats",
     "Release"
 }
 
@@ -18,3 +19,9 @@ include "IgniteMemProject/"
 include "IgniteUtilsProject/"
 
 include "LogProject/"
+
+include "deps/imgui/"
+
+-- Tests
+include "Tests/TestProject/"
+include "Tests/IgniteMemTests/"
