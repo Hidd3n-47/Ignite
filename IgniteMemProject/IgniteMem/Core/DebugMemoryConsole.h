@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <unordered_map>
 
 #include "Node.h"
 
@@ -9,6 +10,8 @@ struct SDL_Renderer;
 
 namespace ignite::mem
 {
+
+struct BinaryTreePosition;
 
 class DebugMemoryConsole
 {
@@ -34,11 +37,13 @@ private:
 
     static DebugMemoryConsole* mInstance;
 
-    bool mRunning;
-    SDL_Window* mWindow;
+    bool          mRunning;
+    SDL_Window*   mWindow;
     SDL_Renderer* mRenderer;
 
     static void UpdateMemoryBlockVector(std::vector<float>& vector, const Node* node, const uint64_t barSize);
+
+    static void AssignPositionsForBinaryTree(Node* node, const int depth, int& order, std::unordered_map<Node*, BinaryTreePosition>& positions);
 };
 
 } // Namespace ignite::mem;

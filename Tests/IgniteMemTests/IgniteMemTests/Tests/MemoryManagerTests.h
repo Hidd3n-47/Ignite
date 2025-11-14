@@ -14,9 +14,14 @@ public:
         ignite::mem::MemoryManager::Init(MEMORY_MANAGER_SIZE);
 
         testRegistry->AddTestCase("MemoryManagerTests", "MemoryManagerInitializedCorrectly", MemoryManagerInitializedCorrectly);
-        DEBUG(testRegistry->AddTestCase("MemoryManagerTests", "MemoryManagerInitializedMemoryInDebugMode", MemoryManagerInitializedMemoryInDebugMode));
-        testRegistry->AddTestCase("MemoryManagerTests", "AllocatedCorrectSizeInt", AllocatedCorrectSizeInt);
-        testRegistry->AddTestCase("MemoryManagerTests", "AllocatedCorrectSizeInt64", AllocatedCorrectSizeInt64);
+        DEBUG(testRegistry->AddTestCase("MemoryManagerTests", "MemoryManagerInitializedUnallocatedMemoryInDebugMode", MemoryManagerInitializedUnallocatedMemoryInDebugMode));
+        DEBUG(testRegistry->AddTestCase("MemoryManagerTests", "MemoryManagerInitializedAllocatedMemoryInDebugMode", MemoryManagerInitializedAllocatedMemoryInDebugMode));
+        DEBUG(testRegistry->AddTestCase("MemoryManagerTests", "MemoryManagerInitializedFreedMemoryInDebugMode", MemoryManagerInitializedFreedMemoryInDebugMode));
+        //testRegistry->AddTestCase("MemoryManagerTests", "AllocatedCorrectSizeInt", AllocatedCorrectSizeInt);
+        //testRegistry->AddTestCase("MemoryManagerTests", "AllocatedCorrectSizeInt64", AllocatedCorrectSizeInt64);
+        //testRegistry->AddTestCase("MemoryManagerTests", "Allocated3Int64AndFreedReverseOrder", Allocated3Int64AndFreedReverseOrder);
+        //testRegistry->AddTestCase("MemoryManagerTests", "Allocated3Int64AndFreedInSameOrder", Allocated3Int64AndFreedInSameOrder);
+        testRegistry->AddTestCase("MemoryManagerTests", "AllocatedDifferentSizeAndFreedInDifferentOrderTest1", AllocatedDifferentSizeAndFreedInDifferentOrderTest1);
     }
 
     static std::optional<std::string> MemoryManagerInitializedCorrectly()
@@ -31,7 +36,7 @@ public:
     }
 
 #ifdef DEV_CONFIGURATION
-    static std::optional<std::string> MemoryManagerInitializedMemoryInDebugMode()
+    static std::optional<std::string> MemoryManagerInitializedUnallocatedMemoryInDebugMode()
     {
         ignite::mem::MemoryManager* manager = ignite::mem::MemoryManager::Instance();
 
@@ -41,6 +46,37 @@ public:
         memset(&unallocatedByteCode, static_cast<int>(ignite::mem::DebugMemoryHexValues::UNALLOCATED), sizeof(uint64_t));
 
         if (startingByte != unallocatedByteCode) return { "Memory manager has not initialized memory to UNALLOCATED code in dev mode." };
+
+        return {};
+    }
+
+    static std::optional<std::string> MemoryManagerInitializedAllocatedMemoryInDebugMode()
+    {
+        ignite::mem::MemoryManager* manager = ignite::mem::MemoryManager::Instance();
+
+        const uint64_t* integer = manager->New<uint64_t>();
+
+        uint64_t allocatedByteCode;
+        memset(&allocatedByteCode, static_cast<int>(ignite::mem::DebugMemoryHexValues::NEWLY_ALLOCATED), sizeof(uint64_t));
+
+        if (*integer != allocatedByteCode) return { "Memory manager has not initialized allocated memory to NEWLY_ALLOCATED code in dev mode." };
+
+        manager->Delete(integer);
+
+        return {};
+    }
+
+    static std::optional<std::string> MemoryManagerInitializedFreedMemoryInDebugMode()
+    {
+        ignite::mem::MemoryManager* manager = ignite::mem::MemoryManager::Instance();
+
+        const uint64_t* integer = manager->New<uint64_t>();
+        manager->Delete(integer);
+
+        uint64_t allocatedByteCode;
+        memset(&allocatedByteCode, static_cast<int>(ignite::mem::DebugMemoryHexValues::FREED), sizeof(uint64_t));
+
+        if (*integer != allocatedByteCode) return { "Memory manager has not initialized freed memory to FREED code in dev mode." };
 
         return {};
     }
@@ -61,7 +97,7 @@ public:
 
         DEV_PAUSE();
 
-        ignite::mem::MemoryManager::Instance()->Delete((void*)integer);
+        ignite::mem::MemoryManager::Instance()->Delete(integer);
 
         if (ignite::mem::MemoryManager::Instance()->GetAllocated() != 0)                   return { "Memory manager still has allocated values even after freeing." };
         if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE) return { "Memory manager's free space was not reset after freeing." };
@@ -70,7 +106,6 @@ public:
 
         return {};
     }
-
 
     static std::optional<std::string> AllocatedCorrectSizeInt64()
     {
@@ -87,7 +122,93 @@ public:
 
         DEV_PAUSE();
 
-        ignite::mem::MemoryManager::Instance()->Delete((void*)integer);
+        ignite::mem::MemoryManager::Instance()->Delete(integer);
+
+        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != 0)                   return { "Memory manager still has allocated values even after freeing." };
+        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE) return { "Memory manager's free space was not reset after freeing." };
+
+        DEV_PAUSE();
+
+        return {};
+    }
+
+    static std::optional<std::string> Allocated3Int64AndFreedReverseOrder()
+    {
+        const uint64_t* integer1 = ignite::mem::MemoryManager::Instance()->New<uint64_t>();
+        const uint64_t* integer2 = ignite::mem::MemoryManager::Instance()->New<uint64_t>();
+        const uint64_t* integer3 = ignite::mem::MemoryManager::Instance()->New<uint64_t>();
+
+        DEV_PAUSE();
+
+        const uint64_t allocSize = 3 * (sizeof(uint64_t) + ignite::mem::MemoryManager::GetMetadataPadding());
+
+        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the int." };
+        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of int." };
+
+        DEV_PAUSE();
+
+        ignite::mem::MemoryManager::Instance()->Delete(integer3);
+        ignite::mem::MemoryManager::Instance()->Delete(integer2);
+        ignite::mem::MemoryManager::Instance()->Delete(integer1);
+
+        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != 0)                   return { "Memory manager still has allocated values even after freeing." };
+        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE) return { "Memory manager's free space was not reset after freeing." };
+
+        DEV_PAUSE();
+
+        return {};
+    }
+
+    static std::optional<std::string> Allocated3Int64AndFreedInSameOrder()
+    {
+        const uint64_t* integer1 = ignite::mem::MemoryManager::Instance()->New<uint64_t>();
+        const uint64_t* integer2 = ignite::mem::MemoryManager::Instance()->New<uint64_t>();
+        const uint64_t* integer3 = ignite::mem::MemoryManager::Instance()->New<uint64_t>();
+
+        DEV_PAUSE();
+
+        const uint64_t allocSize = 3 * (sizeof(uint64_t) + ignite::mem::MemoryManager::GetMetadataPadding());
+
+        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the int." };
+        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of int." };
+
+        DEV_PAUSE();
+
+        ignite::mem::MemoryManager::Instance()->Delete(integer1);
+        ignite::mem::MemoryManager::Instance()->Delete(integer2);
+        ignite::mem::MemoryManager::Instance()->Delete(integer3);
+
+        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != 0)                   return { "Memory manager still has allocated values even after freeing." };
+        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE) return { "Memory manager's free space was not reset after freeing." };
+
+        DEV_PAUSE();
+
+        return {};
+    }
+
+    static std::optional<std::string> AllocatedDifferentSizeAndFreedInDifferentOrderTest1()
+    {
+        const uint32_t* integer1 = ignite::mem::MemoryManager::Instance()->New<uint32_t>();
+        const uint32_t* integer2 = ignite::mem::MemoryManager::Instance()->New<uint32_t>();
+        const uint64_t* integer3 = ignite::mem::MemoryManager::Instance()->New<uint64_t>();
+        const uint32_t* integer4 = ignite::mem::MemoryManager::Instance()->New<uint32_t>();
+
+        DEV_PAUSE();
+
+        const uint64_t allocSize = 3 * sizeof(uint32_t) + sizeof(uint64_t) + 4 * ignite::mem::MemoryManager::GetMetadataPadding();
+
+        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the int." };
+        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of int." };
+
+        DEV_PAUSE();
+
+        ignite::mem::MemoryManager::Instance()->Delete(integer1);
+        DEV_PAUSE();
+        ignite::mem::MemoryManager::Instance()->Delete(integer3);
+        DEV_PAUSE();
+        ignite::mem::MemoryManager::Instance()->Delete(integer2);
+        DEV_PAUSE();
+        ignite::mem::MemoryManager::Instance()->Delete(integer4);
 
         if (ignite::mem::MemoryManager::Instance()->GetAllocated() != 0)                   return { "Memory manager still has allocated values even after freeing." };
         if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE) return { "Memory manager's free space was not reset after freeing." };

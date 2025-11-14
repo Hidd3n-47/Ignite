@@ -1,11 +1,12 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 
 struct Node
 {
-    void* start;
-    uint64_t size;
+    std::byte* start;
+    uint64_t   size;
 
     Node* left;
     Node* right;

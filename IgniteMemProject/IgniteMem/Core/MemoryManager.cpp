@@ -11,6 +11,7 @@ namespace ignite::mem
 
 MemoryManager* MemoryManager::mInstance = nullptr;
 
+
 MemoryManager::MemoryManager(const uint64_t sizeBytes)
 {
     mSize = sizeBytes;
@@ -18,7 +19,7 @@ MemoryManager::MemoryManager(const uint64_t sizeBytes)
     DEBUG(SetMemoryBlockDebug(DebugMemoryHexValues::UNALLOCATED, mMemoryBlock, mSize));
 
     // todo make this a part of the reserved memory
-    mRootNode = new Node{ .start = mMemoryBlock, .size = sizeBytes, .left = nullptr, .right = nullptr, .parent = nullptr };
+    mRootNode = new Node{ .start = static_cast<std::byte*>(mMemoryBlock), .size = sizeBytes, .left = nullptr, .right = nullptr, .parent = nullptr };
     mSmallestBlock = mRootNode;
     mLargestBlock  = mRootNode;
 
@@ -61,39 +62,53 @@ void MemoryManager::Destroy()
     delete mInstance;
 }
 
-void MemoryManager::Delete(void* free)
-{
-    // todo make it take template type to prevent having to cast.
-
-    Node* node = mRootNode;
-    do
-    {
-        if (Node* comparingNode = reinterpret_cast<uintptr_t>(free) < reinterpret_cast<uintptr_t>(node->start) ? node->left : node->right; comparingNode)
-        {
-            node = comparingNode;
-            continue;
-        }
-
-        void* baseAddress = (uint8_t*)free - METADATA_PADDING;
-
-        const uint32_t size = *reinterpret_cast<uint32_t*>(baseAddress) + METADATA_PADDING;
-
-        node->start = baseAddress;
-        node->size += size;
-        mAllocated -= size;
-
-        DEBUG(SetMemoryBlockDebug(DebugMemoryHexValues::FREED, free, size - METADATA_PADDING));
-        return;
-    } 
-    while (node->left || node->right);
-
-    //todo assert if we get here.
-    __debugbreak();
-}
-
 void MemoryManager::SetMemoryBlockDebug(DebugMemoryHexValues value, void* memory, const uint64_t size)
 {
     memset(memory, static_cast<int>(value), size);
+}
+
+void MemoryManager::TryUpdateSmallestBlock(Node* potentialSmallBlock)
+{
+    // If the new potential block is smaller, always set the smallest block to this.
+    if (mSmallestBlock->size > potentialSmallBlock->size)
+    {
+        mSmallestBlock = potentialSmallBlock;
+        return;
+    }
+
+    // If it's not smaller, the only other case we consider is if they are equal.
+    if (mSmallestBlock->size != potentialSmallBlock->size)
+    {
+        return;
+    }
+
+    // If the blocks are equal size we should always point to the left most address.
+    if (mSmallestBlock->start > potentialSmallBlock->start)
+    {
+        mSmallestBlock = potentialSmallBlock;
+    }
+}
+
+void MemoryManager::TryUpdateLargestBlock(Node* potentialLargeBlock)
+{
+    // If the new potential block is larger, always set the larger block to this.
+    if (mLargestBlock->size < potentialLargeBlock->size)
+    {
+        mLargestBlock = potentialLargeBlock;
+        return;
+    }
+
+    // If it's not larger, the only other case we consider is if they are equal.
+    if (mLargestBlock->size != potentialLargeBlock->size)
+    {
+        return;
+    }
+
+    // If the blocks are equal size we should always point to the left most address.
+    if (mLargestBlock->start > potentialLargeBlock->start)
+    {
+        mLargestBlock = potentialLargeBlock;
+    }
 }
 
 } // Namespace ignite::mem.
