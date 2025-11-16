@@ -73,6 +73,14 @@ private:
 
     static constexpr uint32_t METADATA_PADDING{ 4 };
 
+    /**
+     * @brief This function is used to try and merge free memory blocks together. This situation occurs when we have an existing memory block that size increases.
+     * Due to this increase in memory size, we might fill a gap causing blocks to be able to be merged. This can occur when the freed memory is adjacent to two free memory blocks.
+     * One to the left and one to the right. The right adjacent free block will be chosen as the node and expanded to the left, then this function can help that expanded node
+     * to be merged with the adjacent left node.
+     * @param node The node that we are checking if it can be merged with a free memory block to the left (left meaning earlier in memory - not left child node.
+     * Children nodes are strictly less than the parent, and hence both are considered in this function.
+     */
     void TryMergeFreeBlockLeft(Node* node);
 
     bool TryUpdateSmallestBlock(Node* potentialSmallBlock);
@@ -165,7 +173,17 @@ void MemoryManager::Delete(T* free)
 
     //todo assert if baseAddress + size > node->start;
 
-    //MergeFreeBlocksLeft(node, baseAddress, size);
+    /*
+     * Check if the memory being freed can be merged to the left.
+     * This needs to be checked because of the following:
+     * Due to our traversing algorithm, we choose the closest free block to the freed memory whose memory address is strickly greater than the address being freed.
+     * Therefore, in an example like this:
+     * New three ints, 1,2,3. Now free them in that order: 1,2,3. When we free the first, we have a block of memory at address 0-4 (hypothetically), now when we free
+     * int 2, the node that we will be comparing to will be root node and not block at address 0 due to 0 being before 4 (starting address of int 2 - hypothetically)
+     * Therefore, before we create a whole new memory block, merge with this memory block 0-4 => becoming 0-8.
+     * This is very similar to the function <see ref="TryMergeFreeBlockLeft">, however the difference is, the node. With <see ref="TryMergeFreeBlockLeft">, the starting
+     * node was the block being extended to the left, i.e. the block being free was adjacent to the node. This is needed for the time when there is no adjacency.
+     */
     for (Node* n : { node->left, node->right })
     {
         if (n && n->start + size == baseAddress)
