@@ -48,14 +48,14 @@ void TestRegistry::RunTests()
         Log::Debug("Tests", "| ----------------------------------------------", categoryName);
         Log::Debug("Tests", "| \tTests run   : {}", tests.size());
         Log::Info ("Tests", "| \tTests passed: {}", passed);
-        //if (failed > 0)
-        //{
-        //    Log::Error("Tests", "| \tTests failed: {}", failed);
-        //}
-        //else
-        //{
+        if (failed > 0)
+        {
+            Log::Error("Tests", "| \tTests failed: {}", failed);
+        }
+        else
+        {
             Log::Info("Tests", "| \tTests failed: {}", failed);
-        //}
+        }
 
         mPassedTests += passed;
         mFailedTests += failed;

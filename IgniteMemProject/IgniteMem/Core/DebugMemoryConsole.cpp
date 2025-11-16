@@ -1,5 +1,7 @@
 #include "DebugMemoryConsole.h"
 
+#ifdef DEV_CONFIGURATION
+
 #include <print>
 #include <ranges>
 #include <string>
@@ -193,7 +195,7 @@ void DebugMemoryConsole::Render() const
         };
 
         // Draw the edges connecting the centres of the binary tree. Done first to be rendered under nodes.
-        std::function<void(Node*)> drawEdges = [&](Node* node)
+        std::function<void(Node*)> DrawEdges = [&](Node* node)
         {
             if (!node)
             {
@@ -208,16 +210,16 @@ void DebugMemoryConsole::Render() const
             {
                 const ImVec2 centreLeft = GetNodeCentre(node->left);
                 drawList->AddLine(centre, centreLeft, lineColor, 2.0f);
-                drawEdges(node->left);
+                DrawEdges(node->left);
             }
             if (node->right) 
             {
                 const ImVec2 centreRight = GetNodeCentre(node->right);
                 drawList->AddLine(centre, centreRight, lineColor, 2.0f);
-                drawEdges(node->right);
+                DrawEdges(node->right);
             }
         };
-        drawEdges(root);
+        DrawEdges(root);
 
         // Draw the nodes of the binary tree.
         std::function<void(Node*)> DrawNodes = [&](Node* node)
@@ -229,10 +231,28 @@ void DebugMemoryConsole::Render() const
 
             const ImVec2 centre = GetNodeCentre(node);
 
+            constexpr uint32_t nodeColorSmallestBlock = IM_COL32(117, 223, 237, 255);
+            constexpr uint32_t nodeColorLargestBlock  = IM_COL32(237, 131, 117, 255);
             constexpr uint32_t nodeColor        = IM_COL32(70, 120, 200, 255);
             constexpr uint32_t hoveredNodeColor = IM_COL32(70, 120, 255, 255);
 
-            drawList->AddRectFilled({ centre.x - quadHalfSize.x, centre.y - quadHalfSize.y}, { centre.x + quadHalfSize.x, centre.y + quadHalfSize.y }, nodeColor);
+            const bool smallest = MemoryManager::mInstance->GetSmallestBlockNode() == node;
+            const bool largest  = MemoryManager::mInstance->GetLargestBlockNode()  == node;
+
+            uint32_t leftColor  = smallest ? nodeColorSmallestBlock : nodeColor;
+            uint32_t rightColor = largest  ? nodeColorLargestBlock  : nodeColor;
+
+            leftColor  = !smallest ? rightColor : leftColor;
+            rightColor = !largest  ? leftColor  : rightColor;
+
+            // Draw the outline rect first to see the color.
+            constexpr float borderWidth = 4.0f;
+            drawList->AddRectFilledMultiColor({ centre.x - quadHalfSize.x - borderWidth, centre.y - quadHalfSize.y - borderWidth },
+                                              { centre.x + quadHalfSize.x + borderWidth, centre.y + quadHalfSize.y + borderWidth },
+                                          leftColor, rightColor, rightColor, leftColor);
+
+            drawList->AddRectFilled({ centre.x - quadHalfSize.x, centre.y - quadHalfSize.y},
+                                    { centre.x + quadHalfSize.x, centre.y + quadHalfSize.y }, nodeColor);
 
             // Strings for the text on the nodes and tooltip.
             char blockMemoryAddress[64];
@@ -248,7 +268,7 @@ void DebugMemoryConsole::Render() const
                 drawList->AddRectFilled({ centre.x - quadHalfSize.x - sizeIncrease, centre.y - quadHalfSize.y - sizeIncrease }, 
                                         { centre.x + quadHalfSize.x + sizeIncrease, centre.y + quadHalfSize.y + sizeIncrease }, hoveredNodeColor);
 
-                const std::string tooltip = std::format("Block: {}\nBlock Free : {}\nBlock Alloc: {}", blockMemoryAddress, blockFreeSpace, blockAllocated);
+                const std::string tooltip = std::format("Block: {}\nBlock Free : {}\nBlock Alloc: {}\nSmallest   : {}\nLargest    : {}", blockMemoryAddress, blockFreeSpace, blockAllocated, smallest ? "Y" : "N", largest ? "Y" : "N");
                 ImGui::SetItemTooltip("%s", tooltip.c_str());
             }
 
@@ -344,3 +364,5 @@ void DebugMemoryConsole::AssignPositionsForBinaryTree(Node* node, const int dept
 }
 
 } // Namespace ignite::mem.
+
+#endif // DEV_CONFIGURATION.

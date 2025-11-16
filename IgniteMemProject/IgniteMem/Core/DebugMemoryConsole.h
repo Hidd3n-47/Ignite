@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef DEV_CONFIGURATION
+
 #include <vector>
 #include <unordered_map>
 
@@ -46,4 +48,6 @@ private:
     static void AssignPositionsForBinaryTree(Node* node, const int depth, int& order, std::unordered_map<Node*, BinaryTreePosition>& positions);
 };
 
-} // Namespace ignite::mem;
+} // Namespace ignite::mem.
+
+#endif // DEV_CONFIGURATION.

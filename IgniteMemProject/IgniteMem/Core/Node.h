@@ -3,6 +3,9 @@
 #include <cstddef>
 #include <cstdint>
 
+namespace ignite::mem
+{
+
 struct Node
 {
     std::byte* start;
@@ -12,3 +15,5 @@ struct Node
     Node* right;
     Node* parent;
 };
+
+} // Namespace ignite.

@@ -39,6 +39,8 @@ public:
     void Delete(T* free);
 
 #ifdef DEV_CONFIGURATION
+    [[nodiscard]] inline Node*    GetSmallestBlockNode()  const { return mSmallestBlock; }
+    [[nodiscard]] inline Node*    GetLargestBlockNode()   const { return mLargestBlock; }
     [[nodiscard]] inline Node*    GetRootNode()           const { return mRootNode; }
     [[nodiscard]] inline void*    GetStartOfMemoryBlock() const { return mMemoryBlock; }
     [[nodiscard]] inline uint64_t GetSize()               const { return mSize; }
@@ -71,8 +73,10 @@ private:
 
     static constexpr uint32_t METADATA_PADDING{ 4 };
 
-    void TryUpdateSmallestBlock(Node* potentialSmallBlock);
-    void TryUpdateLargestBlock(Node* potentialLargeBlock);
+    void TryMergeFreeBlockLeft(Node* node);
+
+    bool TryUpdateSmallestBlock(Node* potentialSmallBlock);
+    bool TryUpdateLargestBlock(Node* potentialLargeBlock);
 };
 
 template <typename T>
@@ -147,53 +151,36 @@ void MemoryManager::Delete(T* free)
     DEBUG(SetMemoryBlockDebug(DebugMemoryHexValues::FREED, (void*)(free), size - METADATA_PADDING));
     mAllocated -= size;
 
-    // If the base address being freed + size equals to the start of the node, we can update the node to just point earlier.
-    /**
-     * A = Allocated.
-     * F = Address being freed.
-     * N = Start of the free node block.
-     * ==============================
-     * |AAFN                        |
-     * ==============================
-     *   ^^
-     *   |L Node (N)
-     *   L  Address being freed (F)
-     *
-     *   Since our freed address meets the node, we can push the node just to point to the left, making the free block larger:
-     * ==============================
-     * |AAN                         |
-     * ==============================
-     */
+    // Since out baseAddress + size is at the start of the node, this means we can merge our new size into that free block.
     if (baseAddress + size == node->start)
     {
         node->size += size;
         node->start = baseAddress;
 
-        Node** nodesToCheck[2] = { &node->left, &node->right };
-        // Check if we have to absolve previous block.
-        for (Node**& n : nodesToCheck)
-        {
-            if (*n && (*n)->start + (*n)->size == node->start)
-            {
-                node->size += (*n)->size;
-                node->start = (*n)->start;
-
-                // Since we have absolved some nodes together, this means their size is larger, therefore check if we have a new larger block.
-
-
-                //node->left = node->left->left;
-                //node->right = node->left->right; //< todo look at this as this might not be the case.
-
-                delete *n;
-                *n = nullptr;
-                //todo check if we are smallest or largest....
-            }
-        }
+        // Since this free block has increased size going leftwards, we need to check if we can merge to the block on the left.
+        TryMergeFreeBlockLeft(node);
 
         return;
     }
 
     //todo assert if baseAddress + size > node->start;
+
+    //MergeFreeBlocksLeft(node, baseAddress, size);
+    for (Node* n : { node->left, node->right })
+    {
+        if (n && n->start + size == baseAddress)
+        {
+            n->size += size;
+
+            if (n->parent && n->size >= n->parent->size)
+            {
+                n->parent->right = n;
+                n->parent->left  = nullptr;
+            }
+
+            return;
+        }
+    }
 
     // If we get to this point, we are freeing an address not adjacent to other free block, therefore create a new free block.
     Node* newNode = new Node{ .start = baseAddress, .size = size, .left = nullptr, .right = nullptr, .parent = node };
