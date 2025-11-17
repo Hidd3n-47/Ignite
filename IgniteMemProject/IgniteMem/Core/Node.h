@@ -13,7 +13,7 @@ struct Node
 
     Node* left;
     Node* right;
-    Node* parent;
+    //Node* parent;
 };
 
 } // Namespace ignite.
