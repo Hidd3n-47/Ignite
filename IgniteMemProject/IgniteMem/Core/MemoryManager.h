@@ -77,7 +77,7 @@ private:
 
     static constexpr uint32_t METADATA_PADDING{ 4 };
 
-    ListNode* FindAllocationListNode(const uint64_t size) const;
+    std::tuple<ListNode*, ListNode*> FindAllocationListNode(const uint64_t size) const;
 };
 
 template <typename T>
@@ -86,7 +86,9 @@ T* MemoryManager::New()
     const uint64_t size = sizeof(T);
     const uint64_t allocatedSize = size + METADATA_PADDING;
 
-    ListNode* allocationNode = FindAllocationListNode(allocatedSize);
+    assert(mSize - mAllocated >= allocatedSize && "Not enough memory to allocate.");
+
+    auto [previous, allocationNode] = FindAllocationListNode(allocatedSize);
 
     *reinterpret_cast<uint32_t*>(allocationNode->value.address) = size;
 
@@ -99,12 +101,46 @@ T* MemoryManager::New()
 
     DEBUG(SetMemoryBlockDebug(DebugMemoryHexValues::NEWLY_ALLOCATED, typeAddress, size));
 
+    // Todo add test cases where we ensure that nodes behave correctly when:
+    //    1: Remove the starting node and no other node
+    //    2: Remove the starting node and there is another node.
+    //    3: Remove a node in the middle of two blocks - ensure correct relinking.
+    //    4: Remove a node all the way on the right/no nodes to the right.
+    //    5: Complex case where we have a block in the middle, block is filled, freed and then filled.
+
+    // If this allocation fills the block, it might be possible to remove the block.
+    if (allocationNode->value.sizeFree == 0)
+    {
+        // If we are the starting block but have another block, we can remove the node and update starting node.
+        if (!previous && mStartingListNode->next)
+        {
+            // If there is no previous node, we have to be the starting node, else we have a broken list.
+            assert(allocationNode == mStartingListNode);
+            mStartingListNode = allocationNode->next;
+            delete allocationNode;
+        }
+
+        // If we are not the starting block, we can delete the intermediate block and link the previous to next.
+        if (previous)
+        {
+            previous->next = allocationNode->next;
+            delete allocationNode;
+        }
+
+        // The omitted case is when we are the starting node and have no next node.
+        // We do not need to do anything in this situation as we need to constantly have a node.
+        // Therefore, we just will have a node of 0 bytes and do not want to delete it.
+    }
+
     return static_cast<T*>(typeAddress);
 }
 
 template <typename T>
 void MemoryManager::Delete(T* free)
 {
+    assert(free);
+    //todo add validation to ensure that this memory address hasn't been freed already.
+
     std::byte*     freeAddress      = (std::byte*)free - METADATA_PADDING;
     const uint64_t deallocationSize = *((uint32_t*)freeAddress) + METADATA_PADDING;
 
@@ -124,6 +160,18 @@ void MemoryManager::Delete(T* free)
     {
         previous = node;
         node     = node->next;
+    }
+
+    // When the memory block has been free and max has been allocated, we can re-use the full block to make a new block.
+    if (node->value.sizeFree == 0)
+    {
+        // Since this should only occur when memory of reserved block is at full allocation, assert to catch any edge cases.
+        assert(mAllocated + deallocationSize == mSize && "This should only exist if its the first node with no memory left");
+        assert(!node->next);
+
+        node->value.address  = freeAddress;
+        node->value.sizeFree = deallocationSize;
+        return;
     }
 
     // If there is no node to the left of the free address, we might need to create a new node.

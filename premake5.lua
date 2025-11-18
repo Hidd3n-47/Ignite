@@ -25,3 +25,6 @@ include "deps/imgui/"
 -- Tests
 include "Tests/TestProject/"
 include "Tests/IgniteMemTests/"
+
+-- Benchmark
+include "IgniteMemBenchmark"

@@ -135,6 +135,66 @@ void DebugMemoryConsole::Render() const
         ImGui::ShowDemoWindow(&show_demo_window);
 
     {
+        ImGui::Begin("Free memory block linked list");
+
+        ListNode<MemoryBlock>* head = MemoryManager::mInstance->mStartingListNode;
+
+        ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+        const ImVec2 canvasPos  = ImGui::GetCursorScreenPos();
+        const ImVec2 canvasSize = ImGui::GetContentRegionAvail();
+
+        drawList->AddRectFilled(canvasPos,
+            { canvasPos.x + canvasSize.x, canvasPos.y + canvasSize.y },
+            IM_COL32(32, 32, 32, 255));
+
+        constexpr ImVec2 quadHalfSize = { 50.0f, 25.0f };
+        constexpr float  xStep   = 140.0f;
+        const float      yOffset = canvasPos.y + 60.0f;
+
+        float xOffset = canvasPos.x + 100.0f;
+
+        int a = 0;
+        ListNode<MemoryBlock>* node = head;
+        while (node)
+        {
+            ++a;
+            const ImVec2 centre = { xOffset, yOffset };
+
+            drawList->AddRectFilled(
+                { centre.x - quadHalfSize.x, centre.y - quadHalfSize.y },
+                { centre.x + quadHalfSize.x, centre.y + quadHalfSize.y },
+                IM_COL32(70, 120, 200, 255));
+
+            std::string blockMemoryAddress = std::format("{:X}", reinterpret_cast<uintptr_t>(node->value.address));
+            std::string blockFreeSpace     = std::to_string(node->value.sizeFree);
+
+            ImVec2 textSize = ImGui::CalcTextSize(blockMemoryAddress.c_str());
+            drawList->AddText({ centre.x - textSize.x * 0.5f, centre.y - textSize.y },
+                IM_COL32(255, 255, 255, 255), blockMemoryAddress.c_str());
+
+            textSize = ImGui::CalcTextSize(blockFreeSpace.c_str());
+            drawList->AddText({ centre.x - textSize.x * 0.5f, centre.y + 5.0f },
+                IM_COL32(70, 200, 70, 255), blockFreeSpace.c_str());
+
+            if (node->next)
+            {
+                const ImVec2 nextCentre = { xOffset + xStep, yOffset };
+                drawList->AddLine({ centre.x + quadHalfSize.x, centre.y },
+                    { nextCentre.x - quadHalfSize.x, nextCentre.y },
+                    IM_COL32(180, 180, 180, 255), 2.0f);
+            }
+
+            xOffset += xStep;
+            node = node->next;
+        }
+
+        ImGui::Dummy(canvasSize);
+        ImGui::End();
+
+    }
+
+    {
         ImGui::Begin("Allocation Stats");
 
         ImGui::Text("Memory Blocks:");

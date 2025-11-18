@@ -69,17 +69,20 @@ void MemoryManager::SetMemoryBlockDebug(DebugMemoryHexValues value, void* memory
 }
 #endif // DEV_CONFIGURATION.
 
-MemoryManager::ListNode* MemoryManager::FindAllocationListNode(const uint64_t size) const
+std::tuple<MemoryManager::ListNode*, MemoryManager::ListNode*> MemoryManager::FindAllocationListNode(const uint64_t size) const
 {
-    ListNode* node = mStartingListNode;
+    ListNode* previous = nullptr;
+    ListNode* node     = mStartingListNode;
+
     while (node->value.sizeFree < size)
     {
+        previous = node;
         node = node->next;
 
         assert(node && "No valid size found to allocated.");
     }
 
-    return node;
+    return { previous, node };
 }
 
 } // Namespace ignite::mem.
