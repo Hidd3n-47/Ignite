@@ -43,7 +43,7 @@ private:
     SDL_Window*   mWindow;
     SDL_Renderer* mRenderer;
 
-    static void UpdateMemoryBlockVector(std::vector<float>& vector, const Node* node, const uint64_t barSize);
+    static void UpdateMemoryBlockVector(std::vector<float>& vector, const uint64_t barSize);
 
     static void AssignPositionsForBinaryTree(Node* node, const int depth, int& order, std::unordered_map<Node*, BinaryTreePosition>& positions);
 };

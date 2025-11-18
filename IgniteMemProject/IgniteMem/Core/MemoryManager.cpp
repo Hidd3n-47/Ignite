@@ -1,5 +1,6 @@
 #include "MemoryManager.h"
 
+#include <cassert>
 #include <string>
 
 #ifdef DEV_CONFIGURATION
@@ -19,7 +20,8 @@ MemoryManager::MemoryManager(const uint64_t sizeBytes)
     DEBUG(SetMemoryBlockDebug(DebugMemoryHexValues::UNALLOCATED, mMemoryBlock, mSize));
 
     //todo make this a part of the reserved memory
-    mRootNode = new Node{ .start = static_cast<std::byte*>(mMemoryBlock), .size = sizeBytes, .left = nullptr, .right = nullptr, .parent = nullptr };
+    //mRootNode = new Node{ .start = static_cast<std::byte*>(mMemoryBlock), .size = sizeBytes, .left = nullptr, .right = nullptr, .parent = nullptr };
+    mStartingListNode = new ListNode{ .value = {.address = static_cast<std::byte*>(mMemoryBlock), .sizeFree = sizeBytes }, .next = nullptr};
 
 #ifdef DEV_CONFIGURATION
     mThread = std::thread(&DebugMemoryConsole::Init);
@@ -66,5 +68,18 @@ void MemoryManager::SetMemoryBlockDebug(DebugMemoryHexValues value, void* memory
     memset(memory, static_cast<int>(value), size);
 }
 #endif // DEV_CONFIGURATION.
+
+MemoryManager::ListNode* MemoryManager::FindAllocationListNode(const uint64_t size) const
+{
+    ListNode* node = mStartingListNode;
+    while (node->value.sizeFree < size)
+    {
+        node = node->next;
+
+        assert(node && "No valid size found to allocated.");
+    }
+
+    return node;
+}
 
 } // Namespace ignite::mem.
