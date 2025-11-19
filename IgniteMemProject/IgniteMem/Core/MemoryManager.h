@@ -48,10 +48,11 @@ public:
     void Delete(T* free);
 
 #ifdef DEV_CONFIGURATION
-    [[nodiscard]] inline void*    GetStartOfMemoryBlock() const { return mMemoryBlock; }
-    [[nodiscard]] inline uint64_t GetSize()               const { return mSize; }
-    [[nodiscard]] inline uint64_t GetAllocated()          const { return mAllocated; }
-    [[nodiscard]] inline uint64_t GetSizeFree()           const { return mSize - mAllocated; }
+    [[nodiscard]] inline ListNode* GetStartingListNode()   const { return mStartingListNode; }
+    [[nodiscard]] inline void*     GetStartOfMemoryBlock() const { return mMemoryBlock; }
+    [[nodiscard]] inline uint64_t  GetSize()               const { return mSize; }
+    [[nodiscard]] inline uint64_t  GetAllocated()          const { return mAllocated; }
+    [[nodiscard]] inline uint64_t  GetSizeFree()           const { return mSize - mAllocated; }
 
     static void SetMemoryBlockDebug(DebugMemoryHexValues value, void* memory, const uint64_t size);
     inline static uint32_t GetMetadataPadding() { return METADATA_PADDING; }
@@ -100,13 +101,6 @@ T* MemoryManager::New()
     void* typeAddress = allocationNode->value.address - size;
 
     DEBUG(SetMemoryBlockDebug(DebugMemoryHexValues::NEWLY_ALLOCATED, typeAddress, size));
-
-    // Todo add test cases where we ensure that nodes behave correctly when:
-    //    1: Remove the starting node and no other node
-    //    2: Remove the starting node and there is another node.
-    //    3: Remove a node in the middle of two blocks - ensure correct relinking.
-    //    4: Remove a node all the way on the right/no nodes to the right.
-    //    5: Complex case where we have a block in the middle, block is filled, freed and then filled.
 
     // If this allocation fills the block, it might be possible to remove the block.
     if (allocationNode->value.sizeFree == 0)
