@@ -2,10 +2,10 @@
 
 #ifdef DEV_CONFIGURATION
 
+#include <string>
 #include <vector>
-#include <unordered_map>
 
-#include "Node.h"
+#include "Defines.h"
 
 struct SDL_Window;
 struct SDL_Renderer;
@@ -13,9 +13,13 @@ struct SDL_Renderer;
 namespace ignite::mem
 {
 
-struct BinaryTreePosition;
+struct HistogramInfo
+{
+    std::string title;
+    std::vector<float> values;
+};
 
-class DebugMemoryConsole
+class API DebugMemoryConsole
 {
 public:
     [[nodiscard]] inline static DebugMemoryConsole* Instance() { return mInstance; }
@@ -33,6 +37,8 @@ public:
     void Run();
     void Update();
     void Render() const;
+
+    void AddHistogram(const std::string& title, const void* data, const uint32_t size);
 private:
     DebugMemoryConsole();
     ~DebugMemoryConsole();
@@ -43,9 +49,9 @@ private:
     SDL_Window*   mWindow;
     SDL_Renderer* mRenderer;
 
-    static void UpdateMemoryBlockVector(std::vector<float>& vector, const uint64_t barSize);
+    std::vector<HistogramInfo> mHistograms;
 
-    static void AssignPositionsForBinaryTree(Node* node, const int depth, int& order, std::unordered_map<Node*, BinaryTreePosition>& positions);
+    static void UpdateMemoryBlockVector(std::vector<float>& vector, const uint64_t barSize);
 };
 
 } // Namespace ignite::mem.

@@ -27,11 +27,11 @@ public:
         testRegistry->AddTestCase("MemoryManagerTests", "AllocateLargerSkipsSmallGap", AllocateLargerSkipsSmallGap);
         testRegistry->AddTestCase("MemoryManagerTests", "AllocateFullFreeCollapsesAndInsertInMiddle", AllocateFullFreeCollapsesAndInsertInMiddle);
         testRegistry->AddTestCase("MemoryManagerTests", "WhenFullyAllocatedOnlyHaveRootNodeAndNoneOthers", WhenFullyAllocatedOnlyHaveRootNodeAndNoneOthers);
-        testRegistry->AddTestCase("MemoryManagerTests", "StartingNodeCollapsesWhenFullAndAnotherNodeExists", StartingNodeCollapsesWhenFullAndAnotherNodeExists);
-        testRegistry->AddTestCase("MemoryManagerTests", "StartingNodeCollapsesWhenFullAndNoOtherNodeExists", StartingNodeCollapsesWhenFullAndNoOtherNodeExists);
-        testRegistry->AddTestCase("MemoryManagerTests", "MiddleNodeCollapsesAndListReLinks", MiddleNodeCollapsesAndListReLinks);
-        testRegistry->AddTestCase("MemoryManagerTests", "EndNodeCollapsesWhenThereIsALeftNode", EndNodeCollapsesWhenThereIsALeftNode);
-        testRegistry->AddTestCase("MemoryManagerTests", "MiddleBlockAddedThenCollapsedThenAdded", MiddleBlockAddedThenCollapsedThenAdded);
+        testRegistry->AddTestCase("LinkedListNodeTest", "StartingNodeCollapsesWhenFullAndAnotherNodeExists", StartingNodeCollapsesWhenFullAndAnotherNodeExists);
+        testRegistry->AddTestCase("LinkedListNodeTest", "StartingNodeCollapsesWhenFullAndNoOtherNodeExists", StartingNodeCollapsesWhenFullAndNoOtherNodeExists);
+        testRegistry->AddTestCase("LinkedListNodeTest", "MiddleNodeCollapsesAndListReLinks", MiddleNodeCollapsesAndListReLinks);
+        testRegistry->AddTestCase("LinkedListNodeTest", "EndNodeCollapsesWhenThereIsALeftNode", EndNodeCollapsesWhenThereIsALeftNode);
+        testRegistry->AddTestCase("LinkedListNodeTest", "MiddleBlockAddedThenCollapsedThenAdded", MiddleBlockAddedThenCollapsedThenAdded);
     }
 
     static uint32_t GetFragmentCount()

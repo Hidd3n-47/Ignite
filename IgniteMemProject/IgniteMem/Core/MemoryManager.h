@@ -11,13 +11,6 @@
 #include "DebugMemoryHexValues.h"
 #endif // DEV_CONFIGURATION.
 
-
-#ifdef MEM_MANAGER
-#define API __declspec(dllexport)
-#else
-#define API __declspec(dllimport)
-#endif
-
 namespace ignite::mem
 {
 
@@ -57,6 +50,7 @@ public:
     static void SetMemoryBlockDebug(DebugMemoryHexValues value, void* memory, const uint64_t size);
     inline static uint32_t GetMetadataPadding() { return METADATA_PADDING; }
 
+    void AddHistogram(const std::string& title, const void* data, const uint32_t size) const;
 private:
     std::thread mThread;
 

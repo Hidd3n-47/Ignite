@@ -207,14 +207,36 @@ void DebugMemoryConsole::Render() const
 
         ImGui::PlotHistogram("##Memory block", values.data(), static_cast<int>(values.size()), 0, nullptr, 0.0f, 1.0f);
 
-        ImGui::Text("\nMemory allocated:\n%d of %d bytes", MemoryManager::mInstance->GetAllocated(), MemoryManager::mInstance->GetSize());
+        ImGui::Text("\nMemory allocated:\n%llu of %llu bytes", MemoryManager::mInstance->GetAllocated(), MemoryManager::mInstance->GetSize());
         ImGui::ProgressBar(1.0f - static_cast<float>(MemoryManager::mInstance->GetSizeFree()) / static_cast<float>(MemoryManager::mInstance->GetSize()), { 200.0f, 0.0f });
 
-        ImGui::Text("\nStart of Memory Block:");
-        char buf[64];
-        (void)snprintf(buf, sizeof(buf), "%016" PRIX64, reinterpret_cast<uintptr_t>(MemoryManager::mInstance->GetStartOfMemoryBlock()));
-        ImGui::Text(buf);
+        std::string blockMemoryAddress = std::format("{:X}", reinterpret_cast<uintptr_t>(MemoryManager::mInstance->GetStartOfMemoryBlock()));
+        ImGui::Text("\nStart of Memory Block:\n%s", blockMemoryAddress.c_str());
+
+        ImGui::SameLine(300.0f);
+
+        uint32_t fragments = 0;
+        auto node = MemoryManager::mInstance->GetStartingListNode();
+        while (node)
+        {
+            ++fragments;
+            node = node->next;
+        }
+        ImGui::Text("\nNumber of Memory Fragments:\n%u", fragments);
+
         ImGui::End();
+    }
+
+    {
+        for (const HistogramInfo& info : mHistograms)
+        {
+            ImGui::Begin(info.title.c_str());
+
+            std::string id = "##histogram" + info.title;
+            ImGui::PlotHistogram(id.c_str(), info.values.data(), static_cast<int>(info.values.size()), 0, nullptr, 0.0f, 1.0f);
+
+            ImGui::End();
+        }
     }
 
     constexpr ImVec4 clearColor{ 0.45f, 0.55f, 0.6f, 1.0f };
@@ -225,6 +247,16 @@ void DebugMemoryConsole::Render() const
     SDL_RenderClear(mRenderer);
     ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), mRenderer);
     SDL_RenderPresent(mRenderer);
+}
+
+void DebugMemoryConsole::AddHistogram(const std::string& title, const void* data, const uint32_t size)
+{
+    HistogramInfo info;
+    mHistograms.push_back(info);
+    mHistograms.back().title = title;
+
+    mHistograms.back().values.resize(size);
+    memcpy(mHistograms.back().values.data(), data, size);
 }
 
 void DebugMemoryConsole::UpdateMemoryBlockVector(std::vector<float>& vector, const uint64_t barSize)
@@ -243,22 +275,6 @@ void DebugMemoryConsole::UpdateMemoryBlockVector(std::vector<float>& vector, con
 
         node = node->next;
     }
-}
-
-void DebugMemoryConsole::AssignPositionsForBinaryTree(Node* node, const int depth, int& order, std::unordered_map<Node*, BinaryTreePosition>& positions) 
-{
-    if (!node)
-    {
-        return;
-    }
-
-    AssignPositionsForBinaryTree(node->left, depth + 1, order, positions);
-
-    positions[node] = {  .index = order, .depth = depth };
-
-    ++order;
-
-    AssignPositionsForBinaryTree(node->right, depth + 1, order, positions);
 }
 
 } // Namespace ignite::mem.
