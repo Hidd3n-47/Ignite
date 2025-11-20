@@ -852,8 +852,8 @@ public:
         Vec2* instance = manager->New<Vec2>(Vec2::solution, -Vec2::solution);
 
         const uint64_t allocSize = sizeof(Vec2) + ignite::mem::MemoryManager::GetMetadataPadding();
-        if (manager->GetAllocated() != allocSize)                                         return { "Memory manager allocated more than the size of the allocation." };
-        if (manager->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize)                   return { "Memory manager's free space was reduced by more than size of allocation" };
+        if (manager->GetAllocated()  != allocSize)                                        return { "Memory manager allocated more than the size of the allocation." };
+        if (manager->GetSizeFree()   != MEMORY_MANAGER_SIZE - allocSize)                  return { "Memory manager's free space was reduced by more than size of allocation" };
         if (!instance || instance->x != Vec2::solution || instance->y != -Vec2::solution) return { "Instances' parameters were not forwarded to constructed and constructed with correct values." };
 
         DEV_PAUSE();

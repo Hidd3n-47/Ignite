@@ -96,8 +96,8 @@ void DebugMemoryConsole::Run()
 {
     while (mRunning)
     {
-        Update();
         Render();
+        Update();
     }
     Destroy();
 }
@@ -154,11 +154,9 @@ void DebugMemoryConsole::Render() const
 
         float xOffset = canvasPos.x + 100.0f;
 
-        int a = 0;
         ListNode<MemoryBlock>* node = head;
         while (node)
         {
-            ++a;
             const ImVec2 centre = { xOffset, yOffset };
 
             drawList->AddRectFilled(
@@ -200,15 +198,17 @@ void DebugMemoryConsole::Render() const
         ImGui::Text("Memory Blocks:");
         const uint64_t size = MemoryManager::mInstance->GetSize();
 
-        std::vector<float> values;
-        values.resize(size / 4, 1.0f);
+        constexpr uint32_t numMemorySlices = 128;
 
-        UpdateMemoryBlockVector(values, 4);
+        std::vector<float> values(numMemorySlices, 1.0f);
+
+        const uint64_t sliceWidth = static_cast<uint64_t>(size / numMemorySlices);
+        UpdateMemoryBlockVector(values, sliceWidth);
 
         ImGui::PlotHistogram("##Memory block", values.data(), static_cast<int>(values.size()), 0, nullptr, 0.0f, 1.0f);
 
-        ImGui::Text("\nMemory allocated:\n%llu of %llu bytes", MemoryManager::mInstance->GetAllocated(), MemoryManager::mInstance->GetSize());
-        ImGui::ProgressBar(1.0f - static_cast<float>(MemoryManager::mInstance->GetSizeFree()) / static_cast<float>(MemoryManager::mInstance->GetSize()), { 200.0f, 0.0f });
+        ImGui::Text("\nMemory allocated:\n%llu of %llu bytes", MemoryManager::mInstance->GetAllocated(), size);
+        ImGui::ProgressBar(1.0f - static_cast<float>(MemoryManager::mInstance->GetSizeFree()) / static_cast<float>(size), { 200.0f, 0.0f });
 
         std::string blockMemoryAddress = std::format("{:X}", reinterpret_cast<uintptr_t>(MemoryManager::mInstance->GetStartOfMemoryBlock()));
         ImGui::Text("\nStart of Memory Block:\n%s", blockMemoryAddress.c_str());
@@ -247,7 +247,7 @@ void DebugMemoryConsole::UpdateMemoryBlockVector(std::vector<float>& vector, con
     while (node)
     {
         const size_t start = reinterpret_cast<std::intptr_t>(node->value.address - memoryStart) / barSize;
-        const size_t end   = start + node->value.sizeFree / barSize;
+        const size_t end   = start + static_cast<size_t>(std::ceil(static_cast<float>(node->value.sizeFree) / barSize));
 
         std::fill(vector.begin() + start, vector.begin() + end, 0.1f);
 

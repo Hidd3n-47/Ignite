@@ -23,9 +23,9 @@ MemoryManager::MemoryManager(const uint64_t sizeBytes)
     //mRootNode = new Node{ .start = static_cast<std::byte*>(mMemoryBlock), .size = sizeBytes, .left = nullptr, .right = nullptr, .parent = nullptr };
     mStartingListNode = new ListNode{ .value = {.address = static_cast<std::byte*>(mMemoryBlock), .sizeFree = sizeBytes }, .next = nullptr};
 
-#ifdef DEV_CONFIGURATION
+#ifdef DEV_LIVE_STATS
     mThread = std::thread(&DebugMemoryConsole::Init);
-#endif // DEV_CONFIGURATION.
+#endif // DEV_LIVE_STATS.
 }
 
 MemoryManager::~MemoryManager()
@@ -47,7 +47,7 @@ void MemoryManager::Init(const uint32_t sizeBytes)
 
 void MemoryManager::Destroy()
 {
-#ifdef DEV_CONFIGURATION
+#ifdef DEV_LIVE_STATS
     // Since the debug console is constructed on a different thread, it's possible to try close before the instance has been constructed.
     // Force stall until it's been created to ensure resources freed.
     while (!DebugMemoryConsole::Instance()) { }
@@ -57,7 +57,7 @@ void MemoryManager::Destroy()
     {
         mInstance->mThread.join();
     }
-#endif // DEV_CONFIGURATION.
+#endif // DEV_LIVE_STATS.
 
     delete mInstance;
 }

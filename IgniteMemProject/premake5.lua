@@ -37,6 +37,7 @@ project "IgniteMem"
     postbuildcommands
     {
         ("{COPYFILE} %[" .. outputPath .. "IgniteMem/IgniteMem.dll] %[" .. outputPath .."IgniteMemTests/]"),
+        ("{COPYFILE} %[" .. outputPath .. "IgniteMem/IgniteMem.dll] %[" .. outputPath .."IgniteMemBenchmark/]"),
     }
 
     filter "system:windows"
@@ -49,7 +50,7 @@ project "IgniteMem"
         
     filter "configurations:Dev_LiveStats"
         runtime "Debug"
-        defines { "MEM_MANAGER", "DEV_CONFIGURATION" }
+        defines { "MEM_MANAGER", "DEV_CONFIGURATION", "DEV_LIVE_STATS" }
         symbols "on"
 
     filter "configurations:Release"

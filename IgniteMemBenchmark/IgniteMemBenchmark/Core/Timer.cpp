@@ -4,16 +4,17 @@ namespace ignite::bench
 {
 
 Timer::Timer()
-    : mStart(std::chrono::high_resolution_clock::now().time_since_epoch())
+    : mStart(std::chrono::high_resolution_clock::now())
 {
     // Empty.
 }
 
 uint64_t Timer::StopTimer() const
 {
-    const auto time = std::chrono::high_resolution_clock::now().time_since_epoch() - mStart;
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - mStart);
 
-    return time.count();
+    return duration.count();
 }
 
 } // Namespace ignite::bench.

@@ -21,7 +21,8 @@ project "IgniteMemTests"
         "$(SolutionDir)Tests/TestProject/",
 
         "$(SolutionDir)IgniteMemProject/",
-
+        
+        "$(SolutionDir)deps/",
         "$(SolutionDir)deps/Include/",
     }
 

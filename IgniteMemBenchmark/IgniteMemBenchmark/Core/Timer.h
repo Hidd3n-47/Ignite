@@ -7,14 +7,13 @@ namespace ignite::bench
 
 class Timer
 {
-typedef std::chrono::duration<unsigned long long, std::nano> nanoseconds;
 public:
     Timer();
     ~Timer() = default;
 
     uint64_t StopTimer() const;
 private:
-    nanoseconds mStart;
+    std::chrono::high_resolution_clock::time_point mStart;
 };
 
 } // Namespace ignite::bench.

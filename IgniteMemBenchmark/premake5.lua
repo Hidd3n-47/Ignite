@@ -19,18 +19,26 @@ project "IgniteMemBenchmark"
     {
         "$(SolutionDir)IgniteMemProject/",
 
+        "$(SolutionDir)deps/imgui/",
         "$(SolutionDir)deps/Include/",
+    }
+
+    libdirs
+    {
+        "$(SolutionDir)deps/Lib/",
     }
 
     links
     {
        "IgniteMem",
+       "imgui",
+
+       "SDL3.lib"
     }
 
     postbuildcommands
     {
-        ("{COPYFILE} %[$(SolutionDir)deps/Lib/SDL3.dll] %[" .. outputPath .."IgniteMemBenchmark/]"),
-        ("{COPYFILE} %[" .. outputPath .. "IgniteMem/IgniteMem.dll] %[" .. outputPath .."IgniteMemBenchmark/]"),
+        ("{COPYFILE} %[$(SolutionDir)deps/Lib/SDL3.dll] %[" .. outputPath .."IgniteMemBenchmark/]")
     }
 
     filter "system:windows"
