@@ -227,18 +227,6 @@ void DebugMemoryConsole::Render() const
         ImGui::End();
     }
 
-    {
-        for (const HistogramInfo& info : mHistograms)
-        {
-            ImGui::Begin(info.title.c_str());
-
-            std::string id = "##histogram" + info.title;
-            ImGui::PlotHistogram(id.c_str(), info.values.data(), static_cast<int>(info.values.size()), 0, nullptr, 0.0f, 1.0f);
-
-            ImGui::End();
-        }
-    }
-
     constexpr ImVec4 clearColor{ 0.45f, 0.55f, 0.6f, 1.0f };
 
     ImGui::Render();
@@ -247,16 +235,6 @@ void DebugMemoryConsole::Render() const
     SDL_RenderClear(mRenderer);
     ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), mRenderer);
     SDL_RenderPresent(mRenderer);
-}
-
-void DebugMemoryConsole::AddHistogram(const std::string& title, const void* data, const uint32_t size)
-{
-    HistogramInfo info;
-    mHistograms.push_back(info);
-    mHistograms.back().title = title;
-
-    mHistograms.back().values.resize(size);
-    memcpy(mHistograms.back().values.data(), data, size);
 }
 
 void DebugMemoryConsole::UpdateMemoryBlockVector(std::vector<float>& vector, const uint64_t barSize)

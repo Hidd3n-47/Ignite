@@ -13,13 +13,7 @@ struct SDL_Renderer;
 namespace ignite::mem
 {
 
-struct HistogramInfo
-{
-    std::string title;
-    std::vector<float> values;
-};
-
-class API DebugMemoryConsole
+class DebugMemoryConsole
 {
 public:
     [[nodiscard]] inline static DebugMemoryConsole* Instance() { return mInstance; }
@@ -37,8 +31,6 @@ public:
     void Run();
     void Update();
     void Render() const;
-
-    void AddHistogram(const std::string& title, const void* data, const uint32_t size);
 private:
     DebugMemoryConsole();
     ~DebugMemoryConsole();
@@ -48,8 +40,6 @@ private:
     bool          mRunning;
     SDL_Window*   mWindow;
     SDL_Renderer* mRenderer;
-
-    std::vector<HistogramInfo> mHistograms;
 
     static void UpdateMemoryBlockVector(std::vector<float>& vector, const uint64_t barSize);
 };

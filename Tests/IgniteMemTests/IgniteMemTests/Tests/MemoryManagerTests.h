@@ -15,7 +15,6 @@ public:
 
         testRegistry->AddTestCase("MemoryManagerTests", "MemoryManagerInitializedCorrectly", MemoryManagerInitializedCorrectly);
         DEBUG(testRegistry->AddTestCase("MemoryManagerTests", "MemoryManagerInitializedUnallocatedMemoryInDebugMode", MemoryManagerInitializedUnallocatedMemoryInDebugMode));
-        DEBUG(testRegistry->AddTestCase("MemoryManagerTests", "MemoryManagerInitializedAllocatedMemoryInDebugMode", MemoryManagerInitializedAllocatedMemoryInDebugMode));
         DEBUG(testRegistry->AddTestCase("MemoryManagerTests", "MemoryManagerInitializedFreedMemoryInDebugMode", MemoryManagerInitializedFreedMemoryInDebugMode));
         testRegistry->AddTestCase("MemoryManagerTests", "AllocatedCorrectSizeInt", AllocatedCorrectSizeInt);
         testRegistry->AddTestCase("MemoryManagerTests", "AllocatedCorrectSizeInt64", AllocatedCorrectSizeInt64);
@@ -32,6 +31,9 @@ public:
         testRegistry->AddTestCase("LinkedListNodeTest", "MiddleNodeCollapsesAndListReLinks", MiddleNodeCollapsesAndListReLinks);
         testRegistry->AddTestCase("LinkedListNodeTest", "EndNodeCollapsesWhenThereIsALeftNode", EndNodeCollapsesWhenThereIsALeftNode);
         testRegistry->AddTestCase("LinkedListNodeTest", "MiddleBlockAddedThenCollapsedThenAdded", MiddleBlockAddedThenCollapsedThenAdded);
+        testRegistry->AddTestCase("Construction", "AllocatingCallsConstructor", AllocatingCallsConstructor);
+        testRegistry->AddTestCase("Construction", "DeallocatingCallsDestructor", DeallocatingCallsDestructor);
+        testRegistry->AddTestCase("Construction", "ConstructorCalledWithParameters", ConstructorCalledWithParameters);
     }
 
     static uint32_t GetFragmentCount()
@@ -73,22 +75,6 @@ public:
         return {};
     }
 
-    static std::optional<std::string> MemoryManagerInitializedAllocatedMemoryInDebugMode()
-    {
-        ignite::mem::MemoryManager* manager = ignite::mem::MemoryManager::Instance();
-
-        const uint64_t* integer = manager->New<uint64_t>();
-
-        uint64_t allocatedByteCode;
-        memset(&allocatedByteCode, static_cast<int>(ignite::mem::DebugMemoryHexValues::NEWLY_ALLOCATED), sizeof(uint64_t));
-
-        if (*integer != allocatedByteCode) return { "Memory manager has not initialized allocated memory to NEWLY_ALLOCATED code in dev mode." };
-
-        manager->Delete(integer);
-
-        return {};
-    }
-
     static std::optional<std::string> MemoryManagerInitializedFreedMemoryInDebugMode()
     {
         ignite::mem::MemoryManager* manager = ignite::mem::MemoryManager::Instance();
@@ -115,8 +101,8 @@ public:
         const void* startingAddress = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(integer) - ignite::mem::MemoryManager::GetMetadataPadding());
 
         if (startingAddress != ignite::mem::MemoryManager::Instance()->GetStartOfMemoryBlock())        return { "Memory manager first allocation is not the starting address of the memory block." };
-        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the int." };
-        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of int." };
+        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the allocation." };
+        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of allocation." };
 
         DEV_PAUSE();
 
@@ -140,8 +126,8 @@ public:
         const void* startingAddress = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(integer) - ignite::mem::MemoryManager::GetMetadataPadding());
 
         if (startingAddress != ignite::mem::MemoryManager::Instance()->GetStartOfMemoryBlock())        return { "Memory manager first allocation is not the starting address of the memory block." };
-        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the int." };
-        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of int." };
+        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the allocation." };
+        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of allocation." };
 
         DEV_PAUSE();
 
@@ -167,8 +153,8 @@ public:
 
         const uint64_t allocSize = 3 * (sizeof(uint64_t) + ignite::mem::MemoryManager::GetMetadataPadding());
 
-        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the int." };
-        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of int." };
+        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the allocation." };
+        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of allocation." };
 
         DEV_PAUSE();
 
@@ -198,8 +184,8 @@ public:
 
         const uint64_t allocSize = 3 * (sizeof(uint64_t) + ignite::mem::MemoryManager::GetMetadataPadding());
 
-        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the int." };
-        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of int." };
+        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the allocation." };
+        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of allocation." };
 
         DEV_PAUSE();
 
@@ -231,8 +217,8 @@ public:
 
         const uint64_t allocSize = 3 * sizeof(uint32_t) + sizeof(uint64_t) + 4 * ignite::mem::MemoryManager::GetMetadataPadding();
 
-        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the int." };
-        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of int." };
+        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the allocation." };
+        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of allocation." };
 
         DEV_PAUSE();
 
@@ -266,8 +252,8 @@ public:
 
         const uint64_t allocSize = 3 * sizeof(uint32_t) + sizeof(uint64_t) + 4 * ignite::mem::MemoryManager::GetMetadataPadding();
 
-        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the int." };
-        if (ignite::mem::MemoryManager::Instance()->GetSizeFree() != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of int." };
+        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the allocation." };
+        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of allocation." };
 
         DEV_PAUSE();
 
@@ -280,7 +266,7 @@ public:
         ignite::mem::MemoryManager::Instance()->Delete(integer4);
 
         if (ignite::mem::MemoryManager::Instance()->GetAllocated() != 0)                   return { "Memory manager still has allocated values even after freeing." };
-        if (ignite::mem::MemoryManager::Instance()->GetSizeFree() != MEMORY_MANAGER_SIZE) return { "Memory manager's free space was not reset after freeing." };
+        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE) return { "Memory manager's free space was not reset after freeing." };
 
         DEV_PAUSE();
 
@@ -297,8 +283,8 @@ public:
 
         const uint64_t allocSize = 2 * sizeof(uint32_t) + 2 * ignite::mem::MemoryManager::GetMetadataPadding();
 
-        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the int." };
-        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of int." };
+        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the allocation." };
+        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of allocation." };
 
         DEV_PAUSE();
 
@@ -332,8 +318,8 @@ public:
         const uint32_t padding = ignite::mem::MemoryManager::GetMetadataPadding();
         const uint64_t allocSize = 2 * sizeof(uint32_t) + 2 * padding;
 
-        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the int." };
-        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of int." };
+        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the allocation." };
+        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of allocation." };
 
         DEV_PAUSE();
 
@@ -372,8 +358,8 @@ public:
 
         const uint64_t allocSize = 2 * sizeof(uint32_t) + 2 * ignite::mem::MemoryManager::GetMetadataPadding();
 
-        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the int." };
-        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of int." };
+        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the allocation." };
+        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of allocation." };
 
         DEV_PAUSE();
 
@@ -421,8 +407,8 @@ public:
 
         const uint64_t allocSize = arraySize * (sizeof(Bytes16) + ignite::mem::MemoryManager::GetMetadataPadding());
 
-        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the int." };
-        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of int." };
+        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the allocation." };
+        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of allocation." };
 
         DEV_PAUSE();
 
@@ -482,8 +468,8 @@ public:
 
         const uint64_t allocSize = arraySize * (sizeof(Bytes16) + ignite::mem::MemoryManager::GetMetadataPadding());
 
-        if (manager->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the int." };
-        if (manager->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of int." };
+        if (manager->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the allocation." };
+        if (manager->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of allocation." };
 
         DEV_PAUSE();
 
@@ -519,8 +505,8 @@ public:
         }
 
         const uint64_t allocSize = arraySize * (sizeof(Bytes16) + ignite::mem::MemoryManager::GetMetadataPadding());
-        if (manager->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the int." };
-        if (manager->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of int." };
+        if (manager->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the allocation." };
+        if (manager->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of allocation." };
 
         DEV_PAUSE();
         manager->Delete(bytes[0]);
@@ -570,8 +556,8 @@ public:
         }
 
         const uint64_t allocSize = arraySize * (sizeof(Bytes16) + ignite::mem::MemoryManager::GetMetadataPadding());
-        if (manager->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the int." };
-        if (manager->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of int." };
+        if (manager->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the allocation." };
+        if (manager->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of allocation." };
 
         DEV_PAUSE();
         manager->Delete(bytes[0]);
@@ -622,8 +608,8 @@ public:
         }
 
         const uint64_t allocSize = arraySize * sizeof(Bytes16) + sizeof(uint32_t) + (arraySize + 1) * ignite::mem::MemoryManager::GetMetadataPadding();
-        if (manager->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the int." };
-        if (manager->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of int." };
+        if (manager->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the allocation." };
+        if (manager->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of allocation." };
 
         DEV_PAUSE();
         manager->Delete(integer1);
@@ -679,8 +665,8 @@ public:
         }
 
         const uint64_t allocSize = (arraySize + 1) * (sizeof(Bytes16) + ignite::mem::MemoryManager::GetMetadataPadding());
-        if (manager->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the int." };
-        if (manager->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of int." };
+        if (manager->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the allocation." };
+        if (manager->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of allocation." };
 
         DEV_PAUSE();
         manager->Delete(integer1);
@@ -733,8 +719,8 @@ public:
         }
 
         const uint64_t allocSize = (arraySize + 1) * (sizeof(Bytes16) + ignite::mem::MemoryManager::GetMetadataPadding());
-        if (manager->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the int." };
-        if (manager->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of int." };
+        if (manager->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the allocation." };
+        if (manager->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of allocation." };
 
         DEV_PAUSE();
         manager->Delete(integer1);
@@ -783,4 +769,102 @@ public:
         return {};
     }
 
+    struct Constructor
+    {
+        Constructor()
+        {
+            a = solution;
+        }
+        uint32_t a{0};
+
+        static constexpr uint32_t solution{ 255 };
+    };
+
+    static std::optional<std::string> AllocatingCallsConstructor()
+    {
+        ignite::mem::MemoryManager* manager = ignite::mem::MemoryManager::Instance();
+
+        Constructor* instance = manager->New<Constructor>();
+        if (instance->a != Constructor::solution) return { "Failed to construct instance after allocating." };
+
+        const uint64_t allocSize = sizeof(Constructor) + ignite::mem::MemoryManager::GetMetadataPadding();
+        if (manager->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the allocation." };
+        if (manager->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of allocation." };
+
+        DEV_PAUSE();
+        manager->Delete(instance);
+
+        if (ignite::mem::MemoryManager::Instance()->GetAllocated() != 0)                   return { "Memory manager still has allocated values even after freeing." };
+        if (ignite::mem::MemoryManager::Instance()->GetSizeFree()  != MEMORY_MANAGER_SIZE) return { "Memory manager's free space was not reset after freeing." };
+
+        DEV_PAUSE();
+
+        return {};
+    }
+
+    struct Destructor
+    {
+        ~Destructor()
+        {
+            a = solution;
+        }
+        inline static uint32_t a { 0 };
+
+        static constexpr uint32_t solution{ 255 };
+    };
+
+    static std::optional<std::string> DeallocatingCallsDestructor()
+    {
+        ignite::mem::MemoryManager* manager = ignite::mem::MemoryManager::Instance();
+
+        Destructor* instance = manager->New<Destructor>();
+
+        const uint64_t allocSize = sizeof(Destructor) + ignite::mem::MemoryManager::GetMetadataPadding();
+        if (manager->GetAllocated() != allocSize)                       return { "Memory manager allocated more than the size of the allocation." };
+        if (manager->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize) return { "Memory manager's free space was reduced by more than the size of allocation." };
+
+        DEV_PAUSE();
+
+        manager->Delete(instance);
+        if (Destructor::a != Destructor::solution) return { "Failed to destructed instance after deallocating." };
+
+        if (manager->GetAllocated() != 0)                   return { "Memory manager still has allocated values even after freeing." };
+        if (manager->GetSizeFree()  != MEMORY_MANAGER_SIZE) return { "Memory manager's free space was not reset after freeing." };
+
+        DEV_PAUSE();
+
+        return {};
+    }
+
+    struct Vec2
+    {
+        Vec2(const float x, const float y) : x(x), y(y) { }
+
+        float x = 0.0f, y = 0.0f;
+
+        constexpr static float solution = 3.14159f;
+    };
+
+    static std::optional<std::string> ConstructorCalledWithParameters()
+    {
+        ignite::mem::MemoryManager* manager = ignite::mem::MemoryManager::Instance();
+
+        Vec2* instance = manager->New<Vec2>(Vec2::solution, -Vec2::solution);
+
+        const uint64_t allocSize = sizeof(Vec2) + ignite::mem::MemoryManager::GetMetadataPadding();
+        if (manager->GetAllocated() != allocSize)                                         return { "Memory manager allocated more than the size of the allocation." };
+        if (manager->GetSizeFree()  != MEMORY_MANAGER_SIZE - allocSize)                   return { "Memory manager's free space was reduced by more than size of allocation" };
+        if (!instance || instance->x != Vec2::solution || instance->y != -Vec2::solution) return { "Instances' parameters were not forwarded to constructed and constructed with correct values." };
+
+        DEV_PAUSE();
+
+        manager->Delete(instance);
+
+        if (manager->GetAllocated() != 0)                   return { "Memory manager still has allocated values even after freeing." };
+        if (manager->GetSizeFree()  != MEMORY_MANAGER_SIZE) return { "Memory manager's free space was not reset after freeing." };
+
+        DEV_PAUSE();
+
+        return {};
+    }
 };

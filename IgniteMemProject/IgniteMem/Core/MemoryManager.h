@@ -34,11 +34,11 @@ public:
     static void Init(const uint32_t sizeBytes);
     static void Destroy();
 
-    template <typename T>
-    T* New();
+    template <typename T, typename... Args>
+    T* New(Args ...args) noexcept;
 
     template <typename T>
-    void Delete(T* free);
+    void Delete(T* free) noexcept;
 
 #ifdef DEV_CONFIGURATION
     [[nodiscard]] inline ListNode* GetStartingListNode()   const { return mStartingListNode; }
@@ -50,7 +50,6 @@ public:
     static void SetMemoryBlockDebug(DebugMemoryHexValues value, void* memory, const uint64_t size);
     inline static uint32_t GetMetadataPadding() { return METADATA_PADDING; }
 
-    void AddHistogram(const std::string& title, const void* data, const uint32_t size) const;
 private:
     std::thread mThread;
 
@@ -75,8 +74,8 @@ private:
     std::tuple<ListNode*, ListNode*> FindAllocationListNode(const uint64_t size) const;
 };
 
-template <typename T>
-T* MemoryManager::New()
+template <typename T, typename... Args>
+T* MemoryManager::New(Args ...args) noexcept
 {
     const uint64_t size = sizeof(T);
     const uint64_t allocatedSize = size + METADATA_PADDING;
@@ -93,8 +92,6 @@ T* MemoryManager::New()
     allocationNode->value.sizeFree -= allocatedSize;
 
     void* typeAddress = allocationNode->value.address - size;
-
-    DEBUG(SetMemoryBlockDebug(DebugMemoryHexValues::NEWLY_ALLOCATED, typeAddress, size));
 
     // If this allocation fills the block, it might be possible to remove the block.
     if (allocationNode->value.sizeFree == 0)
@@ -120,13 +117,18 @@ T* MemoryManager::New()
         // Therefore, we just will have a node of 0 bytes and do not want to delete it.
     }
 
-    return static_cast<T*>(typeAddress);
+    T* allocation = new (static_cast<T*>(typeAddress)) T{ std::forward<Args>(args)... };
+
+    return allocation;
 }
 
 template <typename T>
-void MemoryManager::Delete(T* free)
+void MemoryManager::Delete(T* free) noexcept
 {
     assert(free);
+
+    free->~T();
+
     //todo add validation to ensure that this memory address hasn't been freed already.
 
     std::byte*     freeAddress      = (std::byte*)free - METADATA_PADDING;

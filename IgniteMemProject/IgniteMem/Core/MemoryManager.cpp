@@ -68,10 +68,6 @@ void MemoryManager::SetMemoryBlockDebug(DebugMemoryHexValues value, void* memory
     memset(memory, static_cast<int>(value), size);
 }
 
-void MemoryManager::AddHistogram(const std::string& title, const void* data, const uint32_t size) const
-{
-    DebugMemoryConsole::Instance()->AddHistogram(title, data, size);
-}
 #endif // DEV_CONFIGURATION.
 
 std::tuple<MemoryManager::ListNode*, MemoryManager::ListNode*> MemoryManager::FindAllocationListNode(const uint64_t size) const
