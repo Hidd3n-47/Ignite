@@ -99,6 +99,7 @@ void DebugMemoryConsole::Destroy()
     }
 
     delete mInstance;
+    mInstance = nullptr;
 }
 
 void DebugMemoryConsole::Run()

@@ -17,6 +17,7 @@ project "IgniteMemBenchmark"
 
     includedirs
     {
+        "$(SolutionDir)LogProject/",
         "$(SolutionDir)IgniteMemProject/",
 
         "$(SolutionDir)deps/imgui/",

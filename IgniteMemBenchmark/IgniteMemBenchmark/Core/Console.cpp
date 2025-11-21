@@ -152,11 +152,11 @@ void Console::Render() const
 
                 ImPlot::PlotLine("C++ New/Delete", result.memoryAllocTimesCpp.data(), result.memoryAllocTimesCpp.size());
 
-                double x[2] = { 0, static_cast<double>(result.memoryAllocTimes.size() - 1) };
+                double x[2] = { 0, static_cast<double>(result.memoryAllocTimes.size()) };
                 double y[2] = { result.averageAlloc, result.averageAlloc };
                 ImPlot::PlotLine("Memory Manager Avg", x, y, 2);
 
-                x[1] = static_cast<double>(result.memoryAllocTimesCpp.size() - 1);
+                x[1] = static_cast<double>(result.memoryAllocTimesCpp.size());
                 y[0] = result.averageAllocCpp;
                 y[1] = result.averageAllocCpp;
                 ImPlot::PlotLine("C++ New/Delete Avg", x, y, 2);

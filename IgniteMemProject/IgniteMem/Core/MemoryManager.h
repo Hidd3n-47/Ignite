@@ -168,7 +168,7 @@ void MemoryManager::Delete(T* free) noexcept
 #ifdef DEV_CONFIGURATION
     if ((std::byte*)free < mMemoryBlock || (std::byte*)free > (std::byte*)mMemoryBlock + mSize)
     {
-        MEM_LOG_WARN("Freed memory that was allocated on heap due to exceeding memory budget.");
+        //MEM_LOG_WARN("Freed memory that was allocated on heap due to exceeding memory budget.");
         delete free;
         return;
     }
