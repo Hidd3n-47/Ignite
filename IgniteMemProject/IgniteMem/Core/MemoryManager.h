@@ -1,6 +1,9 @@
 #pragma once
 
+#include <tuple>
 #include <cassert>
+#include <cstddef>
+#include <exception>
 
 #include "Stack.h"
 #include "Defines.h"
@@ -43,20 +46,20 @@ public:
     void Delete(T* free) noexcept;
 
 #ifdef DEV_CONFIGURATION
-    [[nodiscard]] inline ListNode* GetStartingListNode()   const { return mStartingListNode; }
-    [[nodiscard]] inline void*     GetStartOfMemoryBlock() const { return mMemoryBlock; }
-    [[nodiscard]] inline uint64_t  GetSize()               const { return mSize; }
-    [[nodiscard]] inline uint64_t  GetAllocated()          const { return mAllocated; }
-    [[nodiscard]] inline uint64_t  GetSizeFree()           const { return mSize - mAllocated; }
+    [[nodiscard]] inline ListNode*    GetStartingListNode()   const { return mStartingListNode; }
+    [[nodiscard]] inline const Stack& GetListStack()          const { return mListNodeFreeIndicesStack;  }
+    [[nodiscard]] inline void*        GetStartOfMemoryBlock() const { return mMemoryBlock; }
+    [[nodiscard]] inline uint64_t     GetSize()               const { return mSize; }
+    [[nodiscard]] inline uint64_t     GetAllocated()          const { return mAllocated; }
+    [[nodiscard]] inline uint64_t     GetSizeFree()           const { return mSize - mAllocated; }
+    [[nodiscard]] inline uint32_t     GetNumberOfFragments()  const { return mNumberOfFragments; }
 
     static void SetMemoryBlockDebug(DebugMemoryHexValues value, void* memory, const uint64_t size);
     inline static uint32_t GetMetadataPadding() { return METADATA_PADDING; }
 
 private:
     std::thread mThread;
-
-    uint64_t mSize;
-    uint64_t mAllocated{};
+    uint32_t    mNumberOfFragments{ 1 };
 public:
     friend class DebugMemoryConsole;
 #endif // DEV_CONFIGURATION.
@@ -70,7 +73,9 @@ private:
 
     static MemoryManager* mInstance;
 
-    void* mMemoryBlock;
+    void*    mMemoryBlock;
+    uint64_t mSize;
+    uint64_t mAllocated{};
 
     ListNode* mStartingListNode;
 
@@ -92,7 +97,26 @@ T* MemoryManager::New(Args ...args) noexcept
     const uint64_t size = sizeof(T);
     const uint64_t allocatedSize = size + METADATA_PADDING;
 
-    assert(mSize - mAllocated >= allocatedSize && "Not enough memory to allocate.");
+#ifdef DEV_CONFIGURATION
+    const float percentage = static_cast<float>(mAllocated + allocatedSize) / mSize * 100.0f;
+    if (percentage >= 80)
+    {
+        MEM_LOG_WARN("Memory Budged Warning: At {}% of memory budget.", percentage);
+    }
+
+    if (mSize - mAllocated < allocatedSize)
+    {
+        MEM_LOG_ERROR("Memory Budged Exceeded: Not enough reserved memory to allocate! Object will be heap allocated in debug but will fail to create in release builds.");
+        return new T{ std::forward<Args>(args)... };
+    }
+#endif // DEV_CONFIGURATION.
+
+#ifndef DEV_CONFIGURATION
+    if (mSize - mAllocated < allocatedSize)
+    {
+        throw std::bad_alloc{ };
+    }
+#endif
 
     auto [previous, allocationNode] = FindAllocationListNode(allocatedSize);
 
@@ -141,9 +165,27 @@ void MemoryManager::Delete(T* free) noexcept
 {
     assert(free);
 
-    free->~T();
+#ifdef DEV_CONFIGURATION
+    if ((std::byte*)free < mMemoryBlock || (std::byte*)free > (std::byte*)mMemoryBlock + mSize)
+    {
+        MEM_LOG_WARN("Freed memory that was allocated on heap due to exceeding memory budget.");
+        delete free;
+        return;
+    }
 
-    //todo add validation to ensure that this memory address hasn't been freed already.
+    ListNode* freedAlreadyNode = mStartingListNode;
+    while (freedAlreadyNode)
+    {
+        if ((std::byte*)free > freedAlreadyNode->value.address && (std::byte*)free < freedAlreadyNode->value.address + freedAlreadyNode->value.sizeFree)
+        {
+            MEM_LOG_ERROR("Trying to free a memory address that has already been freed!");
+            return;
+        }
+        freedAlreadyNode = freedAlreadyNode->next;
+    }
+#endif // DEV_CONFIGURATION.
+
+    free->~T();
 
     std::byte*     freeAddress      = (std::byte*)free - METADATA_PADDING;
     const uint64_t deallocationSize = *((uint32_t*)freeAddress) + METADATA_PADDING;
@@ -151,9 +193,6 @@ void MemoryManager::Delete(T* free) noexcept
     DEBUG(SetMemoryBlockDebug(DebugMemoryHexValues::FREED, freeAddress, deallocationSize));
 
     mAllocated -= deallocationSize;
-
-    assert(freeAddress >= mMemoryBlock && "Trying to free memory address that is before the allocated block");
-    assert(freeAddress <= (std::byte*)mMemoryBlock + mSize && "Trying to free memory address that is after the allocated block");
 
     // Keep track of the previous so we can correctly relink the list.
     ListNode* previous = nullptr;

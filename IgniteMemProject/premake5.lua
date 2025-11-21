@@ -17,6 +17,7 @@ project "IgniteMem"
 
     includedirs
     {
+        "$(SolutionDir)LogProject/",
         "$(SolutionDir)IgniteMemProject/",
 
         "$(SolutionDir)deps/include/",
@@ -30,6 +31,7 @@ project "IgniteMem"
 
     links
     {
+        "Log",
         "SDL3.lib",
         "imgui"
     }

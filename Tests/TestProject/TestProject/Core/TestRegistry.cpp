@@ -41,6 +41,11 @@ void TestRegistry::RunTests()
                 Log::Error("Tests", "| {} / {} | Test FAILED: \"{}\"", i + 1, tests.size(), test.GetTestName());
                 Log::Error("Tests", "| \t\t{}", result.value());
 
+                if (mOnTestFailedCallback)
+                {
+                    mOnTestFailedCallback();
+                }
+
                 ++failed;
             }
         }

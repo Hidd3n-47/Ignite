@@ -89,6 +89,15 @@ void DebugMemoryConsole::Init()
 
 void DebugMemoryConsole::Destroy()
 {
+    std::ofstream statsOutput("MemoryManagerStats.log");
+    if (!statsOutput.fail())
+    {
+        statsOutput << std::format("Max number of Memory Allocated: {:.2}%", mInstance->mMaxAllocationPercent)      << "\n";
+        statsOutput << std::format("Average allocation percentage : {:.2}%", mInstance->mAverageAllocation.average) << "\n";
+        statsOutput << std::format("Max number of Memory Fragments: {}"    , mInstance->mMaxNumberOfFragments)      << "\n";
+        statsOutput << std::format("Average memory fragments used : {:.2}" , mInstance->mAverageFragments.average)  << "\n";
+    }
+
     delete mInstance;
 }
 
@@ -119,7 +128,7 @@ void DebugMemoryConsole::Update()
     }
 }
 
-void DebugMemoryConsole::Render() const
+void DebugMemoryConsole::Render()
 {
     ImGui_ImplSDLRenderer3_NewFrame();
     ImGui_ImplSDL3_NewFrame();
@@ -127,12 +136,7 @@ void DebugMemoryConsole::Render() const
 
     ImGui::DockSpaceOverViewport();
 
-    bool show_demo_window = true;
-
     const ImGuiIO& io = ImGui::GetIO();
-
-    if (show_demo_window)
-        ImGui::ShowDemoWindow(&show_demo_window);
 
     {
         ImGui::Begin("Free memory block linked list");
@@ -207,22 +211,39 @@ void DebugMemoryConsole::Render() const
 
         ImGui::PlotHistogram("##Memory block", values.data(), static_cast<int>(values.size()), 0, nullptr, 0.0f, 1.0f);
 
+        const float allocatedPercentDecimal = 1.0f - static_cast<float>(MemoryManager::mInstance->GetSizeFree()) / static_cast<float>(size);
+        mMaxAllocationPercent = std::max(mMaxAllocationPercent, 100 * allocatedPercentDecimal);
+        mAverageAllocation.UpdateAverage(allocatedPercentDecimal * 100.0f);
+
         ImGui::Text("\nMemory allocated:\n%llu of %llu bytes", MemoryManager::mInstance->GetAllocated(), size);
-        ImGui::ProgressBar(1.0f - static_cast<float>(MemoryManager::mInstance->GetSizeFree()) / static_cast<float>(size), { 200.0f, 0.0f });
+        ImGui::ProgressBar(allocatedPercentDecimal, { 200.0f, 0.0f });
+
+        const uint32_t fragCapacity = MemoryManager::mInstance->mListNodeFreeIndicesStack.capacity();
+        const uint32_t fragFree     = MemoryManager::mInstance->mListNodeFreeIndicesStack.size();
+        const uint32_t fragments    = MemoryManager::mInstance->GetNumberOfFragments();
+        mMaxNumberOfFragments = std::max(mMaxNumberOfFragments, fragments);
+        mAverageFragments.UpdateAverage(fragments);
+
+        ImGui::Text("\nMemory Fragmentation:\n%llu of %llu bytes", fragments, fragCapacity);
+        ImGui::ProgressBar(1.0f - static_cast<float>(fragFree) / static_cast<float>(fragCapacity), { 200.0f, 0.0f });
 
         std::string blockMemoryAddress = std::format("{:X}", reinterpret_cast<uintptr_t>(MemoryManager::mInstance->GetStartOfMemoryBlock()));
         ImGui::Text("\nStart of Memory Block:\n%s", blockMemoryAddress.c_str());
 
         ImGui::SameLine(300.0f);
 
-        uint32_t fragments = 0;
-        auto node = MemoryManager::mInstance->GetStartingListNode();
-        while (node)
-        {
-            ++fragments;
-            node = node->next;
-        }
         ImGui::Text("\nNumber of Memory Fragments:\n%u", fragments);
+
+        ImGui::End();
+    }
+
+    {
+        ImGui::Begin("Memory Manager Runtime Stats");
+
+        ImGui::Text("Max number of Memory Allocated: %.2f%%", mMaxAllocationPercent);
+        ImGui::Text("\nAverage allocation percentage : %.2f", mAverageAllocation.average);
+        ImGui::Text("\nMax number of Memory Fragments: %u"  , mMaxNumberOfFragments);
+        ImGui::Text("\nAverage memory fragments used : %.2f", mAverageFragments.average);
 
         ImGui::End();
     }
@@ -249,9 +270,14 @@ void DebugMemoryConsole::UpdateMemoryBlockVector(std::vector<float>& vector, con
         const size_t start = reinterpret_cast<std::intptr_t>(node->value.address - memoryStart) / barSize;
         const size_t end   = start + static_cast<size_t>(std::ceil(static_cast<float>(node->value.sizeFree) / barSize));
 
-        std::fill(vector.begin() + start, vector.begin() + end, 0.1f);
-
         node = node->next;
+
+        if (start > vector.size())
+        {
+            continue;
+        }
+
+        std::fill(vector.begin() + start, vector.begin() + std::min(end, vector.size()), 0.1f);
     }
 }
 

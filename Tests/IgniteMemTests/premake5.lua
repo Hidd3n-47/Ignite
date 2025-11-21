@@ -20,6 +20,8 @@ project "IgniteMemTests"
         "$(SolutionDir)Tests/%{prj.name}/%{prj.name}/",
         "$(SolutionDir)Tests/TestProject/",
 
+        "$(SolutionDir)LogProject/",
+
         "$(SolutionDir)IgniteMemProject/",
         
         "$(SolutionDir)deps/",

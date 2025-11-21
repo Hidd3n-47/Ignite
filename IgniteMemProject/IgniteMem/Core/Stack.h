@@ -19,6 +19,7 @@ public:
     void push(const T value);
 
     [[nodiscard]] inline T* data()           const { return mArray; }
+    [[nodsicard]] inline bool empty()        const { return mIndex == 0; }
     [[nodiscard]] inline uint32_t size()     const { return mIndex; }
     [[nodiscard]] inline uint32_t capacity() const { return mCapacity; }
 private:

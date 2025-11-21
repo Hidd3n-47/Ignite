@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <iostream>
 #include <IgniteMem/Core/MemoryManager.h>
 
 #include "Core/Defines.h"
@@ -8,14 +7,18 @@
 class MemoryManagerTests
 {
 public:
+    // Tests are only valid in Dev or Dev_LiveStats as external functions are only included in Dev configuration.
+#ifdef DEV_CONFIGURATION
     constexpr static uint64_t MEMORY_MANAGER_SIZE = 128;
     explicit inline MemoryManagerTests(ignite::test::TestRegistry* testRegistry)
     {
         ignite::mem::MemoryManager::Init(MEMORY_MANAGER_SIZE);
 
         testRegistry->AddTestCase("MemoryManagerTests", "MemoryManagerInitializedCorrectly", MemoryManagerInitializedCorrectly);
-        DEBUG(testRegistry->AddTestCase("MemoryManagerTests", "MemoryManagerInitializedUnallocatedMemoryInDebugMode", MemoryManagerInitializedUnallocatedMemoryInDebugMode));
-        DEBUG(testRegistry->AddTestCase("MemoryManagerTests", "MemoryManagerInitializedFreedMemoryInDebugMode", MemoryManagerInitializedFreedMemoryInDebugMode));
+        testRegistry->AddTestCase("MemoryManagerTests", "MemoryManagerInitializedUnallocatedMemoryInDebugMode", MemoryManagerInitializedUnallocatedMemoryInDebugMode);
+        testRegistry->AddTestCase("MemoryManagerTests", "MemoryManagerInitializedFreedMemoryInDebugMode", MemoryManagerInitializedFreedMemoryInDebugMode);
+        testRegistry->AddTestCase("MemoryManagerTests", "MemoryAddedToHeapInDebugModeWhenReservedBlockFull", MemoryAddedToHeapInDebugModeWhenReservedBlockFull);
+        testRegistry->AddTestCase("MemoryManagerTests", "FragmentNodeAddedToHeapWhenReservedBlockFull", FragmentNodeAddedToHeapWhenReservedBlockFull);
         testRegistry->AddTestCase("MemoryManagerTests", "AllocatedCorrectSizeInt", AllocatedCorrectSizeInt);
         testRegistry->AddTestCase("MemoryManagerTests", "AllocatedCorrectSizeInt64", AllocatedCorrectSizeInt64);
         testRegistry->AddTestCase("MemoryManagerTests", "Allocated3Int64AndFreedReverseOrder", Allocated3Int64AndFreedReverseOrder);
@@ -34,33 +37,40 @@ public:
         testRegistry->AddTestCase("Construction", "AllocatingCallsConstructor", AllocatingCallsConstructor);
         testRegistry->AddTestCase("Construction", "DeallocatingCallsDestructor", DeallocatingCallsDestructor);
         testRegistry->AddTestCase("Construction", "ConstructorCalledWithParameters", ConstructorCalledWithParameters);
+
+        testRegistry->SetOnTestFailedCallback(CreateMemoryManager);
     }
 
-    static uint32_t GetFragmentCount()
+    static void CreateMemoryManager()
     {
-        uint32_t fragments = 0;
-        auto node = ignite::mem::MemoryManager::Instance()->GetStartingListNode();
-        while (node)
-        {
-            ++fragments;
-            node = node->next;
-        }
+        ignite::mem::MemoryManager::Destroy();
 
-        return fragments;
+        ignite::mem::MemoryManager::Init(MEMORY_MANAGER_SIZE);
     }
+
+    // This is on purpose 4 bytes smaller as padding in memory manager is 4 bytes.
+    struct Bytes16
+    {
+        char a[12];
+    };
+
+    // This is on purpose 4 bytes smaller as padding in memory manager is 4 bytes.
+    struct Bytes80
+    {
+        char a[76];
+    };
 
     static std::optional<std::string> MemoryManagerInitializedCorrectly()
     {
         ignite::mem::MemoryManager* manager = ignite::mem::MemoryManager::Instance();
 
-        if (manager->GetSize()      != MEMORY_MANAGER_SIZE) return { "Memory manager has incorrect size." };
-        if (manager->GetAllocated() != 0)                   return { "Memory manager has incorrect allocation size at initialization." };
-        if (manager->GetSizeFree()  != MEMORY_MANAGER_SIZE) return { "Memory manager has incorrect size free at initialization." };
+        DEBUG(if (manager->GetSize()      != MEMORY_MANAGER_SIZE) return { "Memory manager has incorrect size." });
+        DEBUG(if (manager->GetAllocated() != 0)                   return { "Memory manager has incorrect allocation size at initialization." });
+        DEBUG(if (manager->GetSizeFree()  != MEMORY_MANAGER_SIZE) return { "Memory manager has incorrect size free at initialization." });
 
         return {};
     }
 
-#ifdef DEV_CONFIGURATION
     static std::optional<std::string> MemoryManagerInitializedUnallocatedMemoryInDebugMode()
     {
         ignite::mem::MemoryManager* manager = ignite::mem::MemoryManager::Instance();
@@ -89,7 +99,72 @@ public:
 
         return {};
     }
-#endif // DEV_CONFIGURATION.
+
+    static std::optional<std::string> MemoryAddedToHeapInDebugModeWhenReservedBlockFull()
+    {
+        ignite::mem::MemoryManager* manager = ignite::mem::MemoryManager::Instance();
+
+        constexpr uint32_t arraySize = 8;
+        Bytes16* bytes[arraySize];
+
+        for (Bytes16*& b : bytes)
+        {
+            b = manager->New<Bytes16>();
+            DEV_PAUSE();
+        }
+
+        const uint32_t* integer = manager->New<uint32_t>();
+
+        if ((std::byte*)integer > (std::byte*)manager->GetStartOfMemoryBlock() && (std::byte*)integer < (std::byte*)manager->GetStartOfMemoryBlock() + manager->GetSize()) return { "Allocation when memory full is within reserved memory block." };
+
+        manager->Delete(integer);
+        DEV_PAUSE();
+
+        for (Bytes16*& b : bytes)
+        {
+            manager->Delete(b);
+            DEV_PAUSE();
+        }
+
+        return {};
+    }
+
+    static std::optional<std::string> FragmentNodeAddedToHeapWhenReservedBlockFull()
+    {
+        ignite::mem::MemoryManager::Destroy();
+        ignite::mem::MemoryManager::Init(660);
+
+        ignite::mem::MemoryManager* manager = ignite::mem::MemoryManager::Instance();
+
+        constexpr uint32_t arraySize = 130;
+        char* ints[arraySize];
+
+        for (char*& b : ints)
+        {
+            b = manager->New<char>();
+        }
+        DEV_PAUSE();
+
+
+        for (uint32_t i{ 0 }; i < arraySize; i += 2)
+        {
+            manager->Delete(ints[i]);
+        }
+        DEV_PAUSE();
+
+        if (!manager->GetListStack().empty()) return { "The stack of free list indices has not been exhausted." };
+
+        for (uint32_t i{ 1 }; i < arraySize; i += 2)
+        {
+            manager->Delete(ints[i]);
+        }
+        DEV_PAUSE();
+
+        ignite::mem::MemoryManager::Destroy();
+        ignite::mem::MemoryManager::Init(MEMORY_MANAGER_SIZE);
+
+        return {};
+    }
 
     static std::optional<std::string> AllocatedCorrectSizeInt()
     {
@@ -382,18 +457,6 @@ public:
         return {};
     }
 
-    // This is on purpose 4 bytes smaller as padding in memory manager is 4 bytes.
-    struct Bytes16
-    {
-        char a[12];
-    };
-
-    // This is on purpose 4 bytes smaller as padding in memory manager is 4 bytes.
-    struct Bytes80
-    {
-        char a[76];
-    };
-
     static std::optional<std::string> AllocateFullFreeCollapsesAndInsertInMiddle()
     {
         constexpr uint32_t arraySize = 8;
@@ -419,16 +482,15 @@ public:
             DEV_PAUSE();
         }
 
-        uint32_t fragmentsBefore = GetFragmentCount();
+        uint32_t fragmentsBefore = ignite::mem::MemoryManager::Instance()->GetNumberOfFragments();
         ignite::mem::MemoryManager::Instance()->Delete(bytes[2]);
-        uint32_t fragmentsAfter = GetFragmentCount();
+        uint32_t fragmentsAfter = ignite::mem::MemoryManager::Instance()->GetNumberOfFragments();
         if (fragmentsBefore != fragmentsAfter + 1) return { "Freeing should have resulted in a collapse of fragments" };
         DEV_PAUSE();
 
-        //todo test collapse
-        fragmentsBefore = GetFragmentCount();
+        fragmentsBefore = ignite::mem::MemoryManager::Instance()->GetNumberOfFragments();
         ignite::mem::MemoryManager::Instance()->Delete(bytes[4]);
-        fragmentsAfter = GetFragmentCount();
+        fragmentsAfter = ignite::mem::MemoryManager::Instance()->GetNumberOfFragments();
         if (fragmentsBefore != fragmentsAfter + 1) return { "Freeing should have resulted in a collapse of fragments" };
         DEV_PAUSE();
 
@@ -473,8 +535,8 @@ public:
 
         DEV_PAUSE();
 
-        if (GetFragmentCount() != 1)                             return { "Multiple fragments when there should only be one fully allocated block." };
-        if (manager->GetStartingListNode()->value.sizeFree != 0) return { "The block still has free space when all space should be allocated." };
+        if (ignite::mem::MemoryManager::Instance()->GetNumberOfFragments() != 1) return { "Multiple fragments when there should only be one fully allocated block." };
+        if (manager->GetStartingListNode()->value.sizeFree != 0)                 return { "The block still has free space when all space should be allocated." };
         DEV_PAUSE();
 
         for (const Bytes16* b : bytes)
@@ -514,16 +576,18 @@ public:
 
         manager->Delete(bytes[2]);
 
-        const std::byte* blockStart  = manager->GetStartingListNode()->value.address;
-        const std::byte* memoryStart = (std::byte*)manager->GetStartOfMemoryBlock();
-        if (GetFragmentCount() != 3)   return { "Incorrect number of fragments for given situation." };
+        const uint32_t   fragmentCount = ignite::mem::MemoryManager::Instance()->GetNumberOfFragments();
+        const std::byte* blockStart    = manager->GetStartingListNode()->value.address;
+        const std::byte* memoryStart   = (std::byte*)manager->GetStartOfMemoryBlock();
+        if (fragmentCount != 3)   return { "Incorrect number of fragments for given situation." };
         if (blockStart != memoryStart) return { "First memory block should be the start of the memory block." };
         DEV_PAUSE();
 
         const Bytes16* reallocated = ignite::mem::MemoryManager::Instance()->New<Bytes16>();
 
-        const std::byte* newBlockStart = manager->GetStartingListNode()->value.address;
-        if (GetFragmentCount() != 2)      return { "Incorrect number of fragments for given situation." };
+        const uint32_t   newFragmentCount = ignite::mem::MemoryManager::Instance()->GetNumberOfFragments();
+        const std::byte* newBlockStart    = manager->GetStartingListNode()->value.address;
+        if (newFragmentCount != 2)        return { "Incorrect number of fragments for given situation." };
         if (newBlockStart == memoryStart) return { "First memory block should not be the start of the memory block." };
         DEV_PAUSE();
 
@@ -565,9 +629,10 @@ public:
 
         bytes[0] = ignite::mem::MemoryManager::Instance()->New<Bytes16>();
 
-        const std::byte* blockStart  = manager->GetStartingListNode()->value.address;
-        const std::byte* memoryStart = (std::byte*)manager->GetStartOfMemoryBlock();
-        if (GetFragmentCount() != 1)                             return { "Should only have a single fragment." };
+        const uint32_t   fragmentCount = ignite::mem::MemoryManager::Instance()->GetNumberOfFragments();
+        const std::byte* blockStart    = manager->GetStartingListNode()->value.address;
+        const std::byte* memoryStart   = (std::byte*)manager->GetStartOfMemoryBlock();
+        if (fragmentCount != 1)                                  return { "Should only have a single fragment." };
         if (blockStart != memoryStart + 16)                      return { "First memory block should be one allocation of Bytes16 off of the starting block address." };
         if (manager->GetStartingListNode()->value.sizeFree != 0) return { "First memory block should have no space free to allocate." };
         /*
@@ -616,18 +681,20 @@ public:
         DEV_PAUSE();
         manager->Delete(bytes[1]);
 
+        const uint32_t   fragmentCount = ignite::mem::MemoryManager::Instance()->GetNumberOfFragments();
         const std::byte* blockStart  = manager->GetStartingListNode()->value.address;
         const std::byte* memoryStart = (std::byte*)manager->GetStartOfMemoryBlock();
-        if (GetFragmentCount() != 3)   return { "Incorrect number of fragments for given situation." };
+        if (fragmentCount != 3)        return { "Incorrect number of fragments for given situation." };
         if (blockStart != memoryStart) return { "First memory block should be the start of the memory block." };
         DEV_PAUSE();
 
         const Bytes16* reallocated = ignite::mem::MemoryManager::Instance()->New<Bytes16>();
 
+        const uint32_t   newFragmentCount          = ignite::mem::MemoryManager::Instance()->GetNumberOfFragments();
         const std::byte* newBlockStart             = manager->GetStartingListNode()->value.address;
         const std::byte* nextBlockStart            = manager->GetStartingListNode()->next->value.address;
         const std::byte* addressOfEndOfAllocations = (std::byte*)bytes[2] + sizeof(Bytes16);
-        if (GetFragmentCount() != 2)                     return { "Incorrect number of fragments for given situation." };
+        if (newFragmentCount != 2)                       return { "Incorrect number of fragments for given situation." };
         if (newBlockStart  != memoryStart)               return { "First memory block should be the start of the memory block." };
         if (reallocated    != bytes[1])                  return { "Reallocation should be in the middle." };
         if (nextBlockStart != addressOfEndOfAllocations) return { "Final block should start at the end of previous allocations." };
@@ -673,16 +740,18 @@ public:
         DEV_PAUSE();
         manager->Delete(bytes[arraySize - 1]);
 
-        const std::byte* blockStart  = manager->GetStartingListNode()->value.address;
-        const std::byte* memoryStart = (std::byte*)manager->GetStartOfMemoryBlock();
-        if (GetFragmentCount() != 2)                         return { "Should have two memory fragments after freeing." };
+        const uint32_t   fragmentCount = ignite::mem::MemoryManager::Instance()->GetNumberOfFragments();
+        const std::byte* blockStart    = manager->GetStartingListNode()->value.address;
+        const std::byte* memoryStart   = (std::byte*)manager->GetStartOfMemoryBlock();
+        if (fragmentCount != 2)                              return { "Should have two memory fragments after freeing." };
         if (blockStart != memoryStart)                       return { "First memory block should be the base address of memory block." };
         if (manager->GetStartingListNode()->next == nullptr) return { "Starting memory block should point to the end memory block." };
 
         DEV_PAUSE();
         bytes[arraySize - 1] = ignite::mem::MemoryManager::Instance()->New<Bytes16>();
 
-        if (GetFragmentCount() != 1)                         return { "Last memory block should have been collapsed and removed due to not having space to allocate." };
+        const uint32_t newFragmentCount = ignite::mem::MemoryManager::Instance()->GetNumberOfFragments();
+        if (newFragmentCount != 1)                           return { "Last memory block should have been collapsed and removed due to not having space to allocate." };
         if (blockStart != memoryStart)                       return { "First memory block should be the base address of memory block." };
         if (manager->GetStartingListNode()->next != nullptr) return { "Starting memory block remove link to next block as it collapsed." };
         DEV_PAUSE();
@@ -730,24 +799,27 @@ public:
         manager->Delete(bytes[arraySize - 1]);
         bytes[arraySize - 1] = nullptr;
 
-        const std::byte* blockStart  = manager->GetStartingListNode()->value.address;
-        std::byte*       memoryStart = (std::byte*)manager->GetStartOfMemoryBlock();
-        if (GetFragmentCount() != 3)   return { "Should have three memory fragments after freeing." };
+        const std::byte* blockStart    = manager->GetStartingListNode()->value.address;
+        std::byte*       memoryStart   = (std::byte*)manager->GetStartOfMemoryBlock();
+        uint32_t         fragmentCount = ignite::mem::MemoryManager::Instance()->GetNumberOfFragments();
+        if (fragmentCount != 3)        return { "Should have three memory fragments after freeing." };
         if (blockStart != memoryStart) return { "First memory block should be the base address of memory block." };
 
         DEV_PAUSE();
         bytes[3] = ignite::mem::MemoryManager::Instance()->New<Bytes16>();
 
-        memoryStart = (std::byte*)manager->GetStartOfMemoryBlock();
-        if (GetFragmentCount() != 2)   return { "Middle node should collapse leaving two." };
+        fragmentCount = ignite::mem::MemoryManager::Instance()->GetNumberOfFragments();
+        memoryStart   = (std::byte*)manager->GetStartOfMemoryBlock();
+        if (fragmentCount != 2)        return { "Middle node should collapse leaving two." };
         if (blockStart != memoryStart) return { "First memory block should be the base address of memory block." };
         DEV_PAUSE();
 
         manager->Delete(bytes[3]);
         bytes[3] = nullptr;
 
-        memoryStart = (std::byte*)manager->GetStartOfMemoryBlock();
-        if (GetFragmentCount() != 3)   return { "Middle freed, so should have 3 blocks again." };
+        fragmentCount = ignite::mem::MemoryManager::Instance()->GetNumberOfFragments();
+        memoryStart   = (std::byte*)manager->GetStartOfMemoryBlock();
+        if (fragmentCount != 3)        return { "Middle freed, so should have 3 blocks again." };
         if (blockStart != memoryStart) return { "First memory block should be the base address of memory block." };
         DEV_PAUSE();
 
@@ -867,4 +939,7 @@ public:
 
         return {};
     }
+#else  // DEV_CONFIGURATION.
+explicit inline MemoryManagerTests(ignite::test::TestRegistry* testRegistry) {}
+#endif // !DEV_CONFIGURATION.
 };

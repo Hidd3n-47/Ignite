@@ -53,11 +53,13 @@ public:
      */
     inline void AddTestCase(const std::string_view category, const std::string_view testName, const std::function<std::optional<std::string>()>& test) { mTests[category].emplace_back(testName, test); }
 
+    inline void SetOnTestFailedCallback(const std::function<void()>& onTestFailedCallback) { mOnTestFailedCallback = onTestFailedCallback; }
 protected:
     std::string_view mTestSessionName;
 
 private:
     std::unordered_map<std::string_view, std::vector<Test>> mTests;
+    std::function<void()> mOnTestFailedCallback;
 
     uint32_t mPassedTests = 0;
     uint32_t mFailedTests = 0;

@@ -2,10 +2,10 @@
 
 #ifdef DEV_CONFIGURATION
 
-#include <string>
 #include <vector>
 
 #include "Defines.h"
+#include "RunningAverage.h"
 
 struct SDL_Window;
 struct SDL_Renderer;
@@ -30,7 +30,7 @@ public:
 
     void Run();
     void Update();
-    void Render() const;
+    void Render();
 private:
     DebugMemoryConsole();
     ~DebugMemoryConsole();
@@ -40,6 +40,12 @@ private:
     bool          mRunning;
     SDL_Window*   mWindow;
     SDL_Renderer* mRenderer;
+
+    uint32_t mMaxNumberOfFragments{ 0 };
+    float    mMaxAllocationPercent{ 0 };
+
+    RunningAverage mAverageAllocation;
+    RunningAverage mAverageFragments;
 
     static void UpdateMemoryBlockVector(std::vector<float>& vector, const uint64_t barSize);
 };
