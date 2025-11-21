@@ -1,7 +1,6 @@
 #include "MemoryManager.h"
 
 #include <cassert>
-#include <string>
 
 #ifdef DEV_CONFIGURATION
 #include "DebugMemoryConsole.h"
@@ -19,9 +18,13 @@ MemoryManager::MemoryManager(const uint64_t sizeBytes)
     mMemoryBlock = malloc(sizeBytes);
     DEBUG(SetMemoryBlockDebug(DebugMemoryHexValues::UNALLOCATED, mMemoryBlock, mSize));
 
-    //todo make this a part of the reserved memory
-    //mRootNode = new Node{ .start = static_cast<std::byte*>(mMemoryBlock), .size = sizeBytes, .left = nullptr, .right = nullptr, .parent = nullptr };
-    mStartingListNode = new ListNode{ .value = {.address = static_cast<std::byte*>(mMemoryBlock), .sizeFree = sizeBytes }, .next = nullptr};
+    // Populate the stack in reverse order to get index of 0 on first pop.
+    for (unsigned char i{ 0 }; i < MAX_FRAGMENTS; ++i)
+    {
+        mListNodeFreeIndicesStack.push(MAX_FRAGMENTS - i - 1);
+    }
+
+    mStartingListNode = new (&mListNodes[mListNodeFreeIndicesStack.pop()]) ListNode{ .value = {.address = static_cast<std::byte*>(mMemoryBlock), .sizeFree = sizeBytes }, .next = nullptr };
 
 #ifdef DEV_LIVE_STATS
     mThread = std::thread(&DebugMemoryConsole::Init);
@@ -86,4 +89,38 @@ std::tuple<MemoryManager::ListNode*, MemoryManager::ListNode*> MemoryManager::Fi
     return { previous, node };
 }
 
+MemoryManager::ListNode* MemoryManager::GetListNode(std::byte* address, const uint64_t size, ListNode* next)
+{
+#ifdef DEV_CONFIGURATION
+    if (mListNodeFreeIndicesStack.size() == 0)
+    {
+        // debug log here.
+        __debugbreak();
+        // We have failed to create a list node due to there being too many nodes. Create a new node on the heap as we are in debug mode.
+        return new ListNode{ .value = {.address = address, .sizeFree = size }, .next = next };
+    }
+
+    return new (&mListNodes[mListNodeFreeIndicesStack.pop()]) ListNode{ .value = {.address = address, .sizeFree = size }, .next = next };
+#endif // DEV_CONFIGURATION.
+    return new (&mListNodes[mListNodeFreeIndicesStack.pop()]) ListNode{ .value = {.address = address, .sizeFree = size }, .next = next };
+}
+
+void MemoryManager::FreeListNode(const ListNode* node)
+{
+    if (!node) { return; }
+
+#ifdef DEV_CONFIGURATION
+    const uint64_t addressDifference = node - mListNodes;
+    if (addressDifference > mListNodeFreeIndicesStack.capacity())
+    {
+        // debug log here.
+        __debugbreak();
+
+        delete node;
+        return;
+    }
+#endif // DEV_CONFIGURATION.
+
+    mListNodeFreeIndicesStack.push(static_cast<unsigned char>(addressDifference));
+}
 } // Namespace ignite::mem.

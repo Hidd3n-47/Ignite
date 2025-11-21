@@ -2,6 +2,7 @@
 
 #include <cassert>
 
+#include "Stack.h"
 #include "Defines.h"
 #include "ListNode.h"
 
@@ -22,6 +23,7 @@ struct MemoryBlock
 
 class API MemoryManager
 {
+    using Stack    = Stack<unsigned char>;
     using ListNode = ListNode<MemoryBlock>;
 public:
     [[nodiscard]] inline static MemoryManager* Instance() { return mInstance; }
@@ -60,6 +62,9 @@ public:
 #endif // DEV_CONFIGURATION.
 
 private:
+    static constexpr uint32_t MAX_FRAGMENTS   { 64 };
+    static constexpr uint32_t METADATA_PADDING{  4 };
+
     MemoryManager(const uint64_t sizeBytes);
     ~MemoryManager();
 
@@ -69,10 +74,17 @@ private:
 
     ListNode* mStartingListNode;
 
-    static constexpr uint32_t METADATA_PADDING{ 4 };
+    Stack    mListNodeFreeIndicesStack{ MAX_FRAGMENTS };
+    ListNode mListNodes[MAX_FRAGMENTS];
 
     std::tuple<ListNode*, ListNode*> FindAllocationListNode(const uint64_t size) const;
+    ListNode* GetListNode(std::byte* address, const uint64_t size, ListNode* next);
+    void FreeListNode(const ListNode* node);
 };
+
+/*
+   =================================================================================================
+                                                                                                      */
 
 template <typename T, typename... Args>
 T* MemoryManager::New(Args ...args) noexcept
@@ -102,14 +114,16 @@ T* MemoryManager::New(Args ...args) noexcept
             // If there is no previous node, we have to be the starting node, else we have a broken list.
             assert(allocationNode == mStartingListNode);
             mStartingListNode = allocationNode->next;
-            delete allocationNode;
+
+            FreeListNode(allocationNode);
         }
 
         // If we are not the starting block, we can delete the intermediate block and link the previous to next.
         if (previous)
         {
             previous->next = allocationNode->next;
-            delete allocationNode;
+
+            FreeListNode(allocationNode);
         }
 
         // The omitted case is when we are the starting node and have no next node.
@@ -175,7 +189,7 @@ void MemoryManager::Delete(T* free) noexcept
             return;
         }
 
-        ListNode* newNode = new ListNode{ .value = { .address = freeAddress, .sizeFree = deallocationSize }, .next = node };
+        ListNode* newNode = GetListNode(freeAddress, deallocationSize, node);
 
         if (previous)
         {
@@ -194,7 +208,7 @@ void MemoryManager::Delete(T* free) noexcept
     }
     else
     {
-        ListNode* newNode = new ListNode{ .value = {.address = freeAddress, .sizeFree = deallocationSize }, .next = node->next };
+        ListNode* newNode = GetListNode(freeAddress, deallocationSize, node->next);
 
         node->next = newNode;
 
@@ -209,7 +223,7 @@ void MemoryManager::Delete(T* free) noexcept
         const ListNode* next = node->next;
         node->next = next->next;
 
-        delete next;
+        FreeListNode(next);
     }
 }
 
