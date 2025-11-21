@@ -128,15 +128,7 @@ void Console::Render() const
 
     ImGui::DockSpaceOverViewport();
 
-    bool show_demo_window = true;
-
     const ImGuiIO& io = ImGui::GetIO();
-
-    if (show_demo_window)
-    {
-        ImGui::ShowDemoWindow(&show_demo_window);
-        ImPlot::ShowDemoWindow(&show_demo_window);
-    }
 
     {
         for (const TestResult& result : TestResultsManager::Instance()->GetTestResults())

@@ -79,8 +79,8 @@ private:
 
     ListNode* mStartingListNode;
 
-    Stack    mListNodeFreeIndicesStack{ MAX_FRAGMENTS };
-    ListNode mListNodes[MAX_FRAGMENTS];
+    Stack     mListNodeFreeIndicesStack{ MAX_FRAGMENTS };
+    ListNode* mListNodes;
 
     std::tuple<ListNode*, ListNode*> FindAllocationListNode(const uint64_t size) const;
     ListNode* GetListNode(std::byte* address, const uint64_t size, ListNode* next);

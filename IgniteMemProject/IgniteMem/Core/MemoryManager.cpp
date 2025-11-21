@@ -23,6 +23,8 @@ MemoryManager::MemoryManager(const uint64_t sizeBytes)
         mListNodeFreeIndicesStack.push(MAX_FRAGMENTS - i - 1);
     }
 
+    mListNodes = (ListNode*)malloc(sizeof(ListNode) * MAX_FRAGMENTS);
+
     mStartingListNode = new (&mListNodes[mListNodeFreeIndicesStack.pop()]) ListNode{ .value = {.address = static_cast<std::byte*>(mMemoryBlock), .sizeFree = sizeBytes }, .next = nullptr };
 
 #ifdef DEV_LIVE_STATS
@@ -32,6 +34,7 @@ MemoryManager::MemoryManager(const uint64_t sizeBytes)
 
 MemoryManager::~MemoryManager()
 {
+    free(mListNodes);
     free(mMemoryBlock);
 }
 
