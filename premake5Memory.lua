@@ -1,5 +1,5 @@
--- Main Ignite Solution ------------------------------------------
-workspace "Ignite"
+-- Memory Manager Solution ------------------------------------------
+workspace "IgniteMemory"
 architecture "x64"
 
 configurations
@@ -13,11 +13,7 @@ outputName    = "%{cfg.buildcfg}"
 outputPath    = "$(SolutionDir)Scratch/Bin/" .. outputName .. "/"
 outputIntPath = "$(SolutionDir)Scratch/Int/" .. outputName .. "/"
 
-include "IgniteEngineProject/"
-include "IgniteGameProject/"
-
 include "IgniteMemProject/"
-include "IgniteUtilsProject/"
 
 include "LogProject/"
 

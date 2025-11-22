@@ -11,7 +11,7 @@
 #include "Timer.h"
 #include "TestResultsManager.h"
 
-constexpr uint32_t sizeBytes        = 500 * 1'024 * 1'024;
+constexpr uint32_t sizeBytes        = 12 * 1'024 * 1'024;
 constexpr uint32_t sizeBytesRandom  = 5 * 1'024;
 
 constexpr uint32_t numberOfTests = 20'000;
@@ -292,7 +292,7 @@ static void RunTest()
 
 static void RunTestRandom()
 {
-    srand(time(nullptr));
+    srand(static_cast<uint32_t>(time(nullptr)));
     const uint32_t seed = rand();
     srand(seed);
 

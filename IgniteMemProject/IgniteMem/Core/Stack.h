@@ -11,15 +11,19 @@ template <typename T>
 class Stack
 {
 public:
-    //Stack() = default;
     Stack(const uint32_t maxSize);
     ~Stack();
+
+    Stack(const Stack&)             = delete;
+    Stack(Stack&&)                  = delete;
+    Stack& operator=(Stack&&)       = delete;
+    Stack& operator=(const Stack&)  = delete;
 
     [[nodiscard]] T pop();
     void push(const T value);
 
     [[nodiscard]] inline T* data()           const { return mArray; }
-    [[nodsicard]] inline bool empty()        const { return mIndex == 0; }
+    [[nodiscard]] inline bool empty()        const { return mIndex == 0; }
     [[nodiscard]] inline uint32_t size()     const { return mIndex; }
     [[nodiscard]] inline uint32_t capacity() const { return mCapacity; }
 private:
@@ -44,7 +48,6 @@ Stack<T>::~Stack()
 {
     free(mArray);
 }
-
 
 template <typename T>
 T Stack<T>::pop()

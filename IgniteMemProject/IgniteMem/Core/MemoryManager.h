@@ -18,11 +18,14 @@
 namespace ignite::mem
 {
 
-struct MemoryBlock
+struct API MemoryBlock
 {
     std::byte* address;
     uint64_t   sizeFree;
 };
+
+template class  API Stack<unsigned char>;
+template struct API ListNode<MemoryBlock>;
 
 class API MemoryManager
 {
@@ -36,14 +39,20 @@ public:
     MemoryManager& operator=(MemoryManager&&)      = delete;
     MemoryManager& operator=(const MemoryManager&) = delete;
 
-    static void Init(const uint32_t sizeBytes);
-    static void Destroy();
+    static void Init(const uint32_t sizeBytes) noexcept;
+    static void Destroy() noexcept;
+
+    [[nodiscard]] void* New(const uint64_t size) noexcept;
 
     template <typename T, typename... Args>
-    T* New(Args ...args) noexcept;
+    [[nodiscard]] T* New(Args ...args) noexcept;
 
     template <typename T>
     void Delete(T* free) noexcept;
+
+    //Todo Ideally, I don't want to expose these, but these are used in tests.
+    [[nodiscard]] inline static uint32_t GetMetadataPadding() { return METADATA_PADDING; }
+    [[nodiscard]] inline uint64_t     GetSizeFree()           const { return mSize - mAllocated; }
 
 #ifdef DEV_CONFIGURATION
     [[nodiscard]] inline ListNode*    GetStartingListNode()   const { return mStartingListNode; }
@@ -51,11 +60,9 @@ public:
     [[nodiscard]] inline void*        GetStartOfMemoryBlock() const { return mMemoryBlock; }
     [[nodiscard]] inline uint64_t     GetSize()               const { return mSize; }
     [[nodiscard]] inline uint64_t     GetAllocated()          const { return mAllocated; }
-    [[nodiscard]] inline uint64_t     GetSizeFree()           const { return mSize - mAllocated; }
     [[nodiscard]] inline uint32_t     GetNumberOfFragments()  const { return mNumberOfFragments; }
 
     static void SetMemoryBlockDebug(DebugMemoryHexValues value, void* memory, const uint64_t size);
-    inline static uint32_t GetMetadataPadding() { return METADATA_PADDING; }
 
 private:
     std::thread mThread;
@@ -68,8 +75,8 @@ private:
     static constexpr uint32_t MAX_FRAGMENTS   { 64 };
     static constexpr uint32_t METADATA_PADDING{  4 };
 
-    MemoryManager(const uint64_t sizeBytes);
-    ~MemoryManager();
+    MemoryManager(const uint64_t sizeBytes) noexcept;
+    ~MemoryManager() noexcept;
 
     static MemoryManager* mInstance;
 
@@ -94,70 +101,8 @@ private:
 template <typename T, typename... Args>
 T* MemoryManager::New(Args ...args) noexcept
 {
-    const uint64_t size = sizeof(T);
-    const uint64_t allocatedSize = size + METADATA_PADDING;
-
-#ifdef DEV_CONFIGURATION
-    const float percentage = static_cast<float>(mAllocated + allocatedSize) / mSize * 100.0f;
-    if (percentage >= 80)
-    {
-        MEM_LOG_WARN("Memory Budged Warning: At {}% of memory budget.", percentage);
-    }
-
-    if (mSize - mAllocated < allocatedSize)
-    {
-        MEM_LOG_ERROR("Memory Budged Exceeded: Not enough reserved memory to allocate! Object will be heap allocated in debug but will fail to create in release builds.");
-        return new T{ std::forward<Args>(args)... };
-    }
-#endif // DEV_CONFIGURATION.
-
-#ifndef DEV_CONFIGURATION
-    if (mSize - mAllocated < allocatedSize)
-    {
-        throw std::bad_alloc{ };
-    }
-#endif
-
-    auto [previous, allocationNode] = FindAllocationListNode(allocatedSize);
-
-    *reinterpret_cast<uint32_t*>(allocationNode->value.address) = size;
-
-    mAllocated += allocatedSize;
-
-    allocationNode->value.address  += allocatedSize;
-    allocationNode->value.sizeFree -= allocatedSize;
-
-    void* typeAddress = allocationNode->value.address - size;
-
-    // If this allocation fills the block, it might be possible to remove the block.
-    if (allocationNode->value.sizeFree == 0)
-    {
-        // If we are the starting block but have another block, we can remove the node and update starting node.
-        if (!previous && mStartingListNode->next)
-        {
-            // If there is no previous node, we have to be the starting node, else we have a broken list.
-            assert(allocationNode == mStartingListNode);
-            mStartingListNode = allocationNode->next;
-
-            FreeListNode(allocationNode);
-        }
-
-        // If we are not the starting block, we can delete the intermediate block and link the previous to next.
-        if (previous)
-        {
-            previous->next = allocationNode->next;
-
-            FreeListNode(allocationNode);
-        }
-
-        // The omitted case is when we are the starting node and have no next node.
-        // We do not need to do anything in this situation as we need to constantly have a node.
-        // Therefore, we just will have a node of 0 bytes and do not want to delete it.
-    }
-
-    T* allocation = new (static_cast<T*>(typeAddress)) T{ std::forward<Args>(args)... };
-
-    return allocation;
+    void* address = New(sizeof(T));
+    return new (static_cast<T*>(address)) T{ std::forward<Args>(args)... };
 }
 
 template <typename T>
@@ -168,7 +113,7 @@ void MemoryManager::Delete(T* free) noexcept
 #ifdef DEV_CONFIGURATION
     if ((std::byte*)free < mMemoryBlock || (std::byte*)free > (std::byte*)mMemoryBlock + mSize)
     {
-        //MEM_LOG_WARN("Freed memory that was allocated on heap due to exceeding memory budget.");
+        MEM_LOG_WARN("Freed memory that was allocated on heap due to exceeding memory budget.");
         delete free;
         return;
     }
@@ -266,4 +211,4 @@ void MemoryManager::Delete(T* free) noexcept
     }
 }
 
-} // Namespace ignite::mem;
+} // Namespace ignite::mem.

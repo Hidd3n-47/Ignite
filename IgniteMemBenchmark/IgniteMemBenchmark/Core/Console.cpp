@@ -174,6 +174,8 @@ void Console::Render() const
                 ImPlot::EndPlot();
             }
 
+            ImGui::Text("Note: Random allocations do not have a deallocation graph as there is no way to measure the time of individual allocations and deallocations.");
+
             ImGui::End();
         }
     }
