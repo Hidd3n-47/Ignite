@@ -16,6 +16,8 @@ SpriteRenderer::SpriteRenderer(const std::filesystem::path& filePath, const uint
 
 SpriteRenderer::SpriteRenderer(const Texture& texture, const float xSpritesheet, const float ySpritesheet, const uint32_t layer)
 {
+    PROFILE_FUNC();
+
     mRenderCommand.texture         = texture;
     mRenderCommand.spritesheetPosX = xSpritesheet;
     mRenderCommand.spritesheetPosY = ySpritesheet;
@@ -25,6 +27,8 @@ SpriteRenderer::SpriteRenderer(const Texture& texture, const float xSpritesheet,
 
 void SpriteRenderer::OnComponentAdded(const mem::WeakRef<GameObject> parent)
 {
+    PROFILE_FUNC();
+
     IComponent::OnComponentAdded(parent);
 
     mRenderCommand.transform = mParent->GetComponent<Transform>();
@@ -32,6 +36,8 @@ void SpriteRenderer::OnComponentAdded(const mem::WeakRef<GameObject> parent)
 
 void SpriteRenderer::Render(mem::WeakRef<Renderer> renderer)
 {
+    PROFILE_FUNC();
+
     renderer->AddRenderCommand(mLayer, mem::WeakRef{ &mRenderCommand });
 }
 

@@ -18,6 +18,8 @@ BoxCollider::BoxCollider(const Vec2 dimensionHalfExtents, const bool dynamic, co
 
 void BoxCollider::OnComponentAdded(const mem::WeakRef<GameObject> parent)
 {
+    PROFILE_FUNC();
+
     IComponent::OnComponentAdded(parent);
 
     if (mDynamic)
@@ -38,6 +40,8 @@ void BoxCollider::OnComponentAdded(const mem::WeakRef<GameObject> parent)
 
 void BoxCollider::OnComponentRemoved()
 {
+    PROFILE_FUNC();
+
     if (mDynamic)
     {
         Engine::Instance()->GetCollisionHandler()->RemoveDynamicBox(mParent);
@@ -51,12 +55,16 @@ void BoxCollider::OnComponentRemoved()
 #ifdef DEV_CONFIGURATION
 void BoxCollider::Render(mem::WeakRef<Renderer> renderer)
 {
+    PROFILE_FUNC();
+
     renderer->AddRenderCommand(1000, mem::WeakRef{ &mRenderCommand });
 }
 #endif // DEV_CONFIGURATION.
 
 void BoxCollider::SetOffset(const Vec2 offset)
 {
+    PROFILE_FUNC();
+
     mOffset = offset;
 
 #ifdef DEV_CONFIGURATION

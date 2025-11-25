@@ -14,6 +14,8 @@ namespace ignite
 {
 void CollisionHandler::Update()
 {
+    PROFILE_FUNC();
+
     mTriggeredThisFrame.clear();
 
     for (const mem::WeakRef<GameObject> dynamicBox1 : mDynamicBoxColliders)
@@ -52,16 +54,22 @@ void CollisionHandler::Update()
 
 void CollisionHandler::AddDynamicBox(const mem::WeakRef<GameObject> box)
 {
+    PROFILE_FUNC();
+
     mDynamicBoxColliders.emplace_back(box);
 }
 
 void CollisionHandler::AddStaticBox(const mem::WeakRef<GameObject> box)
 {
+    PROFILE_FUNC();
+
     mStaticBoxColliders.emplace_back(box);
 }
 
 void CollisionHandler::RemoveDynamicBox(const mem::WeakRef<GameObject> box)
 {
+    PROFILE_FUNC();
+
     for (auto it{ mDynamicBoxColliders.begin() }; it != mDynamicBoxColliders.end(); ++it)
     {
         if (*it == box)
@@ -74,6 +82,8 @@ void CollisionHandler::RemoveDynamicBox(const mem::WeakRef<GameObject> box)
 
 void CollisionHandler::RemoveStaticBox(const mem::WeakRef<GameObject> box)
 {
+    PROFILE_FUNC();
+
     for (auto it{ mStaticBoxColliders.begin() }; it != mStaticBoxColliders.end(); ++it)
     {
         if (*it == box)
@@ -86,6 +96,8 @@ void CollisionHandler::RemoveStaticBox(const mem::WeakRef<GameObject> box)
 
 void CollisionHandler::CheckCollisionBetweenBoxes(mem::WeakRef<GameObject> box1, mem::WeakRef<GameObject> box2, const bool pushBothBodies)
 {
+    PROFILE_FUNC();
+
     mem::WeakRef<Transform>   box1Transform = box1->GetComponent<Transform>();
     mem::WeakRef<BoxCollider> box1Collider  = box1->GetComponent<BoxCollider>();
 

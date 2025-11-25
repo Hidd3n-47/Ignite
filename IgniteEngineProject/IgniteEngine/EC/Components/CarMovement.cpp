@@ -15,6 +15,8 @@ namespace ignite
 
 void CarMovement::OnComponentAdded(const mem::WeakRef<GameObject> parent)
 {
+    PROFILE_FUNC();
+
     IComponent::OnComponentAdded(parent);
 
     mTransform       = mParent->GetComponent<Transform>();
@@ -23,6 +25,8 @@ void CarMovement::OnComponentAdded(const mem::WeakRef<GameObject> parent)
 
 void CarMovement::Update(const float dt)
 {
+    PROFILE_FUNC();
+
     if (!mMovementEnabled)
     {
         return;

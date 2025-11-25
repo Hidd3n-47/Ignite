@@ -40,6 +40,8 @@ void FontRenderer::UpdateFont(const uint16_t id, const std::string& text)
 
 void FontRenderer::RenderFonts(const OrthoCamera& camera)
 {
+    PROFILE_FUNC();
+
     for (const Font* font : mFonts | std::views::values)
     {
         const float width  = static_cast<float>(font->width);

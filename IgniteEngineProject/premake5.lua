@@ -54,12 +54,18 @@ project "IgniteEngine"
         ("{COPYFILE} %[$(SolutionDir)deps/Lib/SDL3.dll] %[" .. outputPath .."IgniteGame/]"),
         ("{COPYFILE} %[$(SolutionDir)deps/Lib/SDL3_ttf.dll] %[" .. outputPath .."IgniteGame/]"),
         ("{COPYFILE} %[$(SolutionDir)deps/Lib/SDL3_image.dll] %[" .. outputPath .."IgniteGame/]"),
+        ("{COPYFILE} %[" .. outputPath .. "IgniteMem/IgniteMem.dll] %[" .. outputPath .."IgniteGame/]"),
     }
 
     filter "system:windows"
         systemversion "latest"
 
     filter "configurations:Dev"
+        runtime "Debug"
+        defines { "ENGINE_DEBUG", "DEV_CONFIGURATION" }
+        symbols "on"
+
+    filter "configurations:Dev_LiveStats"
         runtime "Debug"
         defines { "ENGINE_DEBUG", "DEV_CONFIGURATION" }
         symbols "on"

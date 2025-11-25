@@ -17,6 +17,8 @@ GameObject::GameObject(const Ulid id, const mem::WeakRef<Scene> parent)
 
 GameObject::~GameObject()
 {
+    PROFILE_FUNC();
+
     for (IComponent* comp : mComponents)
     {
         comp->OnComponentRemoved();
@@ -26,6 +28,8 @@ GameObject::~GameObject()
 
 void GameObject::Update(const float dt) const
 {
+    PROFILE_FUNC();
+
     for (IComponent* component : mComponents)
     {
         component->Update(dt);
@@ -34,6 +38,8 @@ void GameObject::Update(const float dt) const
 
 void GameObject::Render(mem::WeakRef<Renderer> renderer) const
 {
+    PROFILE_FUNC();
+
     for (IComponent* component : mComponents)
     {
         component->Render(renderer);

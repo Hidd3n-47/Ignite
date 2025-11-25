@@ -14,6 +14,8 @@ namespace ignite
 
 void RigidBody::OnComponentAdded(const mem::WeakRef<GameObject> parent)
 {
+    PROFILE_FUNC();
+
     IComponent::OnComponentAdded(parent);
     mTransform = mParent->GetComponent<Transform>();
 }
@@ -25,6 +27,8 @@ void RigidBody::OnComponentRemoved()
 
 void RigidBody::Update(const float dt)
 {
+    PROFILE_FUNC();
+
     const float rotation = mTransform->rotation;
     const float cosRot = std::cos(Math::DegToRads(rotation));
     const float sinRot = std::sin(Math::DegToRads(rotation));

@@ -24,3 +24,5 @@
 #include <IgniteUtils/Core/Ulid.h>
 
 #include "IgniteEngine/Math/Vec2.h"
+
+#include "IgniteEngine/Core/Profile.h"

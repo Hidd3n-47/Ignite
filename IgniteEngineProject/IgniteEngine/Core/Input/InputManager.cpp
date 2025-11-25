@@ -10,6 +10,8 @@ namespace ignite
 
 void InputManager::Poll()
 {
+    PROFILE_FUNC();
+
     StartFrame();
 
     SDL_Event e;

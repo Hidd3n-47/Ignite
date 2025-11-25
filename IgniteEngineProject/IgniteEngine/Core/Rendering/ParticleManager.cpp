@@ -68,6 +68,8 @@ void ParticleManager::ClearEffects()
 
 void ParticleManager::Update(const float dt) const
 {
+    PROFILE_FUNC();
+
     for (ParticleEffect* effect : mEffects)
     {
         effect->Update(dt);
@@ -76,6 +78,8 @@ void ParticleManager::Update(const float dt) const
 
 void ParticleManager::Render(const mem::WeakRef<Renderer> renderer) const
 {
+    PROFILE_FUNC();
+
     for (const ParticleEffect* effect : mEffects)
     {
         effect->Render(renderer);

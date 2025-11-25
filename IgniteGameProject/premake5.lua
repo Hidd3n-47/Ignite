@@ -45,6 +45,11 @@ project "IgniteGame"
         runtime "Debug"
         defines "DEV_CONFIGURATION"
         symbols "on"
+        
+    filter "configurations:Dev_LiveStats"
+        runtime "Debug"
+        defines "DEV_CONFIGURATION"
+        symbols "on"
 
     filter "configurations:Release"
         runtime "Release"

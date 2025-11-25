@@ -16,6 +16,8 @@ RaceTimer::RaceTimer(const float size)
 
 void RaceTimer::OnComponentAdded(const mem::WeakRef<GameObject> parent)
 {
+    PROFILE_FUNC();
+
     IComponent::OnComponentAdded(parent);
 
     mId = mFontRendererRef->CreateFont("Assets/Fonts/ThaleahFat.ttf", mSize, "0.0", mParent->GetComponent<Transform>());
@@ -23,11 +25,15 @@ void RaceTimer::OnComponentAdded(const mem::WeakRef<GameObject> parent)
 
 void RaceTimer::OnComponentRemoved()
 {
+    PROFILE_FUNC();
+
     mFontRendererRef->RemoveFont(mId);
 }
 
 void RaceTimer::Update(const float dt)
 {
+    PROFILE_FUNC();
+
     if (!mTimerStarted)
     {
         return;
@@ -42,6 +48,8 @@ void RaceTimer::Update(const float dt)
 
 void RaceTimer::StartTimer()
 {
+    PROFILE_FUNC();
+
     mTimer = 0.0f;
 
     mTimerStarted = true;

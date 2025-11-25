@@ -31,12 +31,16 @@ Renderer::~Renderer()
 
 void Renderer::StartRender() const
 {
+    PROFILE_FUNC();
+
     SDL_SetRenderDrawColor(mRenderer, 120, 120, 120, 255);
     SDL_RenderClear(mRenderer);
 }
 
 void Renderer::Render(const OrthoCamera& camera)
 {
+    PROFILE_FUNC();
+
     for (const std::vector<mem::WeakRef<RenderCommand>>& layerCommands : mCommands | std::views::values)
     {
         for (const mem::WeakRef<RenderCommand> command : layerCommands)
@@ -110,6 +114,8 @@ void Renderer::Render(const OrthoCamera& camera)
 
 void Renderer::EndRender() const
 {
+    PROFILE_FUNC();
+
     SDL_RenderPresent(mRenderer);
 }
 

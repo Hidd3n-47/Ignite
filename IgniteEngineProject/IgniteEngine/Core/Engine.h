@@ -24,6 +24,9 @@ class CollisionHandler;
 class Engine
 {
 public:
+    Engine()  = default;
+    ~Engine() = default;
+
     [[nodiscard]] inline static mem::WeakRef<Engine> Instance() { return mem::WeakRef{ mInstance }; }
 
     Engine(const Engine&)             = delete;
@@ -89,9 +92,6 @@ public:
     //const Vec2 DEFAULT_SCREEN_SIZE{ 1280.0f, 720.0f };
     const Vec2 DEFAULT_SCREEN_SIZE{ 1920.0f, 1080.0f };
 private:
-    Engine()  = default;
-    ~Engine() = default;
-
     static Engine* mInstance;
 
     bool mRunning = false;

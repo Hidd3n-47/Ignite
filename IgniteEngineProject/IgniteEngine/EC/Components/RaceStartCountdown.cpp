@@ -18,6 +18,8 @@ RaceStartCountdown::RaceStartCountdown(const mem::WeakRef<UiText> uiTextComponen
 
 void RaceStartCountdown::Update(const float dt)
 {
+    PROFILE_FUNC();
+
     if (!mTimerRunning)
     {
         return;

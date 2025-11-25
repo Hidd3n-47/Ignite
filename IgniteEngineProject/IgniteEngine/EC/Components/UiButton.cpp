@@ -12,6 +12,8 @@ namespace ignite
 
 UiButton::UiButton(const std::filesystem::path& filePath, const bool hasPressedAnimation)
 {
+    PROFILE_FUNC();
+
     Engine::Instance()->GetTextureManager()->Load(mRenderCommand.texture, filePath, hasPressedAnimation ? 2 : 1);
 
     mInputManagerRef   = Engine::Instance()->GetInputManager();
@@ -19,6 +21,8 @@ UiButton::UiButton(const std::filesystem::path& filePath, const bool hasPressedA
 
 void UiButton::OnComponentAdded(const mem::WeakRef<GameObject> parent)
 {
+    PROFILE_FUNC();
+
     IComponent::OnComponentAdded(parent);
 
     mRenderCommand.transform = mParent->GetComponent<Transform>();
@@ -26,6 +30,8 @@ void UiButton::OnComponentAdded(const mem::WeakRef<GameObject> parent)
 
 void UiButton::Update(const float dt)
 {
+    PROFILE_FUNC();
+
     const Vec2 mousePosition = mInputManagerRef->GetMousePosition();
     const Vec2 positionScreenSpace = Engine::Instance()->GetCamera().PositionToScreenSpace(mRenderCommand.transform->translation);
 
@@ -64,6 +70,8 @@ void UiButton::Update(const float dt)
 
 void UiButton::Render(mem::WeakRef<Renderer> renderer)
 {
+    PROFILE_FUNC();
+
     mRenderCommand.spritesheetPosX = std::min(static_cast<float>(mMouseDown),mRenderCommand.spritesheetMaxX - 1);
     renderer->AddRenderCommand(0, mem::WeakRef{ &mRenderCommand });
 }

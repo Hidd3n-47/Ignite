@@ -3,6 +3,8 @@
 
 #include <SDL3/SDL.h>
 
+#include <IgniteMem/Core/MemoryManager.h>
+
 #include "Defines.h"
 #include "EC/Scene.h"
 #include "Core/Input/InputManager.h"
@@ -11,6 +13,30 @@
 #include "Core/Rendering/FontRenderer.h"
 #include "Core/Rendering/TextureManager.h"
 #include "Core/Rendering/ParticleManager.h"
+#include "IgniteUtils/Core/InstrumentationSession.h"
+
+//todo fix.
+static bool memInit = false;
+
+void* operator new(std::size_t size)
+{
+    if (!memInit)
+    {
+        ignite::mem::MemoryManager::Init(128 * 1'024);
+        memInit = true;
+    }
+
+    //std::cout << "using global new...\n";
+    //return malloc(size);
+    return ignite::mem::MemoryManager::Instance()->New(size);
+}
+
+void operator delete(void* address) noexcept
+{
+    //std::cout << "using global delete...\n";
+    //return free(address);
+    return ignite::mem::MemoryManager::Instance()->Delete(address);
+}
 
 namespace ignite
 {
@@ -27,7 +53,11 @@ mem::WeakRef<Engine> Engine::CreateEngine()
         return mem::WeakRef{ mInstance };
     }
 
-    mInstance = new Engine();
+    utils::InstrumentationSession::Instance()->StartSession();
+
+    //mem::MemoryManager::Init(128 * 1'024);
+
+    mInstance = mem::MemoryManager::Instance()->New<Engine>();
     DEBUG_INFO("Successfully created Ignite Engine.");
 
     return mem::WeakRef{ mInstance };
@@ -35,6 +65,8 @@ mem::WeakRef<Engine> Engine::CreateEngine()
 
 void Engine::Init()
 {
+    PROFILE_FUNC();
+
     DEBUG_INFO("Successfully initialized Ignite Engine.");
 
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO))
@@ -43,7 +75,7 @@ void Engine::Init()
         return;
     }
 
-    mInputManager = new InputManager();
+    mInputManager = mem::MemoryManager::Instance()->New<InputManager>();
 
     const OrthoCameraValues cameraSize
     {
@@ -55,7 +87,7 @@ void Engine::Init()
     };
     mCamera = OrthoCamera(cameraSize);
 
-    mWindow   = SDL_CreateWindow("Ignite", static_cast<int>(DEFAULT_SCREEN_SIZE.x), static_cast<int>(DEFAULT_SCREEN_SIZE.y), 0);
+    mWindow = SDL_CreateWindow("Ignite", static_cast<int>(DEFAULT_SCREEN_SIZE.x), static_cast<int>(DEFAULT_SCREEN_SIZE.y), 0);
 
     if (!mWindow)
     {
@@ -63,21 +95,21 @@ void Engine::Init()
         return;
     }
 
-    mRenderer = new Renderer(mWindow);
-    mTextureManager = new TextureManager(mRenderer->GetRendererBackend());
+    mRenderer       = mem::MemoryManager::Instance()->New<Renderer>(mWindow);
+    mTextureManager = mem::MemoryManager::Instance()->New<TextureManager>(mRenderer->GetRendererBackend());
     mRenderer->SetTextureManagerRef(mem::WeakRef{ mTextureManager });
 
-    mFontRenderer = new FontRenderer(mRenderer->GetRendererBackend());
-
-    mCollisionHandler = new CollisionHandler();
-
-    mParticleManager = new ParticleManager();
+    mFontRenderer     = mem::MemoryManager::Instance()->New<FontRenderer>(mRenderer->GetRendererBackend());
+    mCollisionHandler = mem::MemoryManager::Instance()->New<CollisionHandler>();
+    mParticleManager  = mem::MemoryManager::Instance()->New<ParticleManager>();
 
     mRunning = true;
 }
 
 void Engine::Run()
 {
+    PROFILE_FUNC();
+
     while (mRunning)
     {
         StartFrame();
@@ -93,8 +125,11 @@ void Engine::Run()
         Render();
 
 #ifdef DEV_CONFIGURATION
-        std::string title = std::to_string(1.0 / mDeltaTime);
-        SDL_SetWindowTitle(mWindow, title.c_str());
+        // Max frames displayed as: 120.123 <- total of 7 characters + 1 for null terminating character.
+        char title[8];
+        std::to_chars(title, title + sizeof(title), 1.0 / mDeltaTime, std::chars_format::fixed, 3);
+        title[sizeof(title) - 1] = '\0';
+        SDL_SetWindowTitle(mWindow, title);
 #endif // DEV_CONFIGURATION.
 
         EndFrame();
@@ -103,27 +138,35 @@ void Engine::Run()
 
 void Engine::Destroy() const
 {
-    delete mParticleManager;
+    PROFILE_FUNC();
 
-    delete mCollisionHandler;
+    mem::MemoryManager::Instance()->Delete(mParticleManager);
 
-    delete mFontRenderer;
+    mem::MemoryManager::Instance()->Delete(mCollisionHandler);
 
-    delete mTextureManager;
-    delete mRenderer;
+    mem::MemoryManager::Instance()->Delete(mFontRenderer);
+
+    mem::MemoryManager::Instance()->Delete(mTextureManager);
+    mem::MemoryManager::Instance()->Delete(mRenderer);
 
     SDL_DestroyWindow(mWindow);
 
-    delete mInputManager;
+    mem::MemoryManager::Instance()->Delete(mInputManager);
 
-    delete mInstance;
+    mem::MemoryManager::Instance()->Delete(mInstance);
     mInstance = nullptr;
+
+    mem::MemoryManager::Destroy();
+
+    utils::InstrumentationSession::Instance()->EndSession();
 
     DEBUG_INFO("Successfully destroyed Ignite Engine.");
 }
 
 void Engine::Update()
 {
+    PROFILE_FUNC();
+
     if (mActiveScene.IsRefValid())
     {
         mActiveScene->SceneUpdate();
@@ -133,6 +176,8 @@ void Engine::Update()
 
 void Engine::PostUpdate()
 {
+    PROFILE_FUNC();
+
     if (mSceneToChangeTo.IsRefValid())
     {
         mActiveScene = mSceneToChangeTo;
@@ -144,6 +189,8 @@ void Engine::PostUpdate()
 
 void Engine::Render() const
 {
+    PROFILE_FUNC();
+
     mRenderer->StartRender();
 
     if (mActiveScene.IsRefValid())
@@ -162,11 +209,15 @@ void Engine::Render() const
 
 void Engine::StartFrame()
 {
+    PROFILE_FUNC();
+
     mStartFrameTime = SDL_GetPerformanceCounter();
 }
 
 void Engine::EndFrame()
 {
+    PROFILE_FUNC();
+
     const uint64_t now = SDL_GetPerformanceCounter();
     const uint64_t startEndDelta = (now - mStartFrameTime) / SDL_GetPerformanceFrequency() ;
 

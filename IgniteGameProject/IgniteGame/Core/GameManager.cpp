@@ -35,7 +35,9 @@ mem::WeakRef<GameManager> GameManager::CreateGameManager()
 
 void GameManager::Init()
 {
+    PROFILE_FUNC();
     mLevelParser = new LevelParser();
+
     mLevelParser->Init();
 
     ChangeState(ApplicationStates::MAIN_MENU);
@@ -43,6 +45,8 @@ void GameManager::Init()
 
 void GameManager::Destroy() const
 {
+    PROFILE_FUNC();
+
     delete mPreviousScene;
     delete mCurrentScene;
 
@@ -57,6 +61,8 @@ void GameManager::Destroy() const
 
 void GameManager::ChangeState(const ApplicationStates state, IApplicationStateInitInfo* initInfo)
 {
+    PROFILE_FUNC();
+
     delete mPreviousScene;
 
     mPreviousScene = mCurrentScene;
@@ -97,6 +103,8 @@ void GameManager::ChangeState(const ApplicationStates state, IApplicationStateIn
 
 TrophyRanking GameManager::GetTrophyRanking(const float playerTime) const
 {
+    PROFILE_FUNC();
+
     if (playerTime > mTimeForBronze)
     {
         return TrophyRanking::NONE;
