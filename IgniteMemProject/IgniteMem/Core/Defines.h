@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef DEV_CONFIGURATION
-#include <Log/Log.h>
+#include <Logger/Log.h>
 
 #define DEBUG(X) X
 #define MEM_LOG_DEBUG(...) ignite::Log::Debug("IgniteMem", __VA_ARGS__)

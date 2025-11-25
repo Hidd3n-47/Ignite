@@ -1,5 +1,5 @@
--- ---------------------------- Log Project.
-project "Log"
+-- ---------------------------- Logger Project.
+project "Logger"
     location "%{prj.name}"
     kind "StaticLib"
     language "C++"

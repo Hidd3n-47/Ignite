@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef DEV_CONFIGURATION
-#include "Log/Log.h"
+#include "Logger/Log.h"
 #define GAME_BREAK() __debugbreak()
 #define GAME_DEBUG(...) __VA_ARGS__
 #define GAME_LOG(...)   ignite::Log::Debug("IgniteGame", __VA_ARGS__)

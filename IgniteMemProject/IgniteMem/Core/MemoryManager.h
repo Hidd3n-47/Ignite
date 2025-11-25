@@ -42,7 +42,7 @@ public:
     static void Init(const uint32_t sizeBytes) noexcept;
     static void Destroy() noexcept;
 
-    [[nodiscard]] void* New(const uint64_t size) noexcept;
+    [[nodiscard]] void* New(const uint32_t size) noexcept;
 
     template <typename T, typename... Args>
     [[nodiscard]] T* New(Args ...args) noexcept;

@@ -40,7 +40,7 @@ project "IgniteEngine"
 
     links
     {
-        "Log",
+        "Logger",
         "IgniteMem",
         "IgniteUtils",
 

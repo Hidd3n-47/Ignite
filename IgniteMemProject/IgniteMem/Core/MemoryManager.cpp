@@ -96,7 +96,7 @@ void MemoryManager::Destroy() noexcept
     MEM_LOG_DEBUG("Memory managed successfully destroyed.");
 }
 
-void* MemoryManager::New(const uint64_t size) noexcept
+void* MemoryManager::New(const uint32_t size) noexcept
 {
     const uint64_t allocatedSize = size + METADATA_PADDING;
 

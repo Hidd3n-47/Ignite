@@ -31,7 +31,7 @@ project "IgniteMem"
 
     links
     {
-        "Log",
+        "Logger",
         "SDL3.lib",
         "imgui"
     }
