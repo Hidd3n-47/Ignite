@@ -1,13 +1,14 @@
 ﻿#pragma once
 
 #include "IgniteEngine/EC/IComponent.h"
+#include "IgniteEngine/EC/IUpdateableComponent.h"
 
 namespace ignite
 {
 
 class Transform;
 
-class RigidBody : public IComponent
+class RigidBody : public IComponent, public IUpdateableComponent
 {
 public:
     void OnComponentAdded(const mem::WeakRef<GameObject> parent) override;

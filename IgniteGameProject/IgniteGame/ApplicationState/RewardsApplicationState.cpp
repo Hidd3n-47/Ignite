@@ -42,7 +42,7 @@ void RewardsApplicationState::InitScene()
 
     mem::WeakRef<GameObject> backButtonObject = CreateGameObject();
     backButtonObject->GetComponent<Transform>()->translation = Vec2{ 0.0f, -2.0f };
-    mem::WeakRef<UiButton> backButton = backButtonObject->AddComponent<UiButton>(std::filesystem::path{ "Assets/BackButton.png" }, true);
+    mem::WeakRef<UiButton> backButton = backButtonObject->AddComponent<UiButton>("Assets/BackButton.png", true);
     backButton->SetOnButtonPressedEvent([&] { mTextObject->RemoveComponent<UiText>(); GameManager::Instance()->ChangeState(ApplicationStates::MAIN_MENU); });
     backButton->SetOnHoveredEvent(
         [](mem::WeakRef<GameObject> gameObject)

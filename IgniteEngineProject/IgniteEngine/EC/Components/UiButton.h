@@ -1,6 +1,8 @@
 #pragma once
 
 #include "IgniteEngine/EC/IComponent.h"
+#include "IgniteEngine/EC/IUpdateableComponent.h"
+#include "IgniteEngine/EC/IRenderableComponent.h"
 
 #include "IgniteEngine/Core/Rendering/RenderCommand.h"
 
@@ -10,10 +12,10 @@ namespace ignite
 class InputManager;
 class TextureManager;
 
-class UiButton : public IComponent
+class UiButton : public IComponent, public IUpdateableComponent, public IRenderableComponent
 {
 public:
-    UiButton(const std::filesystem::path& filePath, const bool hasPressedAnimation = false);
+    UiButton(const char* filePath, const bool hasPressedAnimation = false);
 
     void OnComponentAdded(const mem::WeakRef<GameObject> parent) override;
 

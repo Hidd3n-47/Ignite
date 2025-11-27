@@ -19,6 +19,7 @@ void* operator new(std::size_t size)
 {
     //std::cout << "using global new...\n";
     //return malloc(size);
+    PROFILE_FUNC();
     return ignite::mem::MemoryManager::Instance()->New(size);
 }
 
@@ -26,7 +27,16 @@ void operator delete(void* address) noexcept
 {
     //std::cout << "using global delete...\n";
     //return free(address);
-    return ignite::mem::MemoryManager::Instance()->Delete(address);
+#ifdef DEV_CONFIGURATION
+    if (ignite::utils::InstrumentationSession::Instance())
+    {
+        PROFILE_FUNC();
+        ignite::mem::MemoryManager::Instance()->Delete(address);
+        return;
+    }
+#endif // DEV_CONFIGURATION.
+
+    ignite::mem::MemoryManager::Instance()->Delete(address);
 }
 
 namespace ignite
@@ -46,6 +56,7 @@ mem::WeakRef<Engine> Engine::CreateEngine()
 
     mem::MemoryManager::Init(128 * 1'024);
 
+    DEBUG(utils::InstrumentationSession::Create());
     DEBUG(utils::InstrumentationSession::Instance()->StartSession());
 
     mInstance = mem::MemoryManager::Instance()->New<Engine>();
@@ -147,9 +158,10 @@ void Engine::Destroy() const
 
     }
 
-    DEBUG(utils::InstrumentationSession::Instance()->EndSession());
-
     DEBUG_INFO("Successfully destroyed Ignite Engine.");
+
+    DEBUG(utils::InstrumentationSession::Instance()->EndSession());
+    DEBUG(utils::InstrumentationSession::Destroy());
 
     mem::MemoryManager::Instance()->Delete(mInstance);
     mInstance = nullptr;
@@ -211,19 +223,9 @@ void Engine::StartFrame()
 void Engine::EndFrame()
 {
     PROFILE_FUNC();
-
     const uint64_t now = SDL_GetPerformanceCounter();
-    const uint64_t startEndDelta = (now - mStartFrameTime) / SDL_GetPerformanceFrequency() ;
 
-    const uint64_t targetDelta = TARGET_FRAME_TIME_MS - startEndDelta;
-
-    if (targetDelta > 0)
-    {
-        SDL_Delay(static_cast<uint32_t>(targetDelta));
-    }
-
-    const uint64_t afterDelay = SDL_GetPerformanceCounter();
-    mDeltaTime = static_cast<float>(afterDelay - mStartFrameTime) / static_cast<float>(SDL_GetPerformanceFrequency());
+    mDeltaTime = static_cast<float>(now - mStartFrameTime) / static_cast<float>(SDL_GetPerformanceFrequency());
 }
 
 } // Namespace ignite.

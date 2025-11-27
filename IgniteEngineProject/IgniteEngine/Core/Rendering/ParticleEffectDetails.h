@@ -5,8 +5,8 @@ namespace ignite
 
 struct ParticleEffectDetails
 {
-    std::filesystem::path textureFilepath{};
-    uint32_t textureLayer = 0;
+    std::string textureFilepath{};
+    uint32_t    textureLayer = 0;
 
     uint32_t numberOfParticles = 1;
 

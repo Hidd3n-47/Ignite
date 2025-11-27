@@ -25,7 +25,7 @@ void ParticleEffect::InitEffect(const mem::WeakRef<ParticleEffectDetails> detail
     mParentTransform = parentTransform;
 
     Texture particleTexture;
-    Engine::Instance()->GetTextureManager()->Load(particleTexture, details->textureFilepath);
+    Engine::Instance()->GetTextureManager()->Load(particleTexture, details->textureFilepath.c_str());
     mTextureId    = particleTexture.id;
 
     for (uint32_t i{ 0 }; i < details->numberOfParticles; ++i)

@@ -1,13 +1,14 @@
 #pragma once
 
 #include "IgniteEngine/EC/IComponent.h"
+#include "IgniteEngine/EC/IUpdateableComponent.h"
 
 namespace ignite
 {
 
 class UiText;
 
-class RaceStartCountdown : public IComponent
+class RaceStartCountdown : public IComponent, public IUpdateableComponent
 {
 public:
     RaceStartCountdown(const mem::WeakRef<UiText> uiTextComponent, const float countdownTime, const std::function<void()>& onTimerCompletedCallback);

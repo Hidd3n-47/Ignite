@@ -3,6 +3,9 @@
 #include "IgniteEngine/Src/IgnitePch.h"
 
 #include "IgniteEngine/EC/IComponent.h"
+#include "IgniteEngine/EC/IUpdateableComponent.h"
+#include "IgniteEngine/EC/IRenderableComponent.h"
+
 #include "IgniteEngine/EC/Components/Transform.h"
 
 namespace ignite
@@ -11,6 +14,8 @@ namespace ignite
 class Scene;
 
 class Renderer;
+class IUpdateableComponent;
+class IRenderableComponent;
 
 /**
  * @class GameObject: A class representing the abstract idea of a 'Game Object'. A game object is a collection of \c Components.
@@ -72,12 +77,22 @@ private:
     mem::WeakRef<Scene> mParent;
 
     std::vector<IComponent*> mComponents;
+    std::vector<mem::WeakRef<IUpdateableComponent>> mUpdateableComponents;
+    std::vector<mem::WeakRef<IRenderableComponent>> mRenderableComponents;
 };
 
 template <typename Component>
 inline mem::WeakRef<Component> GameObject::AddComponent()
 {
     mComponents.emplace_back(new Component());
+    if (IUpdateableComponent* ref = dynamic_cast<IUpdateableComponent*>(mComponents.back()); ref)
+    {
+        mUpdateableComponents.emplace_back(ref);
+    }
+    if (IRenderableComponent* ref = dynamic_cast<IRenderableComponent*>(mComponents.back()); ref)
+    {
+        mRenderableComponents.emplace_back(ref);
+    }
     mComponents.back()->OnComponentAdded(mem::WeakRef{ this });
     return mem::WeakRef{ reinterpret_cast<Component*>(mComponents.back()) };
 }
@@ -86,6 +101,14 @@ template <typename Component, typename... Args>
 inline mem::WeakRef<Component> GameObject::AddComponent(Args ...args)
 {
     mComponents.emplace_back(new Component(std::forward<Args>(args)...));
+    if (IUpdateableComponent* ref = dynamic_cast<IUpdateableComponent*>(mComponents.back()); ref)
+    {
+        mUpdateableComponents.emplace_back(ref);
+    }
+    if (IRenderableComponent* ref = dynamic_cast<IRenderableComponent*>(mComponents.back()); ref)
+    {
+        mRenderableComponents.emplace_back(ref);
+    }
     mComponents.back()->OnComponentAdded(mem::WeakRef{ this });
     return mem::WeakRef{ reinterpret_cast<Component*>(mComponents.back()) };
 }
@@ -97,6 +120,15 @@ void GameObject::RemoveComponent()
     {
         if (Component* castComponent = dynamic_cast<Component*>(*it); castComponent != nullptr)
         {
+            if (IUpdateableComponent* ref = dynamic_cast<IUpdateableComponent*>(mComponents.back()); ref)
+            {
+                std::erase(mUpdateableComponents, ref);
+            }
+            if (IRenderableComponent* ref = dynamic_cast<IRenderableComponent*>(mComponents.back()); ref)
+            {
+                std::erase(mUpdateableComponents, ref);
+            }
+
             castComponent->OnComponentRemoved();
 
             mComponents.erase(it);

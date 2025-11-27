@@ -6,7 +6,6 @@
 namespace ignite
 {
 
-
 Font::Font(SDL_Texture* texture, const uint32_t w, const uint32_t h, const float size, const mem::WeakRef<Transform> transform, std::string text, std::string filePath)
     : texture(texture)
     , width(w)

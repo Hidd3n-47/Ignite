@@ -3,6 +3,18 @@
 namespace ignite::utils
 {
 
+void InstrumentationSession::Create()
+{
+    void* memoryAddress = malloc(sizeof(InstrumentationSession));
+    mInstance = new (memoryAddress) InstrumentationSession();
+}
+
+void InstrumentationSession::Destroy()
+{
+    free(mInstance);
+    mInstance = nullptr;
+}
+
 void InstrumentationSession::StartSession()
 {
     mFileOutput = std::ofstream("Results.json");
@@ -34,9 +46,6 @@ void InstrumentationSession::EndSession()
 {
     mFileOutput << R"(]})";
     mFileOutput.close();
-
-    delete mInstance;
-    mInstance = nullptr;
 }
 
 } // Namespace ignite::utils.

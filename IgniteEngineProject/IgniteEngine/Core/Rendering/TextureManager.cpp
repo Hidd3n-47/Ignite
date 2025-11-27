@@ -32,14 +32,14 @@ TextureManager::~TextureManager()
     RemoveAllTextures();
 }
 
-void TextureManager::Load(Texture& texture, const std::filesystem::path& filePath, const uint32_t spritesheetMaxX, const uint32_t spritesheetMaxY)
+void TextureManager::Load(Texture& texture, const char* filePath, const uint32_t spritesheetMaxX, const uint32_t spritesheetMaxY)
 {
     //todo need to make it that texture manager maps filepath to texture id to prevent reloading same texture.
 
-    SDL_Surface* surface = IMG_Load(filePath.string().c_str());
+    SDL_Surface* surface = IMG_Load(filePath);
     if (!surface)
     {
-        DEBUG_ERROR("Failed to load image at path: {}. Error: {}", filePath.string(), SDL_GetError());
+        DEBUG_ERROR("Failed to load image at path: {}. Error: {}", filePath, SDL_GetError());
         return;
     }
 

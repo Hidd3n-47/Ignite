@@ -10,7 +10,7 @@
 namespace ignite
 {
 
-UiButton::UiButton(const std::filesystem::path& filePath, const bool hasPressedAnimation)
+UiButton::UiButton(const char* filePath, const bool hasPressedAnimation)
 {
     PROFILE_FUNC();
 

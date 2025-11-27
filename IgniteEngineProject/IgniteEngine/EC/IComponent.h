@@ -19,10 +19,7 @@ public:
     virtual ~IComponent() = default;
 
     virtual void OnComponentAdded(const mem::WeakRef<GameObject> parent) { mParent = parent; }
-    virtual void OnComponentRemoved() { }
-
-    virtual void Update(const float dt) { }
-    virtual void Render(mem::WeakRef<Renderer> renderer) { }
+    virtual void OnComponentRemoved() { PROFILE_FUNC(); }
 
     [[nodiscard]] inline mem::WeakRef<GameObject> GetParent() const { return mParent; }
 protected:

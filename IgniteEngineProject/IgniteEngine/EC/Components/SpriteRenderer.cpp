@@ -8,7 +8,7 @@
 namespace ignite
 {
 
-SpriteRenderer::SpriteRenderer(const std::filesystem::path& filePath, const uint32_t layer)
+SpriteRenderer::SpriteRenderer(const char* filePath, const uint32_t layer)
     : mLayer(layer)
 {
     Engine::Instance()->GetTextureManager()->Load(mRenderCommand.texture, filePath);

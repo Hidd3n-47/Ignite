@@ -30,7 +30,7 @@ void GameObject::Update(const float dt) const
 {
     PROFILE_FUNC();
 
-    for (IComponent* component : mComponents)
+    for (mem::WeakRef<IUpdateableComponent> component : mUpdateableComponents)
     {
         component->Update(dt);
     }
@@ -40,7 +40,7 @@ void GameObject::Render(mem::WeakRef<Renderer> renderer) const
 {
     PROFILE_FUNC();
 
-    for (IComponent* component : mComponents)
+    for (mem::WeakRef<IRenderableComponent> component : mRenderableComponents)
     {
         component->Render(renderer);
     }

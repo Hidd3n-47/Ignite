@@ -4,6 +4,7 @@
 #include "Core/Engine.h"
 #include "EC/GameObject.h"
 #include "Core/Rendering/FontRenderer.h"
+#include "Math/Math.h"
 
 namespace ignite
 {
@@ -41,9 +42,12 @@ void RaceTimer::Update(const float dt)
 
     mTimer += dt;
 
-    const uint32_t t10 = static_cast<uint32_t>(mTimer * 10.0f);
-
-    mFontRendererRef->UpdateFont(mId, std::format("{:1}", static_cast<float>(t10) / 10.0f));
+    const float value = static_cast<float>(static_cast<uint32_t>(mTimer * 10.0f)) / 10.0f;
+    if (Math::IsEqualTo(value, mTimerValue))
+    {
+        mTimerValue = value;
+        mFontRendererRef->UpdateFont(mId, std::format("{:1}", mTimerValue));
+    }
 }
 
 void RaceTimer::StartTimer()

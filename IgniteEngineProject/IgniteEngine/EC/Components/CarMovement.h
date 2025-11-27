@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IgniteEngine/EC/IComponent.h"
+#include "IgniteEngine/EC/IUpdateableComponent.h"
 
 namespace ignite
 {
@@ -9,7 +10,7 @@ class Transform;
 class InputManager;
 class SpriteRenderer;
 
-class CarMovement : public IComponent
+class CarMovement : public IComponent, public IUpdateableComponent
 {
 public:
     void OnComponentAdded(const mem::WeakRef<GameObject> parent) override;

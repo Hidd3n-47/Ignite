@@ -21,7 +21,7 @@ public:
     TextureManager& operator=(TextureManager&&)       = delete;
     TextureManager& operator=(const TextureManager&)  = delete;
 
-    void Load(Texture& texture, const std::filesystem::path& filePath, const uint32_t spritesheetMaxX = 1, const uint32_t spritesheetMaxY = 1);
+    void Load(Texture& texture, const char* filePath, const uint32_t spritesheetMaxX = 1, const uint32_t spritesheetMaxY = 1);
 
     void RemoveTexture(const uint16_t id);
     void RemoveAllTextures();

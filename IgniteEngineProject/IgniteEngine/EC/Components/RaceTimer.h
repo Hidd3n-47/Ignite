@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IgniteEngine/EC/IComponent.h"
+#include "IgniteEngine/EC/IUpdateableComponent.h"
 
 namespace ignite
 {
@@ -8,7 +9,7 @@ namespace ignite
 class RaceTimer;
 class FontRenderer;
 
-class RaceTimer : public IComponent
+class RaceTimer : public IComponent, public IUpdateableComponent
 {
 public:
     RaceTimer(const float size);
@@ -30,6 +31,7 @@ private:
     float       mSize;
 
     float       mTimer{};
+    float       mTimerValue{};
 };
 
 } // Namespace ignite.

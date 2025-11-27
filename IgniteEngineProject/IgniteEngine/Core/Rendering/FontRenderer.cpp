@@ -24,18 +24,25 @@ FontRenderer::~FontRenderer()
     TTF_Quit();
 }
 
-uint16_t FontRenderer::CreateFont(const std::string& fontFilepath, const float fontSize, const std::string& text, const mem::WeakRef<Transform> transform)
+uint16_t FontRenderer::CreateFont(const char* fontFilepath, const float fontSize, const std::string& text, const mem::WeakRef<Transform> transform)
 {
     LoadFont(mFontId, fontFilepath, fontSize, text, transform);
 
     return mFontId++;
 }
 
+void FontRenderer::UpdateFont(const uint16_t id, const mem::WeakRef<Transform> transform)
+{
+    mFonts[id]->transform = transform;
+}
+
 void FontRenderer::UpdateFont(const uint16_t id, const std::string& text)
 {
-    mFonts[id]->text = text;
-
-    LoadFont(id, mFonts[id]->filePath, mFonts[id]->fontSize, mFonts[id]->text, mFonts[id]->transform);
+    if (mFonts[id]->text != text)
+    {
+        mFonts[id]->text = text;
+        LoadFont(id, mFonts[id]->filePath.c_str(), mFonts[id]->fontSize, mFonts[id]->text, mFonts[id]->transform);
+    }
 }
 
 void FontRenderer::RenderFonts(const OrthoCamera& camera)
@@ -88,9 +95,9 @@ void FontRenderer::DeleteAllFonts()
     mFonts.clear();
 }
 
-void FontRenderer::LoadFont(const uint16_t fontId, const std::string& fontFilepath, const float fontSize, const std::string& text, const mem::WeakRef<Transform> transform)
+void FontRenderer::LoadFont(const uint16_t fontId, const char* fontFilepath, const float fontSize, const std::string& text, const mem::WeakRef<Transform> transform)
 {
-    mFont = TTF_OpenFont(fontFilepath.c_str(), fontSize);
+    mFont = TTF_OpenFont(fontFilepath, fontSize);
     DEBUG(if (!mFont))
         DEBUG_ERROR("Failed to load font at the passed in filepath: {}", fontFilepath);
 
@@ -111,7 +118,7 @@ void FontRenderer::LoadFont(const uint16_t fontId, const std::string& fontFilepa
 
     if (!mFonts.contains(fontId))
     {
-        mFonts[fontId] = new Font(texture, width, height, fontSize, transform, text, fontFilepath);
+        mFonts[fontId] = new Font(texture, width, height, fontSize, transform, text, std::string{ fontFilepath });
 
         return;
     }

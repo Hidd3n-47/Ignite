@@ -15,7 +15,7 @@ void MainMenuApplicationState::InitScene()
 {
     mem::WeakRef<GameObject> playButtonObject = CreateGameObject();
     playButtonObject->GetComponent<Transform>()->translation = Vec2{ 0.0f, 2.0f };
-    mem::WeakRef<UiButton> playButton = playButtonObject->AddComponent<UiButton>(std::filesystem::path{ "Assets/PlayButton.png" }, true);
+    mem::WeakRef<UiButton> playButton = playButtonObject->AddComponent<UiButton>("Assets/PlayButton.png", true);
     playButton->SetOnButtonPressedEvent([] { GameManager::Instance()->ChangeState(ApplicationStates::LEVEL_SELECT); });
     playButton->SetOnHoveredEvent(
         [](mem::WeakRef<GameObject> gameObject)
@@ -31,7 +31,7 @@ void MainMenuApplicationState::InitScene()
 
     mem::WeakRef<GameObject> exitButtonObject = CreateGameObject();
     exitButtonObject->GetComponent<Transform>()->translation = Vec2{ 0.0f, -2.0f };
-    mem::WeakRef<UiButton> exitButton = exitButtonObject->AddComponent<UiButton>(std::filesystem::path{ "Assets/QuitButton.png" }, true);
+    mem::WeakRef<UiButton> exitButton = exitButtonObject->AddComponent<UiButton>("Assets/QuitButton.png", true);
     exitButton->SetOnButtonPressedEvent([] { Engine::Instance()->CloseGame(); });
     exitButton->SetOnHoveredEvent(
         [](mem::WeakRef<GameObject> gameObject)

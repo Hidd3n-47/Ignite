@@ -1,6 +1,9 @@
 #pragma once
 
+#include "IgniteEngine/Src/Defines.h"
+
 #include "IgniteEngine/EC/IComponent.h"
+#include "IGniteEngine/EC/IRenderableComponent.h"
 
 #include "IgniteEngine/Core/Rendering/RenderCommand.h"
 
@@ -10,7 +13,7 @@ namespace ignite
 class InputManager;
 class TextureManager;
 
-class BoxCollider : public IComponent
+class BoxCollider : public IComponent DEBUG(, public IRenderableComponent)
 {
 public:
     BoxCollider(const Vec2 dimensionHalfExtents, const bool dynamic = false, const bool trigger = false);
