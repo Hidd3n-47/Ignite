@@ -11,13 +11,13 @@ class UiText;
 class RaceStartCountdown : public IComponent, public IUpdateableComponent
 {
 public:
-    RaceStartCountdown(const mem::WeakRef<UiText> uiTextComponent, const float countdownTime, const std::function<void()>& onTimerCompletedCallback);
+    RaceStartCountdown(const mem::WeakHandle<UiText> uiTextComponent, const float countdownTime, const std::function<void()>& onTimerCompletedCallback);
 
     inline void StartTimer() { mTimer = mCountdownTimeMax; mTimerRunning = true; }
 
     void Update(const float dt) override;
 private:
-    mem::WeakRef<UiText> mUiTextComponent;
+    mem::WeakHandle<UiText> mUiTextComponent;
     float mCountdownTimeMax;
     float mTimer;
     bool  mTimerRunning = false;

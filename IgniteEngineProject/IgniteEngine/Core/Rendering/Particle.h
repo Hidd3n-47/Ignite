@@ -10,7 +10,7 @@ struct Particle
 {
     inline Particle()
     {
-        renderCommand.transform = mem::WeakRef{ &transform };
+        renderCommand.transform = mem::WeakHandle{ &transform };
     }
 
     float         lifetime{};

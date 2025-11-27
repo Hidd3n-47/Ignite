@@ -32,7 +32,7 @@ public:
 class GameApplicationState : public Scene
 {
 public:
-    GameApplicationState(const mem::WeakRef<GameApplicationStateInitInfo> info);
+    GameApplicationState(const mem::WeakHandle<GameApplicationStateInitInfo> info);
 
     void InitScene() override;
     void SceneUpdate() override;
@@ -41,13 +41,13 @@ public:
 private:
     LevelState mCurrentLevel;
 
-    mem::WeakRef<GameObject>         mPlayer;
-    mem::WeakRef<CarMovement>        mPlayerMovement;
-    mem::WeakRef<ParticleSystem>     mPlayerWheelParticlesTop;
-    mem::WeakRef<ParticleSystem>     mPlayerWheelParticlesBot;
-    mem::WeakRef<RaceStartCountdown> mRaceCountdown;
-    mem::WeakRef<RaceTimer>          mRaceTimer;
-    mem::WeakRef<InputManager>       mInputManager;
+    mem::WeakHandle<GameObject>         mPlayer;
+    mem::WeakHandle<CarMovement>        mPlayerMovement;
+    mem::WeakHandle<ParticleSystem>     mPlayerWheelParticlesTop;
+    mem::WeakHandle<ParticleSystem>     mPlayerWheelParticlesBot;
+    mem::WeakHandle<RaceStartCountdown> mRaceCountdown;
+    mem::WeakHandle<RaceTimer>          mRaceTimer;
+    mem::WeakHandle<InputManager>       mInputManager;
 };
 
 } // Namespace ignite.

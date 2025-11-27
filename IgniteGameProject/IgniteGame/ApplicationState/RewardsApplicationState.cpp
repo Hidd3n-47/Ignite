@@ -12,7 +12,7 @@
 namespace ignite
 {
 
-RewardsApplicationState::RewardsApplicationState(mem::WeakRef<RewardsApplicationStateInitInfo> initInfo)
+RewardsApplicationState::RewardsApplicationState(mem::WeakHandle<RewardsApplicationStateInitInfo> initInfo)
     : mPlayerRanking(initInfo->ranking)
 {
     // Empty.
@@ -21,7 +21,7 @@ RewardsApplicationState::RewardsApplicationState(mem::WeakRef<RewardsApplication
 void RewardsApplicationState::InitScene()
 {
     mTextObject = CreateGameObject();
-    mem::WeakRef<GameObject> rewardVisual = CreateGameObject();
+    mem::WeakHandle<GameObject> rewardVisual = CreateGameObject();
 
     if (mPlayerRanking == TrophyRanking::NONE)
     {
@@ -40,17 +40,17 @@ void RewardsApplicationState::InitScene()
         mTextObject->GetComponent<Transform>()->translation.y = 2.5f;
     }
 
-    mem::WeakRef<GameObject> backButtonObject = CreateGameObject();
+    mem::WeakHandle<GameObject> backButtonObject = CreateGameObject();
     backButtonObject->GetComponent<Transform>()->translation = Vec2{ 0.0f, -2.0f };
-    mem::WeakRef<UiButton> backButton = backButtonObject->AddComponent<UiButton>("Assets/BackButton.png", true);
+    mem::WeakHandle<UiButton> backButton = backButtonObject->AddComponent<UiButton>("Assets/BackButton.png", true);
     backButton->SetOnButtonPressedEvent([&] { mTextObject->RemoveComponent<UiText>(); GameManager::Instance()->ChangeState(ApplicationStates::MAIN_MENU); });
     backButton->SetOnHoveredEvent(
-        [](mem::WeakRef<GameObject> gameObject)
+        [](mem::WeakHandle<GameObject> gameObject)
         {
             gameObject->GetComponent<Transform>()->scale = Vec2{ 1.2f };
         });
     backButton->SetOnRestingStateEvent(
-        [](mem::WeakRef<GameObject> gameObject)
+        [](mem::WeakHandle<GameObject> gameObject)
         {
             gameObject->GetComponent<Transform>()->scale = Vec2{ 1.0f };
         });

@@ -23,13 +23,13 @@ class IRenderableComponent;
 class GameObject
 {
 public:
-    GameObject(const Ulid id, const mem::WeakRef<Scene> parent);
+    GameObject(const Ulid id, const mem::WeakHandle<Scene> parent);
     ~GameObject();
 
     void Update(const float dt) const;
-    void Render(mem::WeakRef<Renderer> renderer) const;
+    void Render(mem::WeakHandle<Renderer> renderer) const;
 
-    [[nodiscard]] inline mem::WeakRef<Scene> GetScene() const { return mParent; }
+    [[nodiscard]] inline mem::WeakHandle<Scene> GetScene() const { return mParent; }
 
     /**
      * @brief Add a component.
@@ -37,7 +37,7 @@ public:
      * @return A reference to the component that was added.
      */
     template <typename Component>
-    mem::WeakRef<Component> AddComponent();
+    mem::WeakHandle<Component> AddComponent();
 
     /**
      * @brief Add A component and pass in the arguments into the component constructor.
@@ -47,7 +47,7 @@ public:
      * @return
      */
     template <typename Component, typename... Args>
-    mem::WeakRef<Component> AddComponent(Args ...args);
+    mem::WeakHandle<Component> AddComponent(Args ...args);
 
     /**
      * @brief Remove a component.
@@ -63,7 +63,7 @@ public:
      * @see \c WeakRef.
      */
     template <typename Component>
-    [[nodiscard]] mem::WeakRef<Component> GetComponent() const;
+    [[nodiscard]] mem::WeakHandle<Component> GetComponent() const;
 
     /**
      * @brief Get the vector of components that are attached to the game object.
@@ -74,15 +74,15 @@ public:
     [[nodiscard]] inline Ulid GetId() const { return mId; }
 private:
     Ulid mId;
-    mem::WeakRef<Scene> mParent;
+    mem::WeakHandle<Scene> mParent;
 
     std::vector<IComponent*> mComponents;
-    std::vector<mem::WeakRef<IUpdateableComponent>> mUpdateableComponents;
-    std::vector<mem::WeakRef<IRenderableComponent>> mRenderableComponents;
+    std::vector<mem::WeakHandle<IUpdateableComponent>> mUpdateableComponents;
+    std::vector<mem::WeakHandle<IRenderableComponent>> mRenderableComponents;
 };
 
 template <typename Component>
-inline mem::WeakRef<Component> GameObject::AddComponent()
+inline mem::WeakHandle<Component> GameObject::AddComponent()
 {
     mComponents.emplace_back(new Component());
     if (IUpdateableComponent* ref = dynamic_cast<IUpdateableComponent*>(mComponents.back()); ref)
@@ -93,12 +93,12 @@ inline mem::WeakRef<Component> GameObject::AddComponent()
     {
         mRenderableComponents.emplace_back(ref);
     }
-    mComponents.back()->OnComponentAdded(mem::WeakRef{ this });
-    return mem::WeakRef{ reinterpret_cast<Component*>(mComponents.back()) };
+    mComponents.back()->OnComponentAdded(mem::WeakHandle{ this });
+    return mem::WeakHandle{ reinterpret_cast<Component*>(mComponents.back()) };
 }
 
 template <typename Component, typename... Args>
-inline mem::WeakRef<Component> GameObject::AddComponent(Args ...args)
+inline mem::WeakHandle<Component> GameObject::AddComponent(Args ...args)
 {
     mComponents.emplace_back(new Component(std::forward<Args>(args)...));
     if (IUpdateableComponent* ref = dynamic_cast<IUpdateableComponent*>(mComponents.back()); ref)
@@ -109,8 +109,8 @@ inline mem::WeakRef<Component> GameObject::AddComponent(Args ...args)
     {
         mRenderableComponents.emplace_back(ref);
     }
-    mComponents.back()->OnComponentAdded(mem::WeakRef{ this });
-    return mem::WeakRef{ reinterpret_cast<Component*>(mComponents.back()) };
+    mComponents.back()->OnComponentAdded(mem::WeakHandle{ this });
+    return mem::WeakHandle{ reinterpret_cast<Component*>(mComponents.back()) };
 }
 
 template <typename Component>
@@ -120,13 +120,13 @@ void GameObject::RemoveComponent()
     {
         if (Component* castComponent = dynamic_cast<Component*>(*it); castComponent != nullptr)
         {
-            if (IUpdateableComponent* ref = dynamic_cast<IUpdateableComponent*>(mComponents.back()); ref)
+            if (IUpdateableComponent* ref = dynamic_cast<IUpdateableComponent*>(castComponent); ref)
             {
-                std::erase(mUpdateableComponents, ref);
+                std::erase(mUpdateableComponents, mem::WeakHandle{ ref });
             }
-            if (IRenderableComponent* ref = dynamic_cast<IRenderableComponent*>(mComponents.back()); ref)
+            if (IRenderableComponent* ref = dynamic_cast<IRenderableComponent*>(castComponent); ref)
             {
-                std::erase(mUpdateableComponents, ref);
+                std::erase(mRenderableComponents, mem::WeakHandle{ ref });
             }
 
             castComponent->OnComponentRemoved();
@@ -140,23 +140,23 @@ void GameObject::RemoveComponent()
 }
 
 template <typename Component>
-inline mem::WeakRef<Component> GameObject::GetComponent() const
+inline mem::WeakHandle<Component> GameObject::GetComponent() const
 {
     for (IComponent* comp : mComponents)
     {
         if (Component* castComponent = dynamic_cast<Component*>(comp); castComponent != nullptr)
         {
-            return mem::WeakRef{ castComponent };
+            return mem::WeakHandle{ castComponent };
         }
     }
 
-    return mem::WeakRef<Component>{};
+    return mem::WeakHandle<Component>{};
 }
 
 template <>
-inline mem::WeakRef<Transform> GameObject::GetComponent() const
+inline mem::WeakHandle<Transform> GameObject::GetComponent() const
 {
-    return mem::WeakRef{ dynamic_cast<Transform*>(mComponents[0]) };
+    return mem::WeakHandle{ dynamic_cast<Transform*>(mComponents[0]) };
 }
 
 } // Namespace ignite.

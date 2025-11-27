@@ -21,7 +21,7 @@
 namespace ignite
 {
 
-GameApplicationState::GameApplicationState(const mem::WeakRef<GameApplicationStateInitInfo> info)
+GameApplicationState::GameApplicationState(const mem::WeakHandle<GameApplicationStateInitInfo> info)
 {
     mCurrentLevel = info->level;
 }
@@ -32,9 +32,9 @@ void GameApplicationState::InitScene()
 
     mPlayer = CreateGameObject();
 
-    GameManager::Instance()->GetLevelParser()->LoadLevel(mem::WeakRef{ this }.Cast<Scene>(), mPlayer, mCurrentLevel);
+    GameManager::Instance()->GetLevelParser()->LoadLevel(mem::WeakHandle{ this }.Cast<Scene>(), mPlayer, mCurrentLevel);
 
-    mem::WeakRef<Transform> transform = mPlayer->GetComponent<Transform>();
+    mem::WeakHandle<Transform> transform = mPlayer->GetComponent<Transform>();
     transform->scale = Vec2{ 2.0f };
     mPlayerMovement = mPlayer->AddComponent<CarMovement>();
     mPlayer->AddComponent<SpriteRenderer>("Assets/CarBlue.png", 2);
@@ -46,7 +46,7 @@ void GameApplicationState::InitScene()
         .textureFilepath    = "Assets/Smoke.png",
         .textureLayer       = 2,
         .numberOfParticles  = 10,
-        .position           = mem::WeakRef{ &transform->translation },
+        .position           = mem::WeakHandle{ &transform->translation },
         .minPositionOffset  = Vec2{-0.1f, 0.05f },
         .maxPositionOffset  = Vec2{-0.1f, 0.05f },
         .minLifetime        = 0.4f,
@@ -62,7 +62,7 @@ void GameApplicationState::InitScene()
         .textureFilepath = "Assets/Smoke.png",
         .textureLayer = 2,
         .numberOfParticles = 10,
-        .position = mem::WeakRef{ &transform->translation },
+        .position = mem::WeakHandle{ &transform->translation },
         .minPositionOffset = Vec2{-0.1f, -0.05f },
         .maxPositionOffset = Vec2{-0.1f, -0.05f },
         .minLifetime = 0.4f,
@@ -75,11 +75,11 @@ void GameApplicationState::InitScene()
 
     mPlayer->AddComponent<RigidBody>();
 
-    mem::WeakRef<GameObject>   raceCountdownObject = CreateGameObject();
-    const mem::WeakRef<UiText> raceCountdownText   = raceCountdownObject->AddComponent<UiText>("3", 600.0f);
+    mem::WeakHandle<GameObject>   raceCountdownObject = CreateGameObject();
+    const mem::WeakHandle<UiText> raceCountdownText   = raceCountdownObject->AddComponent<UiText>("3", 600.0f);
     mRaceCountdown = raceCountdownObject->AddComponent<RaceStartCountdown>(raceCountdownText, 3.9f, [&] { ChangeGameState(GameState::RACING); });
 
-    mem::WeakRef<GameObject> raceTimerObject = CreateGameObject();
+    mem::WeakHandle<GameObject> raceTimerObject = CreateGameObject();
     raceTimerObject->GetComponent<Transform>()->translation = Vec2{ -7.5f, 4.2f };
 
     mRaceTimer = raceTimerObject->AddComponent<RaceTimer>(50.0f);
@@ -112,7 +112,7 @@ void GameApplicationState::ChangeGameState(const GameState state)
         GAME_LOG("Changed to game state: RACE_COMPLETED");
         mPlayerWheelParticlesTop->Emmit(false);
         mPlayerWheelParticlesBot->Emmit(false);
-        const mem::WeakRef<GameManager> gameManager = GameManager::Instance();
+        const mem::WeakHandle<GameManager> gameManager = GameManager::Instance();
         RewardsApplicationStateInitInfo* initInfo = new RewardsApplicationStateInitInfo(gameManager->GetTrophyRanking(mRaceTimer->Stop()));
         GameManager::Instance()->ChangeState(ApplicationStates::REWARDS, initInfo);
         break;

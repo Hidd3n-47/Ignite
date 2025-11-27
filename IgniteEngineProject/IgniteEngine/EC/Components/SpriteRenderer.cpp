@@ -25,7 +25,7 @@ SpriteRenderer::SpriteRenderer(const Texture& texture, const float xSpritesheet,
     mLayer = layer;
 }
 
-void SpriteRenderer::OnComponentAdded(const mem::WeakRef<GameObject> parent)
+void SpriteRenderer::OnComponentAdded(const mem::WeakHandle<GameObject> parent)
 {
     PROFILE_FUNC();
 
@@ -34,11 +34,11 @@ void SpriteRenderer::OnComponentAdded(const mem::WeakRef<GameObject> parent)
     mRenderCommand.transform = mParent->GetComponent<Transform>();
 }
 
-void SpriteRenderer::Render(mem::WeakRef<Renderer> renderer)
+void SpriteRenderer::Render(mem::WeakHandle<Renderer> renderer)
 {
     PROFILE_FUNC();
 
-    renderer->AddRenderCommand(mLayer, mem::WeakRef{ &mRenderCommand });
+    renderer->AddRenderCommand(mLayer, mem::WeakHandle{ &mRenderCommand });
 }
 
 } // Namespace ignite.

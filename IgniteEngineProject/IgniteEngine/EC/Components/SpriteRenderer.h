@@ -16,8 +16,8 @@ public:
     SpriteRenderer(const char* filePath, const uint32_t layer = 0);
     SpriteRenderer(const Texture& texture, const float xSpritesheet = 0.0f, const float ySpritesheet = 0.0f, const uint32_t layer = 0);
 
-    void OnComponentAdded(const mem::WeakRef<GameObject> parent) override;
-    void Render(mem::WeakRef<Renderer> renderer) override;
+    void OnComponentAdded(const mem::WeakHandle<GameObject> parent) override;
+    void Render(mem::WeakHandle<Renderer> renderer) override;
 private:
     uint32_t mLayer;
     RenderCommand mRenderCommand{ };

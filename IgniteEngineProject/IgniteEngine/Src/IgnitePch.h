@@ -18,8 +18,8 @@
 
 #include <Logger/Log.h>
 
-#include <IgniteMem/Core/WeakRef.h>
-#include <IgniteMem/Core/WeakRefHash.h>
+#include <IgniteMem/Core/WeakHandle.h>
+#include <IgniteMem/Core/WeakHandleHash.h>
 
 #include <IgniteUtils/Core/Ulid.h>
 

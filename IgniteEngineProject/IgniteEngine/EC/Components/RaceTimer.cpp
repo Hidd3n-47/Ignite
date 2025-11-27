@@ -15,7 +15,7 @@ RaceTimer::RaceTimer(const float size)
     mFontRendererRef = Engine::Instance()->GetFontRenderer();
 }
 
-void RaceTimer::OnComponentAdded(const mem::WeakRef<GameObject> parent)
+void RaceTimer::OnComponentAdded(const mem::WeakHandle<GameObject> parent)
 {
     PROFILE_FUNC();
 

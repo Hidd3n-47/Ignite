@@ -13,14 +13,14 @@ class SpriteRenderer;
 class CarMovement : public IComponent, public IUpdateableComponent
 {
 public:
-    void OnComponentAdded(const mem::WeakRef<GameObject> parent) override;
+    void OnComponentAdded(const mem::WeakHandle<GameObject> parent) override;
     void Update(const float dt) override;
 
     inline void EnableMovement() { mMovementEnabled = true; }
     [[nodiscard]] inline bool IsMoving() const { return mMoving; }
 private:
-    mem::WeakRef<Transform>    mTransform;
-    mem::WeakRef<InputManager> mInputManagerRef;
+    mem::WeakHandle<Transform>    mTransform;
+    mem::WeakHandle<InputManager> mInputManagerRef;
 
     bool  mMovementEnabled = false;
     bool  mMoving    = false;

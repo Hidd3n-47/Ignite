@@ -19,7 +19,7 @@ UiButton::UiButton(const char* filePath, const bool hasPressedAnimation)
     mInputManagerRef   = Engine::Instance()->GetInputManager();
 }
 
-void UiButton::OnComponentAdded(const mem::WeakRef<GameObject> parent)
+void UiButton::OnComponentAdded(const mem::WeakHandle<GameObject> parent)
 {
     PROFILE_FUNC();
 
@@ -68,12 +68,12 @@ void UiButton::Update(const float dt)
     }
 }
 
-void UiButton::Render(mem::WeakRef<Renderer> renderer)
+void UiButton::Render(mem::WeakHandle<Renderer> renderer)
 {
     PROFILE_FUNC();
 
     mRenderCommand.spritesheetPosX = std::min(static_cast<float>(mMouseDown),mRenderCommand.spritesheetMaxX - 1);
-    renderer->AddRenderCommand(0, mem::WeakRef{ &mRenderCommand });
+    renderer->AddRenderCommand(0, mem::WeakHandle{ &mRenderCommand });
 }
 
 } // Namespace ignite.

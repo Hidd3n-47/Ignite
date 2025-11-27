@@ -24,14 +24,14 @@ FontRenderer::~FontRenderer()
     TTF_Quit();
 }
 
-uint16_t FontRenderer::CreateFont(const char* fontFilepath, const float fontSize, const std::string& text, const mem::WeakRef<Transform> transform)
+uint16_t FontRenderer::CreateFont(const char* fontFilepath, const float fontSize, const std::string& text, const mem::WeakHandle<Transform> transform)
 {
     LoadFont(mFontId, fontFilepath, fontSize, text, transform);
 
     return mFontId++;
 }
 
-void FontRenderer::UpdateFont(const uint16_t id, const mem::WeakRef<Transform> transform)
+void FontRenderer::UpdateFont(const uint16_t id, const mem::WeakHandle<Transform> transform)
 {
     mFonts[id]->transform = transform;
 }
@@ -95,7 +95,7 @@ void FontRenderer::DeleteAllFonts()
     mFonts.clear();
 }
 
-void FontRenderer::LoadFont(const uint16_t fontId, const char* fontFilepath, const float fontSize, const std::string& text, const mem::WeakRef<Transform> transform)
+void FontRenderer::LoadFont(const uint16_t fontId, const char* fontFilepath, const float fontSize, const std::string& text, const mem::WeakHandle<Transform> transform)
 {
     mFont = TTF_OpenFont(fontFilepath, fontSize);
     DEBUG(if (!mFont))

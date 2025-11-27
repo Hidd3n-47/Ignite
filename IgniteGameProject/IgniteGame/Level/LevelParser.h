@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 
-#include <IgniteMem/Core/WeakRef.h>
+#include <IgniteMem/Core/WeakHandle.h>
 
 #include <IgniteEngine/Core/Rendering/Texture.h>
 
@@ -23,7 +23,7 @@ class LevelParser
 {
 public:
     void Init();
-    void LoadLevel(mem::WeakRef<Scene> scene, mem::WeakRef<GameObject> player, const LevelState state);
+    void LoadLevel(mem::WeakHandle<Scene> scene, mem::WeakHandle<GameObject> player, const LevelState state);
     void Destroy();
 
     inline static constexpr int START_LINE_TEXTURE_ID{ 16 };

@@ -7,7 +7,7 @@
 namespace ignite
 {
 
-RaceStartCountdown::RaceStartCountdown(const mem::WeakRef<UiText> uiTextComponent, const float countdownTime, const std::function<void()>& onTimerCompletedCallback)
+RaceStartCountdown::RaceStartCountdown(const mem::WeakHandle<UiText> uiTextComponent, const float countdownTime, const std::function<void()>& onTimerCompletedCallback)
     : mUiTextComponent(uiTextComponent)
     , mCountdownTimeMax(countdownTime)
     , mTimer(countdownTime)

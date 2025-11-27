@@ -8,7 +8,7 @@
 namespace ignite
 {
 
-GameObject::GameObject(const Ulid id, const mem::WeakRef<Scene> parent)
+GameObject::GameObject(const Ulid id, const mem::WeakHandle<Scene> parent)
     : mId(id)
     , mParent(parent)
 {
@@ -30,17 +30,17 @@ void GameObject::Update(const float dt) const
 {
     PROFILE_FUNC();
 
-    for (mem::WeakRef<IUpdateableComponent> component : mUpdateableComponents)
+    for (mem::WeakHandle<IUpdateableComponent> component : mUpdateableComponents)
     {
         component->Update(dt);
     }
 }
 
-void GameObject::Render(mem::WeakRef<Renderer> renderer) const
+void GameObject::Render(mem::WeakHandle<Renderer> renderer) const
 {
     PROFILE_FUNC();
 
-    for (mem::WeakRef<IRenderableComponent> component : mRenderableComponents)
+    for (mem::WeakHandle<IRenderableComponent> component : mRenderableComponents)
     {
         component->Render(renderer);
     }

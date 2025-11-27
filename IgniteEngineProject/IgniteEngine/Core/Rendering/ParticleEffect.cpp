@@ -17,7 +17,7 @@ ParticleEffect::~ParticleEffect()
     Engine::Instance()->GetTextureManager()->RemoveTexture(mTextureId);
 }
 
-void ParticleEffect::InitEffect(const mem::WeakRef<ParticleEffectDetails> details, const mem::WeakRef<Transform> parentTransform)
+void ParticleEffect::InitEffect(const mem::WeakHandle<ParticleEffectDetails> details, const mem::WeakHandle<Transform> parentTransform)
 {
     mParticles = new Particle[details->numberOfParticles];
 
@@ -74,14 +74,14 @@ void ParticleEffect::Update(const float dt)
     }
 }
 
-void ParticleEffect::Render(mem::WeakRef<Renderer> renderer) const
+void ParticleEffect::Render(mem::WeakHandle<Renderer> renderer) const
 {
     for (uint32_t i{ 0 }; i < mEffectDetails->numberOfParticles; ++i)
     {
         if (mParticles[i].lifetime > 0)
         {
             mParticles[i].renderCommand.transform->rotation = mParentTransform->rotation;
-            renderer->AddRenderCommand(mEffectDetails->textureLayer, mem::WeakRef{ &mParticles[i].renderCommand });
+            renderer->AddRenderCommand(mEffectDetails->textureLayer, mem::WeakHandle{ &mParticles[i].renderCommand });
         }
     }
 }

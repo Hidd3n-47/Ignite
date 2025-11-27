@@ -1,6 +1,6 @@
 #pragma once
 
-#include <IgniteMem/Core/WeakRef.h>
+#include <IgniteMem/Core/WeakHandle.h>
 
 #include "IgniteEngine/Core/Rendering/Renderer.h"
 
@@ -18,12 +18,12 @@ class IComponent
 public:
     virtual ~IComponent() = default;
 
-    virtual void OnComponentAdded(const mem::WeakRef<GameObject> parent) { mParent = parent; }
+    virtual void OnComponentAdded(const mem::WeakHandle<GameObject> parent) { mParent = parent; }
     virtual void OnComponentRemoved() { PROFILE_FUNC(); }
 
-    [[nodiscard]] inline mem::WeakRef<GameObject> GetParent() const { return mParent; }
+    [[nodiscard]] inline mem::WeakHandle<GameObject> GetParent() const { return mParent; }
 protected:
-    mem::WeakRef<GameObject> mParent;
+    mem::WeakHandle<GameObject> mParent;
 };
 
 } // Namespace ignite.

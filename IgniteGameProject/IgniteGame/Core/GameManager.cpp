@@ -17,20 +17,20 @@ namespace ignite
 
 GameManager* GameManager::mInstance = nullptr;
 
-mem::WeakRef<GameManager> GameManager::CreateGameManager()
+mem::WeakHandle<GameManager> GameManager::CreateGameManager()
 {
     if (mInstance)
     {
         GAME_ERROR("Failed to create game manager as it has already been created!");
         GAME_BREAK();
 
-        return mem::WeakRef{ mInstance };
+        return mem::WeakHandle{ mInstance };
     }
 
     mInstance = new GameManager();
     GAME_INFO("Successfully created Ignite Game.");
 
-    return mem::WeakRef{ mInstance };
+    return mem::WeakHandle{ mInstance };
 }
 
 void GameManager::Init()
@@ -81,14 +81,14 @@ void GameManager::ChangeState(const ApplicationStates state, IApplicationStateIn
     {
         GAME_LOG("Updated Application State: GAME");
         GameApplicationStateInitInfo* info = dynamic_cast<GameApplicationStateInitInfo*>(initInfo);
-        mCurrentScene = new GameApplicationState(mem::WeakRef{ info });
+        mCurrentScene = new GameApplicationState(mem::WeakHandle{ info });
         break;
     }
     case ApplicationStates::REWARDS:
     {
         GAME_LOG("Updated Application State: REWARDS");
         RewardsApplicationStateInitInfo* info = dynamic_cast<RewardsApplicationStateInitInfo*>(initInfo);
-        mCurrentScene = new RewardsApplicationState(mem::WeakRef{ info });
+        mCurrentScene = new RewardsApplicationState(mem::WeakHandle{ info });
         break;
     }
     default:
@@ -98,7 +98,7 @@ void GameManager::ChangeState(const ApplicationStates state, IApplicationStateIn
 
     delete initInfo;
 
-    Engine::Instance()->SetSceneToChangeTo(mem::WeakRef{ mCurrentScene });
+    Engine::Instance()->SetSceneToChangeTo(mem::WeakHandle{ mCurrentScene });
 }
 
 TrophyRanking GameManager::GetTrophyRanking(const float playerTime) const

@@ -17,9 +17,9 @@ public:
     FontRenderer(SDL_Renderer* rendererBackend);
     ~FontRenderer();
 
-    [[nodiscard]] uint16_t CreateFont(const char* fontFilepath, const float fontSize, const std::string& text, const mem::WeakRef<Transform> transform);
+    [[nodiscard]] uint16_t CreateFont(const char* fontFilepath, const float fontSize, const std::string& text, const mem::WeakHandle<Transform> transform);
 
-    void UpdateFont(const uint16_t id, const mem::WeakRef<Transform> transform);
+    void UpdateFont(const uint16_t id, const mem::WeakHandle<Transform> transform);
     void UpdateFont(const uint16_t id, const std::string& text);
 
     void RenderFonts(const OrthoCamera& camera);
@@ -33,7 +33,7 @@ private:
     TTF_Font* mFont   = nullptr;
 
     std::unordered_map<uint16_t, Font*> mFonts;
-    void LoadFont(const uint16_t fontId, const char* fontFilepath, const float fontSize, const std::string& text, const mem::WeakRef<Transform> transform);
+    void LoadFont(const uint16_t fontId, const char* fontFilepath, const float fontSize, const std::string& text, const mem::WeakHandle<Transform> transform);
 };
 
 } // Namespace ignite.

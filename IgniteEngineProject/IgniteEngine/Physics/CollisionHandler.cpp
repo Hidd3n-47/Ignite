@@ -18,9 +18,9 @@ void CollisionHandler::Update()
 
     mTriggeredThisFrame.clear();
 
-    for (const mem::WeakRef<GameObject> dynamicBox1 : mDynamicBoxColliders)
+    for (const mem::WeakHandle<GameObject> dynamicBox1 : mDynamicBoxColliders)
     {
-        for (const mem::WeakRef<GameObject> dynamicBox2 : mDynamicBoxColliders)
+        for (const mem::WeakHandle<GameObject> dynamicBox2 : mDynamicBoxColliders)
         {
             if (dynamicBox1 == dynamicBox2)
             {
@@ -31,9 +31,9 @@ void CollisionHandler::Update()
         }
     }
 
-    for (const mem::WeakRef<GameObject> dynamicBox1 : mDynamicBoxColliders)
+    for (const mem::WeakHandle<GameObject> dynamicBox1 : mDynamicBoxColliders)
     {
-        for (const mem::WeakRef<GameObject> staticBox : mStaticBoxColliders)
+        for (const mem::WeakHandle<GameObject> staticBox : mStaticBoxColliders)
         {
             CheckCollisionBetweenBoxes(dynamicBox1, staticBox, false);
         }
@@ -52,21 +52,21 @@ void CollisionHandler::Update()
     mTriggeredPrevFrame = mTriggeredThisFrame;
 }
 
-void CollisionHandler::AddDynamicBox(const mem::WeakRef<GameObject> box)
+void CollisionHandler::AddDynamicBox(const mem::WeakHandle<GameObject> box)
 {
     PROFILE_FUNC();
 
     mDynamicBoxColliders.emplace_back(box);
 }
 
-void CollisionHandler::AddStaticBox(const mem::WeakRef<GameObject> box)
+void CollisionHandler::AddStaticBox(const mem::WeakHandle<GameObject> box)
 {
     PROFILE_FUNC();
 
     mStaticBoxColliders.emplace_back(box);
 }
 
-void CollisionHandler::RemoveDynamicBox(const mem::WeakRef<GameObject> box)
+void CollisionHandler::RemoveDynamicBox(const mem::WeakHandle<GameObject> box)
 {
     PROFILE_FUNC();
 
@@ -80,7 +80,7 @@ void CollisionHandler::RemoveDynamicBox(const mem::WeakRef<GameObject> box)
     }
 }
 
-void CollisionHandler::RemoveStaticBox(const mem::WeakRef<GameObject> box)
+void CollisionHandler::RemoveStaticBox(const mem::WeakHandle<GameObject> box)
 {
     PROFILE_FUNC();
 
@@ -94,18 +94,18 @@ void CollisionHandler::RemoveStaticBox(const mem::WeakRef<GameObject> box)
     }
 }
 
-void CollisionHandler::CheckCollisionBetweenBoxes(mem::WeakRef<GameObject> box1, mem::WeakRef<GameObject> box2, const bool pushBothBodies)
+void CollisionHandler::CheckCollisionBetweenBoxes(mem::WeakHandle<GameObject> box1, mem::WeakHandle<GameObject> box2, const bool pushBothBodies)
 {
     PROFILE_FUNC();
 
-    mem::WeakRef<Transform>   box1Transform = box1->GetComponent<Transform>();
-    mem::WeakRef<BoxCollider> box1Collider  = box1->GetComponent<BoxCollider>();
+    mem::WeakHandle<Transform>   box1Transform = box1->GetComponent<Transform>();
+    mem::WeakHandle<BoxCollider> box1Collider  = box1->GetComponent<BoxCollider>();
 
     const Vec2 b1Centre = box1Transform->translation + box1Collider->GetOffset();
     const Vec2 box1HalfExtents = box1Collider->GetDimensionHalfExtents();
 
-    mem::WeakRef<Transform>   box2Transform = box2->GetComponent<Transform>();
-    mem::WeakRef<BoxCollider> box2Collider  = box2->GetComponent<BoxCollider>();
+    mem::WeakHandle<Transform>   box2Transform = box2->GetComponent<Transform>();
+    mem::WeakHandle<BoxCollider> box2Collider  = box2->GetComponent<BoxCollider>();
 
     const Vec2 b2Centre = box2Transform->translation + box2Collider->GetOffset();
     const Vec2 box2HalfExtents = box2Collider->GetDimensionHalfExtents();

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <IgniteMem/Core/WeakRef.h>
+#include <IgniteMem/Core/WeakHandle.h>
 
 #include "IgniteEngine/Math/Vec2.h"
 #include "IgniteEngine/Core/OrthoCamera.h"
@@ -31,7 +31,7 @@ public:
     Engine()  = default;
     ~Engine() = default;
 
-    [[nodiscard]] inline static mem::WeakRef<Engine> Instance() { return mem::WeakRef{ mInstance }; }
+    [[nodiscard]] inline static mem::WeakHandle<Engine> Instance() { return mem::WeakHandle{ mInstance }; }
 
     Engine(const Engine&)             = delete;
     Engine(Engine&&)                  = delete;
@@ -43,7 +43,7 @@ public:
      * @note This should only happen once per application lifetime. Returns existing instance if called multiple times.
      * @return The instance of the engine that is created.
      */
-    static mem::WeakRef<Engine> CreateEngine();
+    static mem::WeakHandle<Engine> CreateEngine();
 
     /**
      * @brief Initialize the engine and its requirements.
@@ -81,13 +81,13 @@ public:
      * @note: This occurs next frame as the current game object in the scene could be used, therefore only change next frame once nothing is using them.
      * @param scene A weak reference to the scene that will become active next frame.
      */
-    inline void SetSceneToChangeTo(const mem::WeakRef<Scene> scene) { mSceneToChangeTo = scene; }
+    inline void SetSceneToChangeTo(const mem::WeakHandle<Scene> scene) { mSceneToChangeTo = scene; }
 
-    [[nodiscard]] inline mem::WeakRef<InputManager>     GetInputManager()     const { return mem::WeakRef{ mInputManager }; }
-    [[nodiscard]] inline mem::WeakRef<FontRenderer>     GetFontRenderer()     const { return mem::WeakRef{ mFontRenderer }; }
-    [[nodiscard]] inline mem::WeakRef<TextureManager>   GetTextureManager()   const { return mem::WeakRef{ mTextureManager }; }
-    [[nodiscard]] inline mem::WeakRef<CollisionHandler> GetCollisionHandler() const { return mem::WeakRef{ mCollisionHandler }; }
-    [[nodiscard]] inline mem::WeakRef<ParticleManager>  GetParticleManager()  const { return mem::WeakRef{ mParticleManager }; }
+    [[nodiscard]] inline mem::WeakHandle<InputManager>     GetInputManager()     const { return mem::WeakHandle{ mInputManager }; }
+    [[nodiscard]] inline mem::WeakHandle<FontRenderer>     GetFontRenderer()     const { return mem::WeakHandle{ mFontRenderer }; }
+    [[nodiscard]] inline mem::WeakHandle<TextureManager>   GetTextureManager()   const { return mem::WeakHandle{ mTextureManager }; }
+    [[nodiscard]] inline mem::WeakHandle<CollisionHandler> GetCollisionHandler() const { return mem::WeakHandle{ mCollisionHandler }; }
+    [[nodiscard]] inline mem::WeakHandle<ParticleManager>  GetParticleManager()  const { return mem::WeakHandle{ mParticleManager }; }
     [[nodiscard]] inline const OrthoCamera& GetCamera() const { return mCamera; }
 
     static constexpr uint32_t TARGET_FRAMES = 120;
@@ -113,8 +113,8 @@ private:
     SDL_Window*   mWindow   = nullptr;
     Renderer*     mRenderer = nullptr;
 
-    mem::WeakRef<Scene> mActiveScene;
-    mem::WeakRef<Scene> mSceneToChangeTo;
+    mem::WeakHandle<Scene> mActiveScene;
+    mem::WeakHandle<Scene> mSceneToChangeTo;
 
     OrthoCamera mCamera;
 

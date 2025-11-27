@@ -17,7 +17,7 @@ UiText::UiText(std::string text, const float size)
     mFontRendererRef = Engine::Instance()->GetFontRenderer();
 }
 
-void UiText::OnComponentAdded(const mem::WeakRef<GameObject> parent)
+void UiText::OnComponentAdded(const mem::WeakHandle<GameObject> parent)
 {
     PROFILE_FUNC();
 

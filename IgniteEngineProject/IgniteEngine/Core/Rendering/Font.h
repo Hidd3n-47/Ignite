@@ -10,7 +10,7 @@ class Transform;
 struct Font
 {
     Font() = default;
-    Font(SDL_Texture* texture, const uint32_t w, const uint32_t h, const float size, const mem::WeakRef<Transform> transform, std::string text, std::string filePath);
+    Font(SDL_Texture* texture, const uint32_t w, const uint32_t h, const float size, const mem::WeakHandle<Transform> transform, std::string text, std::string filePath);
     ~Font();
 
     SDL_Texture* texture = nullptr;
@@ -19,7 +19,7 @@ struct Font
     uint32_t height   = 0;
     float    fontSize = 12;
 
-    mem::WeakRef<Transform> transform;
+    mem::WeakHandle<Transform> transform;
 
     std::string text;
     std::string filePath;

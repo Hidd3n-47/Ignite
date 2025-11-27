@@ -14,7 +14,7 @@ class RaceTimer : public IComponent, public IUpdateableComponent
 public:
     RaceTimer(const float size);
 
-    void OnComponentAdded(const mem::WeakRef<GameObject> parent) override;
+    void OnComponentAdded(const mem::WeakHandle<GameObject> parent) override;
     void OnComponentRemoved() override;
 
     void Update(const float dt) override;
@@ -23,7 +23,7 @@ public:
 
     [[nodiscard]] inline float Stop() { mTimerStarted = false; return mTimer; }
 private:
-    mem::WeakRef<FontRenderer> mFontRendererRef;
+    mem::WeakHandle<FontRenderer> mFontRendererRef;
 
     bool mTimerStarted = false;
 

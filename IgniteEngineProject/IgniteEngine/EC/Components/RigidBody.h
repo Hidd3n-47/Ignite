@@ -11,7 +11,7 @@ class Transform;
 class RigidBody : public IComponent, public IUpdateableComponent
 {
 public:
-    void OnComponentAdded(const mem::WeakRef<GameObject> parent) override;
+    void OnComponentAdded(const mem::WeakHandle<GameObject> parent) override;
     void OnComponentRemoved() override;
 
     void Update(const float dt) override;
@@ -23,7 +23,7 @@ private:
     float mAngularVelocity = 0.0f;
     float mInertia = 100.0f;
 
-    mem::WeakRef<Transform> mTransform;
+    mem::WeakHandle<Transform> mTransform;
 
 };
 

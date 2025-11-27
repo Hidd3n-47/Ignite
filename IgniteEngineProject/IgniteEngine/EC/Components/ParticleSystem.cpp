@@ -14,13 +14,13 @@ ParticleSystem::ParticleSystem(ParticleEffectDetails&& particleEffectDetails)
     // Empty.
 }
 
-void ParticleSystem::OnComponentAdded(const mem::WeakRef<GameObject> parent)
+void ParticleSystem::OnComponentAdded(const mem::WeakHandle<GameObject> parent)
 {
     PROFILE_FUNC();
 
     IComponent::OnComponentAdded(parent);
 
-    mEffect = Engine::Instance()->GetParticleManager()->AddEffect(mem::WeakRef{ this }, mem::WeakRef{ &mParticleEffectDetails });
+    mEffect = Engine::Instance()->GetParticleManager()->AddEffect(mem::WeakHandle{ this }, mem::WeakHandle{ &mParticleEffectDetails });
     mEffect->Emmit();
 }
 
@@ -28,7 +28,7 @@ void ParticleSystem::OnComponentRemoved()
 {
     PROFILE_FUNC();
 
-    Engine::Instance()->GetParticleManager()->RemoveEffect(mem::WeakRef{ this });
+    Engine::Instance()->GetParticleManager()->RemoveEffect(mem::WeakHandle{ this });
 }
 
 void ParticleSystem::Emmit(const bool emmit)

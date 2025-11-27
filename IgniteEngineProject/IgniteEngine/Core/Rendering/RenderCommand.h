@@ -16,7 +16,7 @@ struct RenderCommand
     float spritesheetMaxX = 1;
     float spritesheetMaxY = 1;
 
-    mem::WeakRef<Transform> transform;
+    mem::WeakHandle<Transform> transform;
     Vec2 offset;
 
     uint8_t alpha = 255;

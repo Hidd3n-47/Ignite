@@ -24,7 +24,7 @@ void Scene::Update(const float dt) const
     }
 }
 
-void Scene::Render(mem::WeakRef<Renderer> renderer) const
+void Scene::Render(mem::WeakHandle<Renderer> renderer) const
 {
     PROFILE_FUNC();
 
@@ -34,12 +34,12 @@ void Scene::Render(mem::WeakRef<Renderer> renderer) const
     }
 }
 
-mem::WeakRef<GameObject> Scene::CreateGameObject()
+mem::WeakHandle<GameObject> Scene::CreateGameObject()
 {
     PROFILE_FUNC();
 
-    mGameObjects.emplace_back(new GameObject{ Ulid{}, mem::WeakRef{ this } });
-    return mem::WeakRef{ mGameObjects.back() };
+    mGameObjects.emplace_back(new GameObject{ Ulid{}, mem::WeakHandle{ this } });
+    return mem::WeakHandle{ mGameObjects.back() };
 }
 
 } // Namespace ignite.

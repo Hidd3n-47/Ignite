@@ -12,7 +12,7 @@
 namespace ignite
 {
 
-void RigidBody::OnComponentAdded(const mem::WeakRef<GameObject> parent)
+void RigidBody::OnComponentAdded(const mem::WeakHandle<GameObject> parent)
 {
     PROFILE_FUNC();
 

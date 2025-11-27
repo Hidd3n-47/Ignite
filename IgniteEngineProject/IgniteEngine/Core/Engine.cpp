@@ -44,14 +44,14 @@ namespace ignite
 
 Engine* Engine::mInstance = nullptr;
 
-mem::WeakRef<Engine> Engine::CreateEngine()
+mem::WeakHandle<Engine> Engine::CreateEngine()
 {
     if (mInstance)
     {
         DEBUG_ERROR("Failed to create engine as engine has already been created!");
         DEBUG_BREAK();
 
-        return mem::WeakRef{ mInstance };
+        return mem::WeakHandle{ mInstance };
     }
 
     mem::MemoryManager::Init(128 * 1'024);
@@ -62,7 +62,7 @@ mem::WeakRef<Engine> Engine::CreateEngine()
     mInstance = mem::MemoryManager::Instance()->New<Engine>();
     DEBUG_INFO("Successfully created Ignite Engine.");
 
-    return mem::WeakRef{ mInstance };
+    return mem::WeakHandle{ mInstance };
 }
 
 void Engine::Init()
@@ -99,7 +99,7 @@ void Engine::Init()
 
     mRenderer       = mem::MemoryManager::Instance()->New<Renderer>(mWindow);
     mTextureManager = mem::MemoryManager::Instance()->New<TextureManager>(mRenderer->GetRendererBackend());
-    mRenderer->SetTextureManagerRef(mem::WeakRef{ mTextureManager });
+    mRenderer->SetTextureManagerRef(mem::WeakHandle{ mTextureManager });
 
     mFontRenderer     = mem::MemoryManager::Instance()->New<FontRenderer>(mRenderer->GetRendererBackend());
     mCollisionHandler = mem::MemoryManager::Instance()->New<CollisionHandler>();
@@ -201,7 +201,7 @@ void Engine::Render() const
 
     if (mActiveScene.IsRefValid())
     {
-        const mem::WeakRef<Renderer> renderer = mem::WeakRef{ mRenderer };
+        const mem::WeakHandle<Renderer> renderer = mem::WeakHandle{ mRenderer };
         mActiveScene->Render(renderer);
         mParticleManager->Render(renderer);
     }

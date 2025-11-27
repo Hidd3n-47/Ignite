@@ -11,8 +11,8 @@ class BoxCollider;
 
 struct TriggeredColliderInfo
 {
-    mem::WeakRef<BoxCollider> bodyCollider;
-    mem::WeakRef<GameObject>  otherBody;
+    mem::WeakHandle<BoxCollider> bodyCollider;
+    mem::WeakHandle<GameObject>  otherBody;
 };
 
 class CollisionHandler
@@ -20,19 +20,19 @@ class CollisionHandler
 public:
     void Update();
 
-    void AddDynamicBox(const mem::WeakRef<GameObject> box);
-    void AddStaticBox(const mem::WeakRef<GameObject> box);
+    void AddDynamicBox(const mem::WeakHandle<GameObject> box);
+    void AddStaticBox(const mem::WeakHandle<GameObject> box);
 
-    void RemoveDynamicBox(const mem::WeakRef<GameObject> box);
-    void RemoveStaticBox(const mem::WeakRef<GameObject> box);
+    void RemoveDynamicBox(const mem::WeakHandle<GameObject> box);
+    void RemoveStaticBox(const mem::WeakHandle<GameObject> box);
 private:
-    std::vector<mem::WeakRef<GameObject>> mDynamicBoxColliders;
-    std::vector<mem::WeakRef<GameObject>> mStaticBoxColliders;
+    std::vector<mem::WeakHandle<GameObject>> mDynamicBoxColliders;
+    std::vector<mem::WeakHandle<GameObject>> mStaticBoxColliders;
 
-    std::unordered_map<mem::WeakRef<GameObject>, TriggeredColliderInfo> mTriggeredPrevFrame;
-    std::unordered_map<mem::WeakRef<GameObject>, TriggeredColliderInfo> mTriggeredThisFrame;
+    std::unordered_map<mem::WeakHandle<GameObject>, TriggeredColliderInfo> mTriggeredPrevFrame;
+    std::unordered_map<mem::WeakHandle<GameObject>, TriggeredColliderInfo> mTriggeredThisFrame;
 
-    void CheckCollisionBetweenBoxes(mem::WeakRef<GameObject> box1, mem::WeakRef<GameObject> box2, const bool pushBothBodies = false);
+    void CheckCollisionBetweenBoxes(mem::WeakHandle<GameObject> box1, mem::WeakHandle<GameObject> box2, const bool pushBothBodies = false);
 };
 
 } // Namespace ignite.

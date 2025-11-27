@@ -16,13 +16,13 @@ class ParticleSystem : public IComponent
 public:
     ParticleSystem(ParticleEffectDetails&& particleEffectDetails);
 
-    void OnComponentAdded(const mem::WeakRef<GameObject> parent) override;
+    void OnComponentAdded(const mem::WeakHandle<GameObject> parent) override;
     void OnComponentRemoved() override;
 
     void Emmit(const bool emmit = true);
 private:
     ParticleEffectDetails mParticleEffectDetails;
-    mem::WeakRef<ParticleEffect> mEffect;
+    mem::WeakHandle<ParticleEffect> mEffect;
 
 };
 

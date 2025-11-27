@@ -21,14 +21,14 @@ public:
 class RewardsApplicationState : public Scene
 {
 public:
-    RewardsApplicationState(mem::WeakRef<RewardsApplicationStateInitInfo> initInfo);
+    RewardsApplicationState(mem::WeakHandle<RewardsApplicationStateInitInfo> initInfo);
 
     void InitScene() override;
 
 private:
     TrophyRanking mPlayerRanking;
 
-    mem::WeakRef<GameObject> mTextObject;
+    mem::WeakHandle<GameObject> mTextObject;
 };
 
 } // Namespace ignite.

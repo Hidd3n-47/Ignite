@@ -4,23 +4,23 @@ namespace ignite::mem
 {
 
 /**
- * @class WeakRef: A class used to hold a reference to a pointer such that the ownership is not transferred.<br/>
+ * @class WeakHandle: A class used to hold a reference to a pointer such that the ownership is not transferred.<br/>
  * Having a \c Ref to a pointer allows you to access the pointer and its methods but not call \c delete on it.
  * @tparam T: The class of the pointer.
  */
 template <typename T>
-class WeakRef
+class WeakHandle
 {
 public:
-    WeakRef()      = default;
-    ~WeakRef()     = default;
+    WeakHandle()      = default;
+    ~WeakHandle()     = default;
 
-    WeakRef(const WeakRef&)             = default;
-    WeakRef(WeakRef&&)                  = default;
-    WeakRef& operator=(WeakRef&&)       = default;
-    WeakRef& operator=(const WeakRef&)  = default;
+    WeakHandle(const WeakHandle&)             = default;
+    WeakHandle(WeakHandle&&)                  = default;
+    WeakHandle& operator=(WeakHandle&&)       = default;
+    WeakHandle& operator=(const WeakHandle&)  = default;
 
-    inline explicit WeakRef(T* reference)
+    inline explicit WeakHandle(T* reference)
         : mReferencePtr(reference)
     { /* Empty. */ }
 
@@ -42,13 +42,13 @@ public:
      * @return A \c WeakRef that has been cast to the type \c CastType. Note, this \c WeakRef could be invalid if the cast failed, and hence should be checked if its is valid before use.
      */
     template <typename CastType>
-    [[nodiscard]] inline WeakRef<CastType> Cast() { return WeakRef<CastType>{ reinterpret_cast<CastType*>(mReferencePtr) }; }
+    [[nodiscard]] inline WeakHandle<CastType> Cast() { return WeakHandle<CastType>{ reinterpret_cast<CastType*>(mReferencePtr) }; }
 
     inline T  operator*()               { return *mReferencePtr; }
     inline T* operator->()              { return mReferencePtr; }
     inline const T* operator->() const  { return mReferencePtr; }
-    inline bool operator==(const WeakRef<T>& other) const { return mReferencePtr == other.mReferencePtr; }
-    inline bool operator<(const WeakRef<T>& other)  const { return mReferencePtr < other.mReferencePtr; }
+    inline bool operator==(const WeakHandle<T>& other) const { return mReferencePtr == other.mReferencePtr; }
+    inline bool operator<(const WeakHandle<T>& other)  const { return mReferencePtr < other.mReferencePtr; }
 private:
     T* mReferencePtr = nullptr;
 };

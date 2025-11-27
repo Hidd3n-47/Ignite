@@ -14,16 +14,16 @@ class ParticleEffect
 public:
     ~ParticleEffect();
 
-    void InitEffect(const mem::WeakRef<ParticleEffectDetails> details, const mem::WeakRef<Transform> parentTransform);
+    void InitEffect(const mem::WeakHandle<ParticleEffectDetails> details, const mem::WeakHandle<Transform> parentTransform);
 
     void Update(const float dt);
-    void Render(mem::WeakRef<Renderer> renderer) const;
+    void Render(mem::WeakHandle<Renderer> renderer) const;
 
     void Emmit(const bool emmit = true);
 private:
     Particle* mParticles = nullptr;
-    mem::WeakRef<Transform> mParentTransform;
-    mem::WeakRef<ParticleEffectDetails> mEffectDetails;
+    mem::WeakHandle<Transform> mParentTransform;
+    mem::WeakHandle<ParticleEffectDetails> mEffectDetails;
 
     uint16_t mTextureId{};
 

@@ -21,9 +21,9 @@ public:
     inline virtual void SceneUpdate() { }
 
     void Update(const float dt) const;
-    void Render(mem::WeakRef<Renderer> renderer) const;
+    void Render(mem::WeakHandle<Renderer> renderer) const;
 
-    [[nodiscard]] mem::WeakRef<GameObject> CreateGameObject();
+    [[nodiscard]] mem::WeakHandle<GameObject> CreateGameObject();
 private:
     std::vector<GameObject*> mGameObjects;
 };

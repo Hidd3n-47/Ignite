@@ -8,7 +8,7 @@ class IRenderableComponent
 public:
     virtual ~IRenderableComponent() = default;
 
-    virtual void Render(mem::WeakRef<Renderer> renderer) { PROFILE_FUNC(); }
+    virtual void Render(mem::WeakHandle<Renderer> renderer) { PROFILE_FUNC(); }
 };
 
 } // Namespace ignite.

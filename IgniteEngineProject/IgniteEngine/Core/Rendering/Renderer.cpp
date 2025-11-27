@@ -41,9 +41,9 @@ void Renderer::Render(const OrthoCamera& camera)
 {
     PROFILE_FUNC();
 
-    for (const std::vector<mem::WeakRef<RenderCommand>>& layerCommands : mCommands | std::views::values)
+    for (const std::vector<mem::WeakHandle<RenderCommand>>& layerCommands : mCommands | std::views::values)
     {
-        for (const mem::WeakRef<RenderCommand> command : layerCommands)
+        for (const mem::WeakHandle<RenderCommand> command : layerCommands)
         {
             const float rotation = command->transform->rotation;
             const float cosRot = std::cos(Math::DegToRads(rotation));

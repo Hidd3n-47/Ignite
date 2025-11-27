@@ -16,7 +16,7 @@ BoxCollider::BoxCollider(const Vec2 dimensionHalfExtents, const bool dynamic, co
     // Empty.
 }
 
-void BoxCollider::OnComponentAdded(const mem::WeakRef<GameObject> parent)
+void BoxCollider::OnComponentAdded(const mem::WeakHandle<GameObject> parent)
 {
     PROFILE_FUNC();
 
@@ -53,11 +53,11 @@ void BoxCollider::OnComponentRemoved()
 }
 
 #ifdef DEV_CONFIGURATION
-void BoxCollider::Render(mem::WeakRef<Renderer> renderer)
+void BoxCollider::Render(mem::WeakHandle<Renderer> renderer)
 {
     PROFILE_FUNC();
 
-    renderer->AddRenderCommand(1000, mem::WeakRef{ &mRenderCommand });
+    renderer->AddRenderCommand(1000, mem::WeakHandle{ &mRenderCommand });
 }
 #endif // DEV_CONFIGURATION.
 

@@ -17,26 +17,26 @@ class UiButton : public IComponent, public IUpdateableComponent, public IRendera
 public:
     UiButton(const char* filePath, const bool hasPressedAnimation = false);
 
-    void OnComponentAdded(const mem::WeakRef<GameObject> parent) override;
+    void OnComponentAdded(const mem::WeakHandle<GameObject> parent) override;
 
     void Update(const float dt) override;
-    void Render(mem::WeakRef<Renderer> renderer) override;
+    void Render(mem::WeakHandle<Renderer> renderer) override;
 
-    inline void SetOnHoveredEvent(const std::function<void(mem::WeakRef<GameObject>)>& onHoveredCallback)           { mOnHoveredEvent       = onHoveredCallback; }
-    inline void SetOnRestingStateEvent(const std::function<void(mem::WeakRef<GameObject>)>& onRestingStateCallback) { mOnRestingStateEvent  = onRestingStateCallback; }
+    inline void SetOnHoveredEvent(const std::function<void(mem::WeakHandle<GameObject>)>& onHoveredCallback)           { mOnHoveredEvent       = onHoveredCallback; }
+    inline void SetOnRestingStateEvent(const std::function<void(mem::WeakHandle<GameObject>)>& onRestingStateCallback) { mOnRestingStateEvent  = onRestingStateCallback; }
     inline void SetOnButtonPressedEvent(const std::function<void()>& onButtonPressedCallback)                       { mOnButtonPressedEvent = onButtonPressedCallback; }
 
 private:
     RenderCommand mRenderCommand{ };
 
-    std::function<void(mem::WeakRef<GameObject>)> mOnHoveredEvent;
-    std::function<void(mem::WeakRef<GameObject>)> mOnRestingStateEvent;
+    std::function<void(mem::WeakHandle<GameObject>)> mOnHoveredEvent;
+    std::function<void(mem::WeakHandle<GameObject>)> mOnRestingStateEvent;
     std::function<void()> mOnButtonPressedEvent;
 
     bool mHovered  { false };
     bool mMouseDown{ false };
 
-    mem::WeakRef<InputManager>   mInputManagerRef;
+    mem::WeakHandle<InputManager>   mInputManagerRef;
 };
 
 } // Namespace ignite.

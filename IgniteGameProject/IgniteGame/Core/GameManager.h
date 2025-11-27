@@ -1,6 +1,6 @@
 #pragma once
 
-#include <IgniteMem/Core/WeakRef.h>
+#include <IgniteMem/Core/WeakHandle.h>
 
 #include "ApplicationState/ApplicationState.h"
 
@@ -18,14 +18,14 @@ class LevelParser;
 class GameManager
 {
 public:
-    [[nodiscard]] inline static mem::WeakRef<GameManager> Instance() { return mem::WeakRef{ mInstance }; }
+    [[nodiscard]] inline static mem::WeakHandle<GameManager> Instance() { return mem::WeakHandle{ mInstance }; }
 
     GameManager(const GameManager&)             = delete;
     GameManager(GameManager&&)                  = delete;
     GameManager& operator=(GameManager&&)       = delete;
     GameManager& operator=(const GameManager&)  = delete;
 
-    static mem::WeakRef<GameManager> CreateGameManager();
+    static mem::WeakHandle<GameManager> CreateGameManager();
 
     void Init();
     void Destroy() const;
@@ -35,7 +35,7 @@ public:
     inline void SetLevelRankTimes(const float gold, const float silver, const float bronze) { mTimeForGold = gold; mTimeForSilver = silver; mTimeForBronze = bronze; }
     TrophyRanking GetTrophyRanking(const float playerTime) const;
 
-    [[nodiscard]] inline mem::WeakRef<LevelParser> GetLevelParser() const { return mem::WeakRef{ mLevelParser }; }
+    [[nodiscard]] inline mem::WeakHandle<LevelParser> GetLevelParser() const { return mem::WeakHandle{ mLevelParser }; }
 
 #ifdef DEV_CONFIGURATION
     Log logger{ "IgniteGame" };

@@ -43,7 +43,7 @@ void LevelParser::Init()
     }
 }
 
-void LevelParser::LoadLevel(mem::WeakRef<Scene> scene, mem::WeakRef<GameObject> player, const LevelState state)
+void LevelParser::LoadLevel(mem::WeakHandle<Scene> scene, mem::WeakHandle<GameObject> player, const LevelState state)
 {
     const std::filesystem::path levelPath{ "Assets/Levels/Level" + std::to_string(static_cast<uint8_t>(state)) };
 
@@ -105,9 +105,9 @@ void LevelParser::LoadLevel(mem::WeakRef<Scene> scene, mem::WeakRef<GameObject> 
 
                 const Vec2 position = Vec2{ x - 7.5f, -y + 4.5f };
 
-                mem::WeakRef<GameObject> gameObject = scene->CreateGameObject();
+                mem::WeakHandle<GameObject> gameObject = scene->CreateGameObject();
                 gameObject->AddComponent<SpriteRenderer>(mLevelSpritesheet, spritesheetX, spritesheetY, layer);
-                mem::WeakRef<Transform> transform = gameObject->GetComponent<Transform>();
+                mem::WeakHandle<Transform> transform = gameObject->GetComponent<Transform>();
                 transform->scale = Vec2{ scalingFactor, scalingFactor };
                 transform->translation = position;
 
@@ -128,9 +128,9 @@ void LevelParser::LoadLevel(mem::WeakRef<Scene> scene, mem::WeakRef<GameObject> 
 
                     const Vec2 sizeWorld = camera.ScreenSizeToWorldSize(Vec2{ rect.w, rect.h });
 
-                    mem::WeakRef<BoxCollider> box = gameObject->AddComponent<BoxCollider>(sizeWorld, false, startLine);
+                    mem::WeakHandle<BoxCollider> box = gameObject->AddComponent<BoxCollider>(sizeWorld, false, startLine);
                     box->SetOffset(Vec2{ centreWorld.x, -centreWorld.y });
-                    box->SetOnTriggeredCallback([](mem::WeakRef<GameObject> other) { other->GetComponent<RaceManagerComponent>()->PassedStartFinishLine(); });
+                    box->SetOnTriggeredCallback([](mem::WeakHandle<GameObject> other) { other->GetComponent<RaceManagerComponent>()->PassedStartFinishLine(); });
                 }
             }
             ++y;

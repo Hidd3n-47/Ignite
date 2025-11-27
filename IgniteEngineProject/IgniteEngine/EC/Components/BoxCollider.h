@@ -18,14 +18,14 @@ class BoxCollider : public IComponent DEBUG(, public IRenderableComponent)
 public:
     BoxCollider(const Vec2 dimensionHalfExtents, const bool dynamic = false, const bool trigger = false);
 
-    void OnComponentAdded(const mem::WeakRef<GameObject> parent) override;
+    void OnComponentAdded(const mem::WeakHandle<GameObject> parent) override;
     void OnComponentRemoved() override;
 
-    void OnTriggerEnter(const mem::WeakRef<GameObject> other) const { if (mOnTriggeredCallback) mOnTriggeredCallback(other); }
+    void OnTriggerEnter(const mem::WeakHandle<GameObject> other) const { if (mOnTriggeredCallback) mOnTriggeredCallback(other); }
 
 #ifdef DEV_CONFIGURATION
 public:
-    void Render(mem::WeakRef<Renderer> renderer) override;
+    void Render(mem::WeakHandle<Renderer> renderer) override;
 private:
     RenderCommand mRenderCommand{ };
 public:
@@ -35,7 +35,7 @@ public:
     [[nodiscard]] inline Vec2 GetOffset() const { return mOffset; }
     [[nodiscard]] inline Vec2 GetDimensionHalfExtents() const { return mDimensionHalfExtents; }
 
-    void SetOnTriggeredCallback(const std::function<void(mem::WeakRef<GameObject>)>& onTriggeredCallback) { mOnTriggeredCallback = onTriggeredCallback; }
+    void SetOnTriggeredCallback(const std::function<void(mem::WeakHandle<GameObject>)>& onTriggeredCallback) { mOnTriggeredCallback = onTriggeredCallback; }
     void SetOffset(const Vec2 offset);
 private:
     Vec2 mDimensionHalfExtents;
@@ -43,7 +43,7 @@ private:
     bool mDynamic;
     bool mTrigger;
 
-    std::function<void(mem::WeakRef<GameObject>)> mOnTriggeredCallback;
+    std::function<void(mem::WeakHandle<GameObject>)> mOnTriggeredCallback;
 };
 
 } // Namespace ignite.

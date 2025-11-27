@@ -10,7 +10,7 @@ struct ParticleEffectDetails
 
     uint32_t numberOfParticles = 1;
 
-    mem::WeakRef<Vec2> position{};
+    mem::WeakHandle<Vec2> position{};
     Vec2 minPositionOffset{};
     Vec2 maxPositionOffset{};
 

@@ -13,7 +13,7 @@
 namespace ignite
 {
 
-void CarMovement::OnComponentAdded(const mem::WeakRef<GameObject> parent)
+void CarMovement::OnComponentAdded(const mem::WeakHandle<GameObject> parent)
 {
     PROFILE_FUNC();
 

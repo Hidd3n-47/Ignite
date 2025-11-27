@@ -20,7 +20,7 @@ namespace ignite
  * invalid after a move. Look at adding a moveable reference that holds references to the weak references, and when moved updates the
  * weak references.
  */
-mem::WeakRef<ParticleEffect> ParticleManager::AddEffect(const mem::WeakRef<ParticleSystem> system, const mem::WeakRef<ParticleEffectDetails> details)
+mem::WeakHandle<ParticleEffect> ParticleManager::AddEffect(const mem::WeakHandle<ParticleSystem> system, const mem::WeakHandle<ParticleEffectDetails> details)
 {
     mEffects.emplace_back(new ParticleEffect());
     mEffects.back()->InitEffect(details, system->GetParent()->GetComponent<Transform>());
@@ -28,10 +28,10 @@ mem::WeakRef<ParticleEffect> ParticleManager::AddEffect(const mem::WeakRef<Parti
     mSystemToIndex[system] = mActiveEffects;
     mIndexToSystem[mActiveEffects++] = system;
 
-    return mem::WeakRef{ mEffects.back() };
+    return mem::WeakHandle{ mEffects.back() };
 }
 
-void ParticleManager::RemoveEffect(const mem::WeakRef<ParticleSystem> system)
+void ParticleManager::RemoveEffect(const mem::WeakHandle<ParticleSystem> system)
 {
     const uint32_t deletionIndex = mSystemToIndex[system];
 
@@ -76,7 +76,7 @@ void ParticleManager::Update(const float dt) const
     }
 }
 
-void ParticleManager::Render(const mem::WeakRef<Renderer> renderer) const
+void ParticleManager::Render(const mem::WeakHandle<Renderer> renderer) const
 {
     PROFILE_FUNC();
 
