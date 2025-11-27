@@ -15,17 +15,8 @@
 #include "Core/Rendering/ParticleManager.h"
 #include "IgniteUtils/Core/InstrumentationSession.h"
 
-//todo fix.
-static bool memInit = false;
-
 void* operator new(std::size_t size)
 {
-    if (!memInit)
-    {
-        ignite::mem::MemoryManager::Init(128 * 1'024);
-        memInit = true;
-    }
-
     //std::cout << "using global new...\n";
     //return malloc(size);
     return ignite::mem::MemoryManager::Instance()->New(size);
@@ -53,9 +44,9 @@ mem::WeakRef<Engine> Engine::CreateEngine()
         return mem::WeakRef{ mInstance };
     }
 
-    utils::InstrumentationSession::Instance()->StartSession();
+    mem::MemoryManager::Init(128 * 1'024);
 
-    //mem::MemoryManager::Init(128 * 1'024);
+    DEBUG(utils::InstrumentationSession::Instance()->StartSession());
 
     mInstance = mem::MemoryManager::Instance()->New<Engine>();
     DEBUG_INFO("Successfully created Ignite Engine.");
@@ -138,29 +129,32 @@ void Engine::Run()
 
 void Engine::Destroy() const
 {
-    PROFILE_FUNC();
+    {
+        PROFILE_FUNC();
 
-    mem::MemoryManager::Instance()->Delete(mParticleManager);
+        mem::MemoryManager::Instance()->Delete(mParticleManager);
 
-    mem::MemoryManager::Instance()->Delete(mCollisionHandler);
+        mem::MemoryManager::Instance()->Delete(mCollisionHandler);
 
-    mem::MemoryManager::Instance()->Delete(mFontRenderer);
+        mem::MemoryManager::Instance()->Delete(mFontRenderer);
 
-    mem::MemoryManager::Instance()->Delete(mTextureManager);
-    mem::MemoryManager::Instance()->Delete(mRenderer);
+        mem::MemoryManager::Instance()->Delete(mTextureManager);
+        mem::MemoryManager::Instance()->Delete(mRenderer);
 
-    SDL_DestroyWindow(mWindow);
+        SDL_DestroyWindow(mWindow);
 
-    mem::MemoryManager::Instance()->Delete(mInputManager);
+        mem::MemoryManager::Instance()->Delete(mInputManager);
+
+    }
+
+    DEBUG(utils::InstrumentationSession::Instance()->EndSession());
+
+    DEBUG_INFO("Successfully destroyed Ignite Engine.");
 
     mem::MemoryManager::Instance()->Delete(mInstance);
     mInstance = nullptr;
 
     mem::MemoryManager::Destroy();
-
-    utils::InstrumentationSession::Instance()->EndSession();
-
-    DEBUG_INFO("Successfully destroyed Ignite Engine.");
 }
 
 void Engine::Update()

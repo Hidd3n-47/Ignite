@@ -4,6 +4,10 @@
 
 #include "ApplicationState/ApplicationState.h"
 
+#ifdef DEV_CONFIGURATION
+#include "Logger/Log.h"
+#endif // DEV_CONFIGURATION.
+
 namespace ignite
 {
 enum class TrophyRanking : uint8_t;
@@ -32,6 +36,10 @@ public:
     TrophyRanking GetTrophyRanking(const float playerTime) const;
 
     [[nodiscard]] inline mem::WeakRef<LevelParser> GetLevelParser() const { return mem::WeakRef{ mLevelParser }; }
+
+#ifdef DEV_CONFIGURATION
+    Log logger{ "IgniteGame" };
+#endif // DEV_CONFIGURATION.
 private:
     GameManager()  = default;
     ~GameManager() = default;

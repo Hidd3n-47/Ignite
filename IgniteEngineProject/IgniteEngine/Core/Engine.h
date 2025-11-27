@@ -5,6 +5,10 @@
 #include "IgniteEngine/Math/Vec2.h"
 #include "IgniteEngine/Core/OrthoCamera.h"
 
+#ifdef DEV_CONFIGURATION
+#include "Logger/Log.h"
+#endif // DEV_CONFIGURATION.
+
 struct SDL_Window;
 
 namespace ignite
@@ -91,6 +95,10 @@ public:
 
     //const Vec2 DEFAULT_SCREEN_SIZE{ 1280.0f, 720.0f };
     const Vec2 DEFAULT_SCREEN_SIZE{ 1920.0f, 1080.0f };
+
+#ifdef DEV_CONFIGURATION
+    Log logger{"IgniteEngine"};
+#endif // DEV_CONFIGURATION.
 private:
     static Engine* mInstance;
 

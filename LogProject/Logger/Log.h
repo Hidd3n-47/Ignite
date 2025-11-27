@@ -1,40 +1,52 @@
 #pragma once
 
 #include <print>
-#include <string>
-#include <format>
 #include <chrono>
 #include <fstream>
-#include <unordered_map>
+#include <iostream>
 
 namespace ignite
 {
-
 class Log
 {
 public:
-    template <typename... Args>
-    inline static void Info(const std::string_view title, const std::string_view msg, Args&&... args)
+    Log(std::string title)
+        : mTitle(std::move(title))
+        , mFileOutput(mTitle + ".log")
     {
-        Print(msg, title, GREEN, std::forward<Args>(args)...);
+        if (mFileOutput.fail())
+        {
+            std::cout << RED << "Failed to create log files for '{}'. Messages might not be logged to disk correctly." << DEFAULT << "\n";
+        }
+    }
+
+    ~Log()
+    {
+        mFileOutput.close();
     }
 
     template <typename... Args>
-    inline static void Debug(const std::string_view title, const std::string_view msg, Args&&... args)
+    inline void Info(const std::string_view msg, Args&&... args)
     {
-        Print(msg, title, BLUE, std::forward<Args>(args)...);
+        Print(msg, GREEN, std::forward<Args>(args)...);
     }
 
     template <typename... Args>
-    inline static void Warn(const std::string_view title, const std::string_view msg, Args&&... args)
+    inline void Debug(const std::string_view msg, Args&&... args)
     {
-        Print(msg, title, ORANGE, std::forward<Args>(args)...);
+        Print(msg, BLUE, std::forward<Args>(args)...);
     }
 
     template <typename... Args>
-    inline static void Error(const std::string_view title, const std::string_view msg, Args&&... args)
+    inline void Warn(const std::string_view msg, Args&&... args)
     {
-        Print(msg, title, RED, std::forward<Args>(args)...);
+        Print(msg, ORANGE, std::forward<Args>(args)...);
+    }
+
+    template <typename... Args>
+    inline void Error(const std::string_view msg, Args&&... args)
+    {
+        Print(msg, RED, std::forward<Args>(args)...);
     }
 
 private:
@@ -43,6 +55,9 @@ private:
     static constexpr const char* ORANGE     = "\033[38;5;208m";
     static constexpr const char* RED        = "\033[31m";
     static constexpr const char* DEFAULT    = "\033[0m";
+
+    std::string   mTitle;
+    std::ofstream mFileOutput;
 
     inline static std::string ColorToMessageLevel(const char* color)
     {
@@ -79,31 +94,18 @@ private:
         }
     }
 
-    inline static std::unordered_map<std::string, std::ofstream> mLogNameToFileOutput{};
-
     template <typename... Args>
-    inline static void Print(const std::string_view msg, const std::string_view title, const char* color, Args&&... args)
+    inline void Print(const std::string_view msg, const char* color, Args&&... args)
     {
-        const std::string logPath = std::string{ title } + ".log";
-        if (!mLogNameToFileOutput.contains(logPath))
-        {
-            mLogNameToFileOutput[logPath] = std::ofstream(logPath);
-
-            if (mLogNameToFileOutput[logPath].fail())
-            {
-                std::println("Failed to create log files for '{}'. Messages might not be logged to disk correctly.", title);
-            }
-        }
-
         const auto now = std::chrono::system_clock::now();
         const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
         const std::string timestamp = std::format(" [{:%H:%M:%S.}{:03}]", std::chrono::floor<std::chrono::seconds>(now), ms.count());
 
         if constexpr (sizeof...(args) == 0)
         {
-            std::println("{}{}{}: {}{}", color, title, timestamp, msg, DEFAULT);
+            std::println("{}{}{}: {}{}", color, mTitle, timestamp, msg, DEFAULT);
 
-            mLogNameToFileOutput[logPath] << ColorToMessageLevel(color) << title << timestamp << ": " << msg << '\n';
+            mFileOutput << ColorToMessageLevel(color) << mTitle << timestamp << ": " << msg << '\n';
         }
         else
         {
@@ -111,9 +113,9 @@ private:
 
             auto formattedMsg = std::vformat(msg, std::apply([](auto&... vals) { return std::make_format_args(vals...); }, argsTuple));
 
-            std::println("{}{}{}: {}{}",  color, title, timestamp, formattedMsg, DEFAULT);
+            std::println("{}{}{}: {}{}", color, mTitle, timestamp, formattedMsg, DEFAULT);
 
-            mLogNameToFileOutput[logPath] << ColorToMessageLevel(color) << title << timestamp << ": " << formattedMsg << '\n';
+            mFileOutput << ColorToMessageLevel(color) << mTitle << timestamp << ": " << formattedMsg << '\n';
         }
     }
 

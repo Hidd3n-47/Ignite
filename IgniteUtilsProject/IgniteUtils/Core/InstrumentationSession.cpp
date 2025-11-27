@@ -34,6 +34,9 @@ void InstrumentationSession::EndSession()
 {
     mFileOutput << R"(]})";
     mFileOutput.close();
+
+    delete mInstance;
+    mInstance = nullptr;
 }
 
 } // Namespace ignite::utils.

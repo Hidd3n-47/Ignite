@@ -49,14 +49,6 @@ project "IgniteEngine"
         "SDL3_image.lib",
     }
 
-    postbuildcommands
-    {
-        ("{COPYFILE} %[$(SolutionDir)deps/Lib/SDL3.dll] %[" .. outputPath .."IgniteGame/]"),
-        ("{COPYFILE} %[$(SolutionDir)deps/Lib/SDL3_ttf.dll] %[" .. outputPath .."IgniteGame/]"),
-        ("{COPYFILE} %[$(SolutionDir)deps/Lib/SDL3_image.dll] %[" .. outputPath .."IgniteGame/]"),
-        ("{COPYFILE} %[" .. outputPath .. "IgniteMem/IgniteMem.dll] %[" .. outputPath .."IgniteGame/]"),
-    }
-
     filter "system:windows"
         systemversion "latest"
 

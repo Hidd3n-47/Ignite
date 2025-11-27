@@ -9,10 +9,11 @@
 #endif // ! DEV_CONFIGURATION.
 
 #ifdef ENGINE_DEBUG
-#define DEBUG_LOG(...)   ignite::Log::Debug("IgniteEngine", __VA_ARGS__)
-#define DEBUG_INFO(...)  ignite::Log::Info("IgniteEngine", __VA_ARGS__)
-#define DEBUG_WARN(...)  ignite::Log::Warn("IgniteEngine", __VA_ARGS__)
-#define DEBUG_ERROR(...) ignite::Log::Error("IgniteEngine", __VA_ARGS__)
+#include "IgniteEngine/Core/Engine.h"
+#define DEBUG_LOG(...)   Engine::Instance()->logger.Debug(__VA_ARGS__)
+#define DEBUG_INFO(...)  Engine::Instance()->logger.Info(__VA_ARGS__)
+#define DEBUG_WARN(...)  Engine::Instance()->logger.Warn(__VA_ARGS__)
+#define DEBUG_ERROR(...) Engine::Instance()->logger.Error(__VA_ARGS__)
 #else // ENGINE_DEBUG.
 #define DEBUG_LOG(...)
 #define DEBUG_INFO(...)

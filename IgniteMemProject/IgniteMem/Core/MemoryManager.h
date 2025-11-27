@@ -64,6 +64,7 @@ public:
 
     static void SetMemoryBlockDebug(DebugMemoryHexValues value, void* memory, const uint64_t size);
 
+    Log logger{ "IgniteMem" };
 private:
     std::thread mThread;
     uint32_t    mNumberOfFragments{ 1 };

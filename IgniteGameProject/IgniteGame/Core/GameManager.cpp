@@ -53,10 +53,10 @@ void GameManager::Destroy() const
     mLevelParser->Destroy();
     delete mLevelParser;
 
+    GAME_INFO("Successfully destroyed Ignite Game.");
+
     delete mInstance;
     mInstance = nullptr;
-
-    GAME_INFO("Successfully destroyed Ignite Game.");
 }
 
 void GameManager::ChangeState(const ApplicationStates state, IApplicationStateInitInfo* initInfo)

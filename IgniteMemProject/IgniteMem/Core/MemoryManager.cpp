@@ -1,27 +1,25 @@
 #include "MemoryManager.h"
 
-#include <print>
 #include <cassert>
 
 #ifdef DEV_CONFIGURATION
 #include "DebugMemoryConsole.h"
-#endif // DEV_CONFIGURATION.
+#include <iostream>
 
-void* operator new(std::size_t size)
-{
-#ifndef DEV_CONFIGURATION
-    std::println("Operator new used inside memory manager to allocate size {}. Note: This could be logging.", size);
+// Todo look at this.
+// Commenting this out as logger strings trigger this.
+//void* operator new(std::size_t size)
+//{
+//    std::cout << "Operator new used inside memory manager to allocate size " << size << " . Note: This could be logging.\n";
+//    return malloc(size);
+//}
+//
+//void operator delete(void* address) noexcept
+//{
+//    std::cout << "Operator delete used inside memory manager to deallocate memory. Note: This could be logging.\n";
+//    free(address);
+//}
 #endif // !DEV_CONFIGURATION.
-    return malloc(size);
-}
-
-void operator delete(void* address) noexcept
-{
-#ifndef DEV_CONFIGURATION
-    std::println("Operator delete used inside memory manager to deallocate memory. Note: This could be logging.");
-#endif // !DEV_CONFIGURATION.
-    free(address);
-}
 
 namespace ignite::mem
 {
@@ -91,9 +89,10 @@ void MemoryManager::Destroy() noexcept
     }
 #endif // DEV_LIVE_STATS.
 
+    MEM_LOG_DEBUG("Memory managed successfully destroyed.");
+
     free(mInstance);
     mInstance = nullptr;
-    MEM_LOG_DEBUG("Memory managed successfully destroyed.");
 }
 
 void* MemoryManager::New(const uint32_t size) noexcept
