@@ -11,6 +11,7 @@ void InstrumentationSession::Create()
 
 void InstrumentationSession::Destroy()
 {
+    mInstance->~InstrumentationSession();
     free(mInstance);
     mInstance = nullptr;
 }

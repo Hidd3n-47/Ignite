@@ -3,6 +3,8 @@
 #include <cassert>
 
 #ifdef DEV_CONFIGURATION
+#include <random>
+
 #include "DebugMemoryConsole.h"
 #include <iostream>
 
@@ -44,6 +46,9 @@ MemoryManager::MemoryManager(const uint64_t sizeBytes) noexcept
 
 #ifdef DEV_LIVE_STATS
     mThread = std::thread(&DebugMemoryConsole::Init);
+
+    // Seed random numbers to set value to ensure that ID allocation is consistent and a breakpoint can be used to track allocations.
+    srand(47);
 #endif // DEV_LIVE_STATS.
 }
 
@@ -89,8 +94,22 @@ void MemoryManager::Destroy() noexcept
     }
 #endif // DEV_LIVE_STATS.
 
+#ifdef DEV_CONFIGURATION
+    if (mInstance->mAddressToAllocInfo.empty())
+    {
+        MEM_LOG_INFO("No memory leak, all memory freed!");
+    }
+
+    for (const auto& [address, info] : mInstance->mAddressToAllocInfo) 
+    {
+        MEM_LOG_ERROR("Memory Leak detected at address {}, allocation ID: {}", reinterpret_cast<std::intptr_t>(address), info.id);
+    }
+#endif // DEV_CONFIGURATION.
+
+
     MEM_LOG_DEBUG("Memory managed successfully destroyed.");
 
+    mInstance->~MemoryManager();
     free(mInstance);
     mInstance = nullptr;
 }
@@ -118,7 +137,7 @@ void* MemoryManager::New(const uint32_t size) noexcept
     {
         throw std::bad_alloc{ };
     }
-#endif // DEV_CONFIGURATION.
+#endif // !DEV_CONFIGURATION.
 
     auto [previous, allocationNode] = FindAllocationListNode(allocatedSize);
 
@@ -156,6 +175,19 @@ void* MemoryManager::New(const uint32_t size) noexcept
         // We do not need to do anything in this situation as we need to constantly have a node.
         // Therefore, we just will have a node of 0 bytes and do not want to delete it.
     }
+
+#ifdef DEV_CONFIGURATION
+    const int allocId = rand();
+
+    //<- Change the break ID to be the ID of memory leak to find object that has been leaked.
+    //const int breakId = 0;
+    //if (allocId == breakId)
+    //{
+    //    __debugbreak();
+    //}
+
+    mAddressToAllocInfo[(std::byte*)typeAddress] = { .id = allocId };
+#endif // DEV_CONFIGURATION.
 
     return typeAddress;
 }

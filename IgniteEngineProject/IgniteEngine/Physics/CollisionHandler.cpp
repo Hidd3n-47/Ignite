@@ -1,7 +1,7 @@
 #include "IgnitePch.h"
 #include "CollisionHandler.h"
 
-#include <IgniteMem/Core/WeakRefHash.h>
+#include <IgniteMem/Core/WeakHandleHash.h>
 
 #include "Defines.h"
 #include "EC/GameObject.h"

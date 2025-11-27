@@ -3,7 +3,6 @@
 #include <tuple>
 #include <cassert>
 #include <cstddef>
-#include <exception>
 
 #include "Stack.h"
 #include "Defines.h"
@@ -12,7 +11,45 @@
 #ifdef DEV_CONFIGURATION
 #include <mutex>
 #include <thread>
+#include <unordered_map>
 #include "DebugMemoryHexValues.h"
+
+template <typename T>
+struct CustomAllocator 
+{
+    typedef T value_type;
+
+    CustomAllocator() = default;
+
+    template <typename U>
+    constexpr CustomAllocator(const CustomAllocator<U>&) noexcept {}
+
+    T* allocate(std::size_t n) 
+    {
+        void* address = malloc(n * sizeof(T));
+        return static_cast<T*>(address);
+    }
+
+    void deallocate(T* p, std::size_t n) noexcept 
+    {
+        if (p != nullptr)
+        {
+            for (std::size_t i = 0; i < n; ++i)
+            {
+                p[i].~T();
+            }
+
+            free(p);
+        }
+    }
+};
+
+struct AllocationInfo
+{
+    int id;
+};
+
+using AllocationMap = std::unordered_map<std::byte*, AllocationInfo, std::hash<std::byte*>, std::equal_to<std::byte*>, CustomAllocator<std::pair<std::byte* const, AllocationInfo>>>;
 #endif // DEV_CONFIGURATION.
 
 namespace ignite::mem
@@ -68,6 +105,8 @@ public:
 private:
     std::thread mThread;
     uint32_t    mNumberOfFragments{ 1 };
+
+    AllocationMap mAddressToAllocInfo;
 public:
     friend class DebugMemoryConsole;
 #endif // DEV_CONFIGURATION.
@@ -112,6 +151,8 @@ void MemoryManager::Delete(T* free) noexcept
     assert(free);
 
 #ifdef DEV_CONFIGURATION
+    mAddressToAllocInfo.erase((std::byte*)free);
+
     if ((std::byte*)free < mMemoryBlock || (std::byte*)free > (std::byte*)mMemoryBlock + mSize)
     {
         MEM_LOG_WARN("Freed memory that was allocated on heap due to exceeding memory budget.");
