@@ -19,7 +19,7 @@ InstrumentationTimer::~InstrumentationTimer()
 
     const uint64_t start = std::chrono::time_point_cast<std::chrono::microseconds>(mStart).time_since_epoch().count();
 
-    InstrumentationSession::Instance()->WriteTime(mName, start, end);
+    InstrumentationSession::Instance()->ProfileFunctionTime(mName, start, end);
 }
 
 uint64_t InstrumentationTimer::StopTimer() const

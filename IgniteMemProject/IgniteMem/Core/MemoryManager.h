@@ -9,7 +9,6 @@
 #include "ListNode.h"
 
 #ifdef DEV_CONFIGURATION
-#include <mutex>
 #include <thread>
 #include <unordered_map>
 #include "DebugMemoryHexValues.h"

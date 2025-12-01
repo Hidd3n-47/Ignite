@@ -17,25 +17,11 @@
 
 void* operator new(std::size_t size)
 {
-    //std::cout << "using global new...\n";
-    //return malloc(size);
-    PROFILE_FUNC();
     return ignite::mem::MemoryManager::Instance()->New(size);
 }
 
 void operator delete(void* address) noexcept
 {
-    //std::cout << "using global delete...\n";
-    //return free(address);
-#ifdef DEV_CONFIGURATION
-    if (ignite::utils::InstrumentationSession::Instance())
-    {
-        PROFILE_FUNC();
-        ignite::mem::MemoryManager::Instance()->Delete(address);
-        return;
-    }
-#endif // DEV_CONFIGURATION.
-
     ignite::mem::MemoryManager::Instance()->Delete(address);
 }
 
