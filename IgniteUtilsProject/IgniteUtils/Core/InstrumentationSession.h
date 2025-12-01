@@ -62,14 +62,14 @@ private:
     inline static InstrumentationSession* mInstance = nullptr;
 
     std::ofstream mFileOutput;
-    bool mOutputtedTimeOnce = false;
+    uint32_t mProfileCount = 0;
 
     std::mutex  mFlushMutex;
     std::thread mFlushThread;
     std::atomic<bool> mRunning = true;
     std::vector<FunctionProfile, HeapAllocator<FunctionProfile>> mFunctionTimes;
 
-    void Flush();
+    void Flush(bool forceFlush = false);
 };
 
 } // Namespace ignite::utils.

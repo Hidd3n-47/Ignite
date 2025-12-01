@@ -26,9 +26,8 @@ void InstrumentationSession::StartSession()
 
     mFileOutput << R"({"otherData": {},"traceEvents":[)";
 
-    mOutputtedTimeOnce = false;
-
-    mFlushThread = std::thread{ [&] { Run(); } };
+    mProfileCount = 0;
+    mFlushThread  = std::thread{ [&] { Run(); } };
 }
 
 void InstrumentationSession::Run()
@@ -55,13 +54,13 @@ void InstrumentationSession::EndSession()
     }
 
     // Preform final flush to ensure that the times are all outputted.
-    Flush();
+    Flush(true);
 
     mFileOutput << R"(]})";
     mFileOutput.close();
 }
 
-void InstrumentationSession::Flush()
+void InstrumentationSession::Flush(bool forceFlush)
 {
     std::vector<FunctionProfile, HeapAllocator<FunctionProfile>> times;
     {
@@ -71,13 +70,9 @@ void InstrumentationSession::Flush()
 
     for (const auto [name, startTime, duration] : times)
     {
-        if (mOutputtedTimeOnce)
+        if (mProfileCount++ > 0)
         {
             mFileOutput << ",";
-        }
-        else
-        {
-            mOutputtedTimeOnce = true;
         }
 
         mFileOutput << R"({"cat":"function","dur":)";
@@ -89,7 +84,13 @@ void InstrumentationSession::Flush()
         mFileOutput << R"(})";
     }
 
-    mFileOutput.flush();
+    constexpr uint32_t COUNT_BEFORE_FLUSH{ 1'000 };
+    if (mProfileCount >= COUNT_BEFORE_FLUSH || forceFlush)
+    {
+        mFileOutput.flush();
+
+        mProfileCount = 1;
+    }
 }
 
 } // Namespace ignite::utils.
