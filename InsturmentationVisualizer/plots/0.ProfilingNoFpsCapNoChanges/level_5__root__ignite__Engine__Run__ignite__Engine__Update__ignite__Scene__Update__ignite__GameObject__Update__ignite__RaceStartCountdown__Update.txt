@@ -1,0 +1,3 @@
+=== Functions under 'ignite::RaceStartCountdown::Update' ===
+
+[00] ignite::UiText::SetText [##############################] 100.0% (11.11 ms, calls 27 - avg 411.44 us)

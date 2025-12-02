@@ -1,0 +1,4 @@
+=== Functions under 'ignite::SpriteRenderer::Render' ===
+
+[00] operator delete [------------------------------]   0.0% (0.00 ms, calls 177 - avg 0.00 us)
+[01] operator new    [##############################] 100.0% (0.01 ms, calls 605 - avg 0.01 us)

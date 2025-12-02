@@ -1,0 +1,6 @@
+=== Functions under 'ignite::GameObject::Render' ===
+
+[00] operator new                   [------------------------------]   0.0% (0.00 ms, calls 1140 - avg 0.00 us)
+[01] ignite::UiButton::Render       [#####-------------------------]  19.9% (4.35 ms, calls 226 - avg 19.27 us)
+[02] ignite::SpriteRenderer::Render [###########-------------------]  37.9% (8.30 ms, calls 1661 - avg 5.00 us)
+[03] ignite::BoxCollider::Render    [############------------------]  42.2% (9.25 ms, calls 3271 - avg 2.83 us)

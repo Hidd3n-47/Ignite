@@ -1,0 +1,17 @@
+=== Functions under 'ignite::Engine::Run' ===
+
+[00] ignite::InputManager::Poll                           [###---------------------------]  11.4% (2283.72 ms, calls 26622 - avg 85.78 us)
+[01] ignite::Engine::Update                               [######------------------------]  21.0% (4211.72 ms, calls 7756 - avg 543.03 us)
+[02] ignite::CollisionHandler::Update                     [##----------------------------]   7.1% (1421.61 ms, calls 25124 - avg 56.58 us)
+[03] ignite::ParticleManager::Update                      [------------------------------]   0.0% (0.11 ms, calls 26622 - avg 0.00 us)
+[04] ignite::Engine::PostUpdate                           [------------------------------]   0.1% (11.82 ms, calls 26617 - avg 0.44 us)
+[05] ignite::Renderer::StartRender                        [------------------------------]   0.0% (0.56 ms, calls 25089 - avg 0.02 us)
+[06] ignite::Engine::EndFrame                             [------------------------------]   0.0% (0.36 ms, calls 26622 - avg 0.01 us)
+[07] ignite::Engine::StartFrame                           [------------------------------]   0.0% (0.09 ms, calls 26621 - avg 0.00 us)
+[08] ignite::Engine::Render                               [#################-------------]  59.1% (11881.57 ms, calls 26532 - avg 447.82 us)
+[09] ignite::UiButton::Update                             [------------------------------]   0.0% (1.53 ms, calls 6147 - avg 0.25 us)
+[10] ignite::GameObject::Update                           [------------------------------]   0.4% (83.06 ms, calls 14253 - avg 5.83 us)
+[11] ignite::Scene::Update                                [------------------------------]   1.0% (202.72 ms, calls 6972 - avg 29.08 us)
+[12] ignite::Scene::CreateGameObject                      [------------------------------]   0.0% (0.02 ms, calls 5 - avg 4.40 us)
+[13] ignite::CollisionHandler::CheckCollisionBetweenBoxes [------------------------------]   0.0% (1.65 ms, calls 1498 - avg 1.10 us)
+[14] ignite::ParticleSystem::Emmit                        [------------------------------]   0.0% (0.00 ms, calls 1548 - avg 0.00 us)

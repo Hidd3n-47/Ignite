@@ -1,0 +1,7 @@
+=== Functions under 'ignite::Scene::Update' ===
+
+[00] ignite::CarMovement::Update        [------------------------------]   0.0% (0.03 ms, calls 160 - avg 0.17 us)
+[01] ignite::GameObject::Update         [#####-------------------------]  19.8% (15.97 ms, calls 31870 - avg 0.50 us)
+[02] ignite::RaceStartCountdown::Update [#####################---------]  70.4% (56.82 ms, calls 135 - avg 420.92 us)
+[03] ignite::RaceTimer::Update          [##----------------------------]   9.6% (7.72 ms, calls 125 - avg 61.78 us)
+[04] ignite::UiButton::Update           [------------------------------]   0.2% (0.12 ms, calls 283 - avg 0.43 us)

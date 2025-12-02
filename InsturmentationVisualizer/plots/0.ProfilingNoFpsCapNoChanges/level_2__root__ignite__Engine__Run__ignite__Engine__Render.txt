@@ -1,0 +1,11 @@
+=== Functions under 'ignite::Engine::Render' ===
+
+[00] ignite::Renderer::StartRender     [------------------------------]   0.0% (0.04 ms, calls 1533 - avg 0.03 us)
+[01] ignite::UiButton::Render          [------------------------------]   1.0% (51.07 ms, calls 14746 - avg 3.46 us)
+[02] ignite::ParticleManager::Render   [------------------------------]   0.1% (5.24 ms, calls 26532 - avg 0.20 us)
+[03] ignite::Renderer::Render          [#-----------------------------]   6.1% (301.16 ms, calls 26532 - avg 11.35 us)
+[04] ignite::FontRenderer::RenderFonts [------------------------------]   0.6% (28.28 ms, calls 26532 - avg 1.07 us)
+[05] ignite::Renderer::EndRender       [####################----------]  69.0% (3407.29 ms, calls 26532 - avg 128.42 us)
+[06] ignite::GameObject::Render        [------------------------------]   0.7% (36.48 ms, calls 7723 - avg 4.72 us)
+[07] ignite::Scene::Render             [######------------------------]  22.3% (1101.87 ms, calls 7082 - avg 155.59 us)
+[08] ignite::SpriteRenderer::Render    [------------------------------]   0.1% (4.90 ms, calls 1583 - avg 3.10 us)
