@@ -29,3 +29,4 @@ include "Tests/IgniteMemTests/"
 
 -- Benchmark
 include "IgniteMemBenchmark"
+include "IgniteSamplerProject"

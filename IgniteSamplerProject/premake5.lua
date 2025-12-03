@@ -1,7 +1,7 @@
--- ---------------------------- TestProject project.
-project "TestProject"
+-- ---------------------------- IgniteSampler project.
+project "IgniteSampler"
     location "%{prj.name}"
-    kind "StaticLib"
+    kind "ConsoleApp"
     language "C++"
     staticruntime "Off"
     cppdialect "C++latest"
@@ -17,27 +17,30 @@ project "TestProject"
 
     includedirs
     {
-        "$(SolutionDir)Tests/%{prj.name}/",
+    }
 
-        "$(SolutionDir)LogProject/",
+    libdirs
+    {
+        "$(SolutionDir)deps/Lib/",
     }
 
     links
     {
-        "Logger"
     }
 
     filter "system:windows"
         systemversion "latest"
 
     filter "configurations:Dev"
-        symbols "on"
         runtime "Debug"
+        defines "DEV_CONFIGURATION"
+        symbols "on"
 
     filter "configurations:Dev_LiveStats"
-        symbols "on"
         runtime "Debug"
+        defines "DEV_CONFIGURATION"
+        symbols "on"
 
     filter "configurations:Release"
-        optimize "on"
         runtime "Release"
+        optimize "on"
