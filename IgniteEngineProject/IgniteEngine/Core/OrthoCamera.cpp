@@ -17,6 +17,8 @@ OrthoCamera::OrthoCamera(const OrthoCameraValues& values)
 
 Vec2 OrthoCamera::ScreenToWorld(const Vec2 screenSpace) const
 {
+    PROFILE_FUNC();
+
     Vec2 worldSpace = screenSpace / mScreenDimensions;
     worldSpace *= 2.0f;
     worldSpace -= Vec2{ 1.0f };
@@ -27,6 +29,8 @@ Vec2 OrthoCamera::ScreenToWorld(const Vec2 screenSpace) const
 
 Vec2 OrthoCamera::ScreenSizeToWorldSize(const Vec2 screenSpace) const
 {
+    PROFILE_FUNC();
+
     Vec2 worldSpace = screenSpace / mScreenDimensions;
     worldSpace *= 2.0f;
 
@@ -37,6 +41,8 @@ Vec2 OrthoCamera::ScreenSizeToWorldSize(const Vec2 screenSpace) const
 
 Vec2 OrthoCamera::PositionToScreenSpace(const Vec2 position) const
 {
+    PROFILE_FUNC();
+
     Vec2 screenspace = position / Vec2{ (mRight - mLeft) * 0.5f, (mBottom - mTop) * 0.5f };
     screenspace += Vec2{ 1.0f };
     screenspace /= 2.0f;

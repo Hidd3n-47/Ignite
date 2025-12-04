@@ -12,6 +12,8 @@ namespace ignite
 TextureManager::TextureManager(SDL_Renderer* rendererBackend)
     : mRendererBackend(rendererBackend)
 {
+    PROFILE_FUNC();
+
     // Create the invalid texture. This texture will be created manually from a 1x1 pixel that is pink.
     SDL_Surface* surface = SDL_CreateSurface(1, 1, SDL_PIXELFORMAT_RGBA32);
 
@@ -29,12 +31,14 @@ TextureManager::TextureManager(SDL_Renderer* rendererBackend)
 
 TextureManager::~TextureManager()
 {
+    PROFILE_FUNC();
+
     RemoveAllTextures();
 }
 
 void TextureManager::Load(Texture& texture, const char* filePath, const uint32_t spritesheetMaxX, const uint32_t spritesheetMaxY)
 {
-    //todo need to make it that texture manager maps filepath to texture id to prevent reloading same texture.
+    PROFILE_FUNC();
 
     SDL_Surface* surface = IMG_Load(filePath);
     if (!surface)
@@ -66,6 +70,7 @@ void TextureManager::Load(Texture& texture, const char* filePath, const uint32_t
 
 void TextureManager::RemoveTexture(const uint16_t id)
 {
+    PROFILE_FUNC();
     SDL_DestroyTexture(mTextureMap[id]);
 
     mTextureMap.erase(id);
@@ -73,6 +78,7 @@ void TextureManager::RemoveTexture(const uint16_t id)
 
 void TextureManager::RemoveAllTextures()
 {
+    PROFILE_FUNC();
     for (SDL_Texture* texture : mTextureMap | std::views::values)
     {
         SDL_DestroyTexture(texture);

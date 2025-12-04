@@ -1,6 +1,7 @@
 #include "MemoryManager.h"
 
 #include <cassert>
+#include <exception>
 
 #ifdef DEV_CONFIGURATION
 #include <random>
@@ -116,7 +117,7 @@ void MemoryManager::Destroy() noexcept
 #ifdef DEV_CONFIGURATION
 void* MemoryManager::New(const uint32_t size, const char* name) noexcept
 #else // Else DEV_CONFIGURATION
-void* MemoryManager::New(const uint32_t size) noexcept
+void* MemoryManager::New(const uint32_t size)
 #endif // !DEV_CONFIGURATION
 {
     DEBUG(std::scoped_lock lock(mThreadMutex));

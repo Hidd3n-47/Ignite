@@ -19,12 +19,12 @@
 #include <windows.h>
 #include <dbghelp.h>
 #pragma comment(lib, "dbghelp.lib")
-#endif // DEV_CONFIGURATION.
 
 namespace
 {
 static HANDLE gCurrentProcess = GetCurrentProcess();
 } // Anonymous Namespace.
+#endif // DEV_CONFIGURATION.
 
 void* operator new(std::size_t size)
 {

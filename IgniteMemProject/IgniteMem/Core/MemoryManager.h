@@ -84,7 +84,7 @@ public:
 #ifdef DEV_CONFIGURATION
     [[nodiscard]] void* New(const uint32_t size, const char* name) noexcept;
 #else // Else DEV_CONFIGURATION
-    [[nodiscard]] void* New(const uint32_t size) noexcept;
+    [[nodiscard]] void* New(const uint32_t size);
 #endif // !DEV_CONFIGURATION
 
     template <typename T>

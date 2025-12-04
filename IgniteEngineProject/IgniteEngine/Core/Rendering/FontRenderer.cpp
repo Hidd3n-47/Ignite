@@ -26,6 +26,8 @@ FontRenderer::~FontRenderer()
 
 uint16_t FontRenderer::CreateFont(const char* fontFilepath, const float fontSize, const std::string& text, const mem::WeakHandle<Transform> transform)
 {
+    PROFILE_FUNC();
+
     LoadFont(mFontId, fontFilepath, fontSize, text, transform);
 
     return mFontId++;
@@ -33,11 +35,15 @@ uint16_t FontRenderer::CreateFont(const char* fontFilepath, const float fontSize
 
 void FontRenderer::UpdateFont(const uint16_t id, const mem::WeakHandle<Transform> transform)
 {
+    PROFILE_FUNC();
+
     mFonts[id]->transform = transform;
 }
 
 void FontRenderer::UpdateFont(const uint16_t id, const std::string& text)
 {
+    PROFILE_FUNC();
+
     if (mFonts[id]->text != text)
     {
         mFonts[id]->text = text;
@@ -80,6 +86,8 @@ void FontRenderer::RenderFonts(const OrthoCamera& camera)
 
 void FontRenderer::RemoveFont(const uint16_t id)
 {
+    PROFILE_FUNC();
+
     delete mFonts[id];
 
     mFonts.erase(id);
@@ -87,6 +95,8 @@ void FontRenderer::RemoveFont(const uint16_t id)
 
 void FontRenderer::DeleteAllFonts()
 {
+    PROFILE_FUNC();
+
     for (const Font* font : mFonts | std::views::values)
     {
         delete font;
@@ -97,6 +107,8 @@ void FontRenderer::DeleteAllFonts()
 
 void FontRenderer::LoadFont(const uint16_t fontId, const char* fontFilepath, const float fontSize, const std::string& text, const mem::WeakHandle<Transform> transform)
 {
+    PROFILE_FUNC();
+
     mFont = TTF_OpenFont(fontFilepath, fontSize);
     DEBUG(if (!mFont))
         DEBUG_ERROR("Failed to load font at the passed in filepath: {}", fontFilepath);
