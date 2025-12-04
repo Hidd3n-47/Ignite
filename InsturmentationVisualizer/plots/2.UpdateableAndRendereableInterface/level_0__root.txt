@@ -1,0 +1,7 @@
+=== Functions under 'root' ===
+
+[00] ignite::Engine::Init         [------------------------------]   3.3% (298.30 ms, calls 1 - avg 298299.00 us)
+[01] ignite::GameManager::Init    [------------------------------]   1.2% (110.25 ms, calls 1 - avg 110254.00 us)
+[02] ignite::Engine::Run          [############################--]  95.1% (8522.91 ms, calls 1 - avg 8522913.00 us)
+[03] ignite::GameManager::Destroy [------------------------------]   0.0% (0.91 ms, calls 1 - avg 912.00 us)
+[04] ignite::Engine::Destroy      [------------------------------]   0.4% (34.22 ms, calls 1 - avg 34216.00 us)

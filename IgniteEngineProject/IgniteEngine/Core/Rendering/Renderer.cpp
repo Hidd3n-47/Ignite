@@ -41,7 +41,7 @@ void Renderer::Render(const OrthoCamera& camera)
 {
     PROFILE_FUNC();
 
-    for (const std::vector<mem::WeakHandle<RenderCommand>>& layerCommands : mCommands | std::views::values)
+    for (std::vector<mem::WeakHandle<RenderCommand>>& layerCommands : mCommands | std::views::values)
     {
         for (const mem::WeakHandle<RenderCommand> command : layerCommands)
         {
@@ -106,10 +106,8 @@ void Renderer::Render(const OrthoCamera& camera)
             DEBUG(if (!err))
                 DEBUG_ERROR("Failed to render texture with ID: {}. Error: {}", command->texture.id, SDL_GetError());
         }
+        layerCommands.clear();
     }
-
-
-    mCommands.clear();
 }
 
 void Renderer::EndRender() const
