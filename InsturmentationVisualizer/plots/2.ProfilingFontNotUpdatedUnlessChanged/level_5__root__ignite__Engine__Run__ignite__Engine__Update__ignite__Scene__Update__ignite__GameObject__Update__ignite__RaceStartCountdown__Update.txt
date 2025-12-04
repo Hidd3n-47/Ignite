@@ -1,5 +1,0 @@
-=== Functions under 'ignite::RaceStartCountdown::Update' ===
-
-[00] operator new            [#######-----------------------]  25.0% (0.01 ms, calls 18 - avg 0.33 us)
-[01] ignite::UiText::SetText [######################--------]  75.0% (0.02 ms, calls 18 - avg 1.00 us)
-[02] operator delete         [------------------------------]   0.0% (0.00 ms, calls 18 - avg 0.00 us)

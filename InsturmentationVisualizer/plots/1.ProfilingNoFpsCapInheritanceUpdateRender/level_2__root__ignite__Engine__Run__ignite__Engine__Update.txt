@@ -1,7 +1,0 @@
-=== Functions under 'ignite::Engine::Update' ===
-
-[00] ignite::UiButton::Update      [------------------------------]   0.5% (1.49 ms, calls 4196 - avg 0.36 us)
-[01] ignite::GameObject::Update    [###---------------------------]  11.8% (38.84 ms, calls 4739 - avg 8.20 us)
-[02] ignite::ParticleSystem::Emmit [------------------------------]   0.0% (0.00 ms, calls 1220 - avg 0.00 us)
-[03] ignite::CarMovement::Update   [------------------------------]   0.0% (0.08 ms, calls 487 - avg 0.16 us)
-[04] ignite::Scene::Update         [##########################----]  87.7% (288.90 ms, calls 514 - avg 562.06 us)

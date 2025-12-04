@@ -1,3 +1,0 @@
-=== Functions under 'ignite::GameObject::Update' ===
-
-[00] ignite::UiText::SetText [##############################] 100.0% (92.97 ms, calls 217 - avg 428.41 us)

@@ -1,3 +1,0 @@
-=== Functions under 'ignite::RaceStartCountdown::Update' ===
-
-[00] ignite::GameObject::Update [##############################] 100.0% (57.68 ms, calls 119 - avg 484.70 us)
