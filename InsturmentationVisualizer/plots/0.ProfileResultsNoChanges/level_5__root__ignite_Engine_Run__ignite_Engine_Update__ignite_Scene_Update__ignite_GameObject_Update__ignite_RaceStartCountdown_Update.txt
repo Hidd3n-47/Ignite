@@ -1,0 +1,4 @@
+=== Functions under 'ignite::RaceStartCountdown::Update' ===
+
+[00] ignite::FontRenderer::UpdateFont [##########################----]  88.2% (54.11 ms, calls 120 - avg 450.89 us)
+[01] ignite::UiText::SetText          [###---------------------------]  11.8% (7.22 ms, calls 16 - avg 451.19 us)

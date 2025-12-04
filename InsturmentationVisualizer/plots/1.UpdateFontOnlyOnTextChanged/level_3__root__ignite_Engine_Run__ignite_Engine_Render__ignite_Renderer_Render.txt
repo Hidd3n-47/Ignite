@@ -1,0 +1,3 @@
+=== Functions under 'ignite::Renderer::Render' ===
+
+[00] ignite::OrthoCamera::PositionToScreenSpace [##############################] 100.0% (1.00 ms, calls 668094 - avg 0.00 us)

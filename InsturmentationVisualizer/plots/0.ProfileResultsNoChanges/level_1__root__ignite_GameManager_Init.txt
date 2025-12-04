@@ -1,0 +1,4 @@
+=== Functions under 'ignite::GameManager::Init' ===
+
+[00] ignite::TextureManager::Load     [#####################---------]  70.3% (1.90 ms, calls 1 - avg 1904.00 us)
+[01] ignite::GameManager::ChangeState [########----------------------]  29.7% (0.80 ms, calls 1 - avg 804.00 us)

@@ -1,0 +1,3 @@
+=== Functions under 'ignite::IComponent::Render' ===
+
+[00] ignite::GameObject::Render [##############################] 100.0% (0.03 ms, calls 1 - avg 34.00 us)

@@ -1,0 +1,3 @@
+=== Functions under 'ignite::UiButton::Render' ===
+
+[00] ignite::GameObject::Render [##############################] 100.0% (71.66 ms, calls 2197 - avg 32.62 us)

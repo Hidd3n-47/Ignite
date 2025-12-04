@@ -1,0 +1,8 @@
+=== Functions under 'ignite::GameObject::Update' ===
+
+[00] ignite::OrthoCamera::PositionToScreenSpace [------------------------------]   0.0% (0.00 ms, calls 184 - avg 0.00 us)
+[01] ignite::UiButton::Update                   [#-----------------------------]   3.7% (0.37 ms, calls 187 - avg 1.97 us)
+[02] ignite::IComponent::Update                 [------------------------------]   0.0% (0.00 ms, calls 1364 - avg 0.00 us)
+[03] ignite::RigidBody::Update                  [#-----------------------------]   4.4% (0.44 ms, calls 286 - avg 1.52 us)
+[04] ignite::RaceStartCountdown::Update         [###########################---]  91.9% (9.12 ms, calls 182 - avg 50.13 us)
+[05] ignite::CarMovement::Update                [------------------------------]   0.0% (0.00 ms, calls 1 - avg 0.00 us)

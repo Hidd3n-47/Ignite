@@ -1,0 +1,7 @@
+=== Functions under 'ignite::Scene::Render' ===
+
+[00] ignite::IComponent::Render     [------------------------------]   0.0% (0.03 ms, calls 17209 - avg 0.00 us)
+[01] ignite::GameObject::Render     [#########---------------------]  31.5% (72.74 ms, calls 11021 - avg 6.60 us)
+[02] ignite::UiButton::Render       [#########---------------------]  30.3% (69.92 ms, calls 2197 - avg 31.82 us)
+[03] ignite::SpriteRenderer::Render [###########-------------------]  38.0% (87.56 ms, calls 11440 - avg 7.65 us)
+[04] ignite::BoxCollider::Render    [------------------------------]   0.2% (0.42 ms, calls 1241 - avg 0.34 us)

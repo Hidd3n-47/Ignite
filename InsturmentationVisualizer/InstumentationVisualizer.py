@@ -61,7 +61,7 @@ def print_bar(value, total_value, length=30):
     return "[" + ("#" * bar_length) + ("-" * (length - bar_length)) + "]"
 
 def make_safe_filename(name_to_make_safe):
-    return name_to_make_safe.replace(" ", "_").replace("/", "_").replace("\\", "_")
+    return name_to_make_safe.replace(" ", "_").replace("/", "_").replace("\\", "_").replace("::","_")
 
 def get_node_path(node_to_get_path):
     names = []
