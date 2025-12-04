@@ -15,9 +15,54 @@
 #include "Core/Rendering/ParticleManager.h"
 #include "IgniteUtils/Core/InstrumentationSession.h"
 
+#ifdef DEV_CONFIGURATION
+#include <windows.h>
+#include <dbghelp.h>
+#pragma comment(lib, "dbghelp.lib")
+#endif // DEV_CONFIGURATION.
+
+namespace
+{
+static HANDLE gCurrentProcess = GetCurrentProcess();
+} // Anonymous Namespace.
+
 void* operator new(std::size_t size)
 {
-    return ignite::mem::MemoryManager::Instance()->New(size);
+#ifdef DEV_CONFIGURATION
+    void* stack[10];
+    const USHORT stackCount = RtlCaptureStackBackTrace(1, 10, stack,nullptr);
+
+    // We init it like this as static allocations can cause issues if symbols are not initialized so can't init 
+    // in engine or somewhere similar.
+    static bool init = false;
+    if (!init)
+    {
+        SymInitialize(::gCurrentProcess, nullptr, TRUE);
+        init = true;
+    }
+
+    BYTE symbolBuffer[sizeof(SYMBOL_INFO) + 255];
+    SYMBOL_INFO* symbol  = reinterpret_cast<SYMBOL_INFO*>(symbolBuffer);
+    symbol->MaxNameLen   = 255;
+    symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+
+    bool found = false;
+    for (USHORT i{ 0 }; i < stackCount; ++i)
+    {
+        SymFromAddr(::gCurrentProcess, reinterpret_cast<DWORD64>(stack[i]), nullptr, symbol);
+        if (std::strstr(symbol->Name, "ignite"))
+        {
+            found = true;
+            break;
+        }
+    }
+    char name[256] = { 0 };
+    strncpy(name, symbol->Name, symbol->NameLen);
+    name[symbol->NameLen] = '\0';
+    return ignite::mem::MemoryManager::Instance()->New(static_cast<uint32_t>(size), symbol->NameLen > 0 && found ? name : "Unknown");
+#else // Else DEV_CONFIGURATION.
+    return ignite::mem::MemoryManager::Instance()->New(static_cast<uint32_t>(size));
+#endif // !DEV_CONFIGURATION.
 }
 
 void operator delete(void* address) noexcept
@@ -45,7 +90,12 @@ mem::WeakHandle<Engine> Engine::CreateEngine()
     DEBUG(utils::InstrumentationSession::Create());
     DEBUG(utils::InstrumentationSession::Instance()->StartSession());
 
-    mInstance = mem::MemoryManager::Instance()->New<Engine>();
+    // In debug mode, if we have the live debug window for memory manager, we create an SDL window on another thread.
+    // We then get a race condition as the engine creates another window, meaning we can fail to create one of the windows
+    // if one is being created at the same time. Add a sleep here to ensure the profiling window has time to finish initializing.
+    DEBUG(Sleep(10));
+
+    mInstance = new Engine();
     DEBUG_INFO("Successfully created Ignite Engine.");
 
     return mem::WeakHandle{ mInstance };
@@ -63,7 +113,7 @@ void Engine::Init()
         return;
     }
 
-    mInputManager = mem::MemoryManager::Instance()->New<InputManager>();
+    mInputManager = new InputManager();
 
     const OrthoCameraValues cameraSize
     {
@@ -83,13 +133,13 @@ void Engine::Init()
         return;
     }
 
-    mRenderer       = mem::MemoryManager::Instance()->New<Renderer>(mWindow);
-    mTextureManager = mem::MemoryManager::Instance()->New<TextureManager>(mRenderer->GetRendererBackend());
+    mRenderer       = new Renderer(mWindow);
+    mTextureManager = new TextureManager(mRenderer->GetRendererBackend());
     mRenderer->SetTextureManagerRef(mem::WeakHandle{ mTextureManager });
 
-    mFontRenderer     = mem::MemoryManager::Instance()->New<FontRenderer>(mRenderer->GetRendererBackend());
-    mCollisionHandler = mem::MemoryManager::Instance()->New<CollisionHandler>();
-    mParticleManager  = mem::MemoryManager::Instance()->New<ParticleManager>();
+    mFontRenderer     = new FontRenderer(mRenderer->GetRendererBackend());
+    mCollisionHandler = new CollisionHandler();
+    mParticleManager  = new ParticleManager();
 
     mRunning = true;
 }
@@ -113,8 +163,8 @@ void Engine::Run()
         Render();
 
 #ifdef DEV_CONFIGURATION
-        // Max frames displayed as: 120.123 <- total of 7 characters + 1 for null terminating character.
-        char title[8];
+        // Max frames displayed as: 1234.123 <- total of 8 characters + 1 for null terminating character.
+        char title[9];
         std::to_chars(title, title + sizeof(title), 1.0 / mDeltaTime, std::chars_format::fixed, 3);
         title[sizeof(title) - 1] = '\0';
         SDL_SetWindowTitle(mWindow, title);
@@ -129,18 +179,16 @@ void Engine::Destroy() const
     {
         PROFILE_FUNC();
 
-        mem::MemoryManager::Instance()->Delete(mParticleManager);
+        delete mParticleManager;
 
-        mem::MemoryManager::Instance()->Delete(mCollisionHandler);
+        delete mFontRenderer;
 
-        mem::MemoryManager::Instance()->Delete(mFontRenderer);
-
-        mem::MemoryManager::Instance()->Delete(mTextureManager);
-        mem::MemoryManager::Instance()->Delete(mRenderer);
+        delete mTextureManager;
+        delete mRenderer;
 
         SDL_DestroyWindow(mWindow);
 
-        mem::MemoryManager::Instance()->Delete(mInputManager);
+        delete mInputManager;
 
     }
 
@@ -149,7 +197,7 @@ void Engine::Destroy() const
     DEBUG(utils::InstrumentationSession::Instance()->EndSession());
     DEBUG(utils::InstrumentationSession::Destroy());
 
-    mem::MemoryManager::Instance()->Delete(mInstance);
+    delete mInstance;
     mInstance = nullptr;
 
     mem::MemoryManager::Destroy();

@@ -40,6 +40,7 @@ project "IgniteMem"
     {
         ("{COPYFILE} %[" .. outputPath .. "IgniteMem/IgniteMem.dll] %[" .. outputPath .."IgniteMemTests/]"),
         ("{COPYFILE} %[" .. outputPath .. "IgniteMem/IgniteMem.dll] %[" .. outputPath .."IgniteMemBenchmark/]"),
+        ("{COPYFILE} %[" .. outputPath .. "IgniteMem/IgniteMem.dll] %[" .. outputPath .."IgniteGame/]"),
     }
 
     filter "system:windows"

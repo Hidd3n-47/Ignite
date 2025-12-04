@@ -249,6 +249,44 @@ void DebugMemoryConsole::Render()
         ImGui::End();
     }
 
+    {
+        ImGui::Begin("Allocation Info");
+
+        if (ImGui::BeginTable("AllocInfoTable", 4))
+        {
+            ImGui::TableSetupColumn("Id", ImGuiTableColumnFlags_WidthFixed, 55.0f);
+            ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed, 60.0f);
+            ImGui::TableSetupColumn("Address", ImGuiTableColumnFlags_WidthFixed, 120.0f);
+            ImGui::TableSetupColumn("Name");
+            ImGui::TableHeadersRow();
+
+            AllocationMap allocationMap = MemoryManager::Instance()->GetAllocationMap();
+
+            for (const auto& [address, info] : allocationMap)
+            {
+                ImGui::TableNextRow();
+
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text("%d", info.id);
+
+                ImGui::TableSetColumnIndex(1);
+                ImGui::Text("%llu", info.size);
+
+                ImGui::TableSetColumnIndex(2);
+                std::string blockMemoryAddress = std::format("{:X}", reinterpret_cast<uintptr_t>(address));
+                ImGui::Text("%s", blockMemoryAddress.c_str());
+
+                ImGui::TableSetColumnIndex(3);
+                ImGui::Text("%s", info.allocationLocation);
+            }
+
+            ImGui::EndTable();
+        }
+
+
+        ImGui::End();
+    }
+
     constexpr ImVec4 clearColor{ 0.45f, 0.55f, 0.6f, 1.0f };
 
     ImGui::Render();

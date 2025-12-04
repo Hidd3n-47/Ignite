@@ -106,7 +106,6 @@ void MemoryManager::Destroy() noexcept
     }
 #endif // DEV_CONFIGURATION.
 
-
     MEM_LOG_DEBUG("Memory managed successfully destroyed.");
 
     mInstance->~MemoryManager();
@@ -114,8 +113,14 @@ void MemoryManager::Destroy() noexcept
     mInstance = nullptr;
 }
 
+#ifdef DEV_CONFIGURATION
+void* MemoryManager::New(const uint32_t size, const char* name) noexcept
+#else // Else DEV_CONFIGURATION
 void* MemoryManager::New(const uint32_t size) noexcept
+#endif // !DEV_CONFIGURATION
 {
+    DEBUG(std::scoped_lock lock(mThreadMutex));
+
     const uint64_t allocatedSize = size + METADATA_PADDING;
 
 #ifdef DEV_CONFIGURATION
@@ -186,7 +191,8 @@ void* MemoryManager::New(const uint32_t size) noexcept
     //    __debugbreak();
     //}
 
-    mAddressToAllocInfo[(std::byte*)typeAddress] = { .id = allocId };
+    mAddressToAllocInfo[(std::byte*)typeAddress] = { .id = allocId, .size = size };
+    std::strcpy(mAddressToAllocInfo[(std::byte*)typeAddress].allocationLocation, name);
 #endif // DEV_CONFIGURATION.
 
     return typeAddress;

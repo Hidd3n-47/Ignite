@@ -9,6 +9,7 @@
 #include "ListNode.h"
 
 #ifdef DEV_CONFIGURATION
+#include <mutex>
 #include <thread>
 #include <unordered_map>
 #include "DebugMemoryHexValues.h"
@@ -46,6 +47,8 @@ struct CustomAllocator
 struct AllocationInfo
 {
     int id;
+    size_t size;
+    char allocationLocation[256];
 };
 
 using AllocationMap = std::unordered_map<std::byte*, AllocationInfo, std::hash<std::byte*>, std::equal_to<std::byte*>, CustomAllocator<std::pair<std::byte* const, AllocationInfo>>>;
@@ -78,30 +81,33 @@ public:
     static void Init(const uint32_t sizeBytes) noexcept;
     static void Destroy() noexcept;
 
+#ifdef DEV_CONFIGURATION
+    [[nodiscard]] void* New(const uint32_t size, const char* name) noexcept;
+#else // Else DEV_CONFIGURATION
     [[nodiscard]] void* New(const uint32_t size) noexcept;
-
-    template <typename T, typename... Args>
-    [[nodiscard]] T* New(Args ...args) noexcept;
+#endif // !DEV_CONFIGURATION
 
     template <typename T>
     void Delete(T* free) noexcept;
 
     //Todo Ideally, I don't want to expose these, but these are used in tests.
     [[nodiscard]] inline static uint32_t GetMetadataPadding() { return METADATA_PADDING; }
-    [[nodiscard]] inline uint64_t     GetSizeFree()           const { return mSize - mAllocated; }
+    [[nodiscard]] inline uint64_t        GetSizeFree()  const { return mSize - mAllocated; }
 
 #ifdef DEV_CONFIGURATION
-    [[nodiscard]] inline ListNode*    GetStartingListNode()   const { return mStartingListNode; }
-    [[nodiscard]] inline const Stack& GetListStack()          const { return mListNodeFreeIndicesStack;  }
-    [[nodiscard]] inline void*        GetStartOfMemoryBlock() const { return mMemoryBlock; }
-    [[nodiscard]] inline uint64_t     GetSize()               const { return mSize; }
-    [[nodiscard]] inline uint64_t     GetAllocated()          const { return mAllocated; }
-    [[nodiscard]] inline uint32_t     GetNumberOfFragments()  const { return mNumberOfFragments; }
+    [[nodiscard]] inline ListNode*     GetStartingListNode()   const { return mStartingListNode; }
+    [[nodiscard]] inline const Stack&  GetListStack()          const { return mListNodeFreeIndicesStack;  }
+    [[nodiscard]] inline void*         GetStartOfMemoryBlock() const { return mMemoryBlock; }
+    [[nodiscard]] inline uint64_t      GetSize()               const { return mSize; }
+    [[nodiscard]] inline uint64_t      GetAllocated()          const { return mAllocated; }
+    [[nodiscard]] inline uint32_t      GetNumberOfFragments()  const { return mNumberOfFragments; }
+    [[nodiscard]] inline AllocationMap GetAllocationMap()            { AllocationMap copy; { std::scoped_lock lock(mThreadMutex); copy = mAddressToAllocInfo; } return copy; }
 
     static void SetMemoryBlockDebug(DebugMemoryHexValues value, void* memory, const uint64_t size);
 
     Log logger{ "IgniteMem" };
 private:
+    std::mutex  mThreadMutex;
     std::thread mThread;
     uint32_t    mNumberOfFragments{ 1 };
 
@@ -137,16 +143,10 @@ private:
    =================================================================================================
                                                                                                       */
 
-template <typename T, typename... Args>
-T* MemoryManager::New(Args ...args) noexcept
-{
-    void* address = New(sizeof(T));
-    return new (static_cast<T*>(address)) T{ std::forward<Args>(args)... };
-}
-
 template <typename T>
 void MemoryManager::Delete(T* free) noexcept
 {
+    DEBUG(std::scoped_lock lock(mThreadMutex));
     assert(free);
 
 #ifdef DEV_CONFIGURATION
