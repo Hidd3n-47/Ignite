@@ -180,6 +180,7 @@ void Engine::Destroy() const
         PROFILE_FUNC();
 
         delete mParticleManager;
+        delete mCollisionHandler;
 
         delete mFontRenderer;
 
