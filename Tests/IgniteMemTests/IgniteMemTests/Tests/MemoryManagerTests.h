@@ -132,11 +132,11 @@ public:
     static std::optional<std::string> FragmentNodeAddedToHeapWhenReservedBlockFull()
     {
         ignite::mem::MemoryManager::Destroy();
-        ignite::mem::MemoryManager::Init(660);
+        ignite::mem::MemoryManager::Init(2120);
 
         ignite::mem::MemoryManager* manager = ignite::mem::MemoryManager::Instance();
 
-        constexpr uint32_t arraySize = 130;
+        constexpr uint32_t arraySize = 256;
         char* ints[arraySize];
 
         for (char*& b : ints)

@@ -121,8 +121,12 @@ public:
 #endif // DEV_CONFIGURATION.
 
 private:
-    static constexpr uint32_t MAX_FRAGMENTS   { 64 };
-    static constexpr uint32_t METADATA_PADDING{  4 };
+#ifdef DEV_CONFIGURATION
+    static constexpr uint32_t MAX_FRAGMENTS   { 128 };
+#else // Else DEV_CONFIGURATION.
+    static constexpr uint32_t MAX_FRAGMENTS   {  64 };
+#endif // !DEV_CONFIGURATION.
+    static constexpr uint32_t METADATA_PADDING{   4 };
 
     MemoryManager(const uint64_t sizeBytes) noexcept;
     ~MemoryManager() noexcept;
