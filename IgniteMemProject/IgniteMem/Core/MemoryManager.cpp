@@ -209,23 +209,41 @@ void MemoryManager::SetMemoryBlockDebug(DebugMemoryHexValues value, void* memory
 
 std::tuple<MemoryManager::ListNode*, MemoryManager::ListNode*> MemoryManager::FindAllocationListNode(const uint64_t size) const
 {
-    ListNode* previous = nullptr;
-    ListNode* node     = mStartingListNode;
+    // Memory Manager's Algorithm:
+    // Memory manager will attempt the best-fit algorithm followed by worst-fit.
+    // It will iterate over all the free list nodes and try and locate the node that is the
+    // exact same size as the allocation. If we find one, we can early-out and use the first one.
+    // If we do not find one, the next search block will be for the largest block of memory to try and reduce
+    // fragmentation of smaller sizes.
+    // This worst case we are traversing all 64 nodes. 
+    // Most modern cpu have L1 and L2 cache much larger than 24*64=1536 bytes, which means even
+    // though this is a list and potentially is not in order, it won't cause a new memory fetch and cache miss.
 
-    while (node->value.sizeFree < size)
+    ListNode* previous    = nullptr;
+    ListNode* node        = mStartingListNode;
+    ListNode* largestPrev = nullptr;
+    ListNode* largest     = node;
+
+    while (node)
     {
-        previous = node;
-        node = node->next;
-
-#ifdef DEV_CONFIGURATION
-        if (!node)
+        if (node->value.sizeFree == size)
         {
-            MEM_LOG_ERROR("Could not find a valid list node to allocate to.");
+            // We found a perfect fit, use this.
+            return { previous, node };
         }
-#endif // DEV_CONFIGURATION.
+
+        previous = node;
+        node     = node->next;
+
+        if (node && node->value.sizeFree > largest->value.sizeFree)
+        {
+            largestPrev = previous;
+            largest     = node;
+        }
     }
 
-    return { previous, node };
+    // Could not find a perfect fit, therefore use worst-fit.
+    return { largestPrev, largest };
 }
 
 MemoryManager::ListNode* MemoryManager::GetListNode(std::byte* address, const uint64_t size, ListNode* next)

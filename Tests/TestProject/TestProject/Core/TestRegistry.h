@@ -4,6 +4,7 @@
 #include <unordered_map>
 
 #include "Test.h"
+#include "Logger/Log.h"
 
 namespace ignite::test
 {
@@ -55,14 +56,15 @@ public:
 
     inline void SetOnTestFailedCallback(const std::function<void()>& onTestFailedCallback) { mOnTestFailedCallback = onTestFailedCallback; }
 protected:
+    Log mLogger{ "UnitTests" };
     std::string_view mTestSessionName;
-
 private:
     std::unordered_map<std::string_view, std::vector<Test>> mTests;
     std::function<void()> mOnTestFailedCallback;
 
     uint32_t mPassedTests = 0;
     uint32_t mFailedTests = 0;
+
 };
 
 TestRegistry* CreateTestEnvironment();

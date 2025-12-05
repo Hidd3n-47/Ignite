@@ -30,6 +30,7 @@ private:
 
     uint16_t mId = 0;
     std::unordered_map<uint16_t, SDL_Texture*> mTextureMap;
+    std::unordered_map <std::string, Texture> mFilePathToTexture;
 };
 
 } // Namespace ignite.

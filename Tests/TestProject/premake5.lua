@@ -24,7 +24,7 @@ project "TestProject"
 
     links
     {
-        "Log"
+        "Logger"
     }
 
     filter "system:windows"

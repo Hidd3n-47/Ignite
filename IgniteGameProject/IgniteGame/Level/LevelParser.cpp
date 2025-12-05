@@ -1,7 +1,5 @@
 #include "LevelParser.h"
 
-#include <fstream>
-
 #include <IgniteEngine/EC/Scene.h>
 #include <IgniteEngine/EC/Components/Transform.h>
 #include <IgniteEngine/EC/Components/BoxCollider.h>
@@ -11,7 +9,13 @@
 #include <IgniteEngine/Core/Engine.h>
 #include <IgniteEngine/Core/Rendering/TextureManager.h>
 
+#ifdef DEV_CONFIGURATION
+#include <fstream>
 #include <IgniteUtils/Xml/XmlSerializer.h>
+#else // Else DEV_CONFIGURATION.
+//#include "Build/GeneratedCollisionInfo.cpp"
+#include "Build/GeneratedLevels.h"
+#endif // !DEV_CONFIGURATION.
 
 #include "Core/GameManager.h"
 #include "Src/Defines.h"
@@ -21,8 +25,11 @@ namespace ignite
 
 void LevelParser::Init()
 {
+    PROFILE_FUNC();
+
     Engine::Instance()->GetTextureManager()->Load(mLevelSpritesheet, "Assets/EnvironmentSpritesheet.png", 7, 7);
 
+#ifdef DEV_CONFIGURATION
     const XmlDocument xml = XmlSerializer::Deserialize("Assets/EnvironmentSpritesheet.tsx");
 
     for (const XmlElement& child : xml.GetRootElement()->GetChildElements())
@@ -41,10 +48,16 @@ void LevelParser::Init()
             mSpritesheetIdToCollisionInfo[id] = { .x = x, .y = y, .w = w, .h = h };
         }
     }
+#else // !DEV_CONFIGURATION.
+    CreateCollisionMap();
+#endif // !DEV_CONFIGURATION.
 }
 
 void LevelParser::LoadLevel(mem::WeakHandle<Scene> scene, mem::WeakHandle<GameObject> player, const LevelState state)
 {
+    PROFILE_FUNC();
+
+#ifdef DEV_CONFIGURATION
     const std::filesystem::path levelPath{ "Assets/Levels/Level" + std::to_string(static_cast<uint8_t>(state)) };
 
     std::vector<std::string> lines;
@@ -160,6 +173,17 @@ void LevelParser::LoadLevel(mem::WeakHandle<Scene> scene, mem::WeakHandle<GameOb
 
         GameManager::Instance()->SetLevelRankTimes(std::stof(lines[0]), std::stof(lines[1]), std::stof(lines[2]));
     }
+#else // Else DEV_CONFIGURATION.
+    switch (state)
+    {
+    case LevelState::ONE:
+        BuildLevel1(scene, player, mLevelSpritesheet, mSpritesheetIdToCollisionInfo);
+        break;
+    case LevelState::TWO:
+        BuildLevel2(scene, player, mLevelSpritesheet, mSpritesheetIdToCollisionInfo);
+        break;
+    }
+#endif // !DEV_CONFIGURATION.
 }
 
 void LevelParser::Destroy()

@@ -87,6 +87,10 @@ public:
     [[nodiscard]] void* New(const uint32_t size);
 #endif // !DEV_CONFIGURATION
 
+    template <typename T, typename... Args>
+    [[deprecated("This should not be used in runtime applications, it is kept for the purpose of tests.")]]
+    [[nodiscard]] T* New(Args ...args) noexcept;
+
     template <typename T>
     void Delete(T* free) noexcept;
 
@@ -142,6 +146,17 @@ private:
 /*
    =================================================================================================
                                                                                                       */
+
+template <typename T, typename... Args>
+T* MemoryManager::New(Args ...args) noexcept
+{
+#ifdef DEV_CONFIGURATION
+    void* address = New(sizeof(T), "PlacementAllocation");
+#else // Else DEV_CONFIGURATION.
+    void* address = New(sizeof(T));
+#endif // !DEV_CONFIGURATION.
+    return new (static_cast<T*>(address)) T{ std::forward<Args>(args)... };
+}
 
 template <typename T>
 void MemoryManager::Delete(T* free) noexcept

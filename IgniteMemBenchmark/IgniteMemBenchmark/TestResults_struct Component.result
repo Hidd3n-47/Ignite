@@ -1,24 +1,24 @@
 ================================================================================================
 ================ Memory Manager ================
-Total Time           : 	2423186599.999997 ns [2423.1866 ms]
-Average Alloc Time   : 	60.57966499999993 ns [0.0001 ms]
-Best Alloc Time      : 	49.7 ns [0.0000 ms]
-Worst Alloc Time     : 	226.43 ns [0.0002 ms]
+Total Time           : 	155600699.99999973 ns [155.6007 ms]
+Average Alloc Time   : 	3.890017499999993 ns [0.0000 ms]
+Best Alloc Time      : 	3.08 ns [0.0000 ms]
+Worst Alloc Time     : 	13.37 ns [0.0000 ms]
 ----------------------------------------------------------
-Total Time           : 	2669787599.999997 ns [2669.7876 ms]
-Average Alloc Time   : 	66.74468999999993 ns [0.0001 ms]
-Best Alloc Time      : 	49.7 ns [0.0000 ms]
-Worst Alloc Time     : 	226.43 ns [0.0002 ms]
+Total Time           : 	147974900.00000036 ns [147.9749 ms]
+Average Dealloc Time : 	3.6993725000000084 ns [0.0000 ms]
+Best Dealloc Time    : 	3.06 ns [0.0000 ms]
+Worst Dealloc Time   : 	16.8 ns [0.0000 ms]
 ----------------------------------------------------------
 ================ C++ New/Delete ================
-Total Time           : 	2423186599.999997 ns [2423.1866 ms]
-Average Dealloc Time : 	60.57966499999993 ns [0.0001 ms]
-Best Dealloc Time    : 	49.7 ns [0.0000 ms]
-Worst Dealloc Time   : 	226.43 ns [0.0002 ms]
+Total Time           : 	785371300.0000005 ns [785.3713 ms]
+Average Alloc Time   : 	19.634282500000012 ns [0.0000 ms]
+Best Alloc Time      : 	16.225 ns [0.0000 ms]
+Worst Alloc Time     : 	41.465 ns [0.0000 ms]
 ----------------------------------------------------------
-Total Time           : 	2494517900.0000005 ns [2494.5179 ms]
-Average Dealloc Time : 	62.36294750000001 ns [0.0001 ms]
-Best Dealloc Time    : 	226.43 ns [0.0002 ms]
+Total Time           : 	455206300.0000002 ns [455.2063 ms]
+Average Dealloc Time : 	11.380157500000005 ns [0.0000 ms]
+Best Dealloc Time    : 	26.34 ns [0.0000 ms]
 Worst Dealloc Time   : 	0 ns [0.0000 ms]
 ----------------------------------------------------------
 ================================================================================================

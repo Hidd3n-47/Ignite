@@ -8,16 +8,13 @@
 
 #include "LevelState.h"
 
+#include "CollisionInfoRect.h"
+
 namespace ignite
 {
 
 class Scene;
 class GameObject;
-
-struct CollisionInfoRect
-{
-    float x, y, w, h;
-};
 
 class LevelParser
 {
@@ -26,9 +23,14 @@ public:
     void LoadLevel(mem::WeakHandle<Scene> scene, mem::WeakHandle<GameObject> player, const LevelState state);
     void Destroy();
 
+#ifndef DEV_CONFIGURATION
+    void CreateCollisionMap();
+#endif // !DEV_CONFIGURATION.
+
     inline static constexpr int START_LINE_TEXTURE_ID{ 16 };
 private:
     Texture mLevelSpritesheet;
+
     std::unordered_map<uint32_t, CollisionInfoRect> mSpritesheetIdToCollisionInfo;
 };
 

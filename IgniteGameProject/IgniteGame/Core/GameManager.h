@@ -54,6 +54,9 @@ private:
     float mTimeForGold{};
     float mTimeForSilver{};
     float mTimeForBronze{};
+
+    uint16_t mPlayerTextureId;
+    uint16_t mTrophiesTextureId;
 };
 
 } // Namespace ignite.

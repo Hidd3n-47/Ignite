@@ -40,6 +40,12 @@ void TextureManager::Load(Texture& texture, const char* filePath, const uint32_t
 {
     PROFILE_FUNC();
 
+    if (mFilePathToTexture.contains(filePath))
+    {
+        texture = mFilePathToTexture[filePath];
+        return;
+    }
+
     SDL_Surface* surface = IMG_Load(filePath);
     if (!surface)
     {
@@ -66,6 +72,7 @@ void TextureManager::Load(Texture& texture, const char* filePath, const uint32_t
     texture.width           = static_cast<float>(sdlTexture->w) / texture.spritesheetMaxX;
     texture.height          = static_cast<float>(sdlTexture->h) / texture.spritesheetMaxY;
 
+    mFilePathToTexture[filePath] = texture;
 }
 
 void TextureManager::RemoveTexture(const uint16_t id)
@@ -74,6 +81,15 @@ void TextureManager::RemoveTexture(const uint16_t id)
     SDL_DestroyTexture(mTextureMap[id]);
 
     mTextureMap.erase(id);
+
+    for (auto it = mFilePathToTexture.begin(); it != mFilePathToTexture.end(); ++it)
+    {
+        if (it->second.id == id)
+        {
+            mFilePathToTexture.erase(it);
+            return;
+        }
+    }
 }
 
 void TextureManager::RemoveAllTextures()
@@ -85,6 +101,7 @@ void TextureManager::RemoveAllTextures()
     }
 
     mTextureMap.clear();
+    mFilePathToTexture.clear();
 }
 
 } // Namespace ignite.
