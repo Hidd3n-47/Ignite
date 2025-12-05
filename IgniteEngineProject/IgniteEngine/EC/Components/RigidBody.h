@@ -15,6 +15,8 @@ public:
     void OnComponentRemoved() override;
 
     void Update(const float dt) override;
+
+    inline void SetCanMove(const bool canMove) { mCanMove = canMove; }
 private:
     Vec2 mVelocity;
     float mMass{ 100.0f };
@@ -22,6 +24,7 @@ private:
     float mDragCoefficient = 3.0f;
     float mAngularVelocity = 0.0f;
     float mInertia = 100.0f;
+    bool  mCanMove = true;
 
     mem::WeakHandle<Transform> mTransform;
 

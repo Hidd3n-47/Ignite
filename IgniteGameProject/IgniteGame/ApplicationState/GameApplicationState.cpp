@@ -73,7 +73,7 @@ void GameApplicationState::InitScene()
     };
     mPlayerWheelParticlesBot = mPlayer->AddComponent<ParticleSystem>(smokeParticleDetails2);
 
-    mPlayer->AddComponent<RigidBody>();
+    mPlayer->AddComponent<RigidBody>()->SetCanMove(false);
 
     mem::WeakHandle<GameObject>   raceCountdownObject = CreateGameObject();
     const mem::WeakHandle<UiText> raceCountdownText   = raceCountdownObject->AddComponent<UiText>("3", 600.0f);
@@ -105,6 +105,7 @@ void GameApplicationState::ChangeGameState(const GameState state)
     case GameState::RACING:
         GAME_LOG("Changed to game state: RACING");
         mPlayer->GetComponent<CarMovement>()->EnableMovement();
+        mPlayer->GetComponent<RigidBody>()->SetCanMove(true);
         mRaceTimer->StartTimer();
         break;
     case GameState::RACE_COMPLETED:

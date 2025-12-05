@@ -43,7 +43,7 @@ void RaceTimer::Update(const float dt)
     mTimer += dt;
 
     const float value = static_cast<float>(static_cast<uint32_t>(mTimer * 10.0f)) / 10.0f;
-    if (Math::IsEqualTo(value, mTimerValue))
+    if (!Math::IsEqualTo(value, mTimerValue))
     {
         mTimerValue = value;
         mFontRendererRef->UpdateFont(mId, std::format("{:1}", mTimerValue));

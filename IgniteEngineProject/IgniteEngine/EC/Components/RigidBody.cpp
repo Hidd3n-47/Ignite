@@ -29,6 +29,11 @@ void RigidBody::Update(const float dt)
 {
     PROFILE_FUNC();
 
+    if (!mCanMove)
+    {
+        return;
+    }
+
     const float rotation = mTransform->rotation;
     const float cosRot = std::cos(Math::DegToRads(rotation));
     const float sinRot = std::sin(Math::DegToRads(rotation));
@@ -43,30 +48,39 @@ void RigidBody::Update(const float dt)
 
     Vec2 force;
 
-    // Force from movement.
-    bool accelerating = Engine::Instance()->GetInputManager()->IsKeyDown(Keycode::KEY_W);
+    const bool accelerating = Engine::Instance()->GetInputManager()->IsKeyDown(Keycode::KEY_W);
+    const bool decelerating = Engine::Instance()->GetInputManager()->IsKeyDown(Keycode::KEY_S);
     force += accelerating ? forwardVector * mAccelerationForce : Vec2{};
+    force += decelerating ? forwardVector * mAccelerationForce * -0.5f : Vec2{};
 
-    // Drag
-    float speedSq = mVelocity.MagnitudeSquared();
+    // Drag.
+    const float speedSq = mVelocity.MagnitudeSquared();
     if (speedSq > 0) 
     {
         force += mVelocity / sqrt(speedSq) * -(mDragCoefficient * speedSq);
     }
 
-    Vec2 acceleration = force / mMass;
+    const Vec2 acceleration = force / mMass;
 
     mVelocity += acceleration;
     mTransform->translation += mVelocity * dt;
 
-    // Steering torque
     float steer = 0.0f;
     if (Engine::Instance()->GetInputManager()->IsKeyDown(Keycode::KEY_D))
+    {
         steer += 1.0f;
+    }
     if (Engine::Instance()->GetInputManager()->IsKeyDown(Keycode::KEY_A))
+    {
         steer -= 1.0f;
+    }
 
-    float turnTorque = steer * mVelocity.Magnitude() * 500.0f;
+    if (decelerating)
+    {
+        steer *= -1.0f;
+    }
+
+    const float turnTorque = steer * mVelocity.Magnitude() * 500.0f;
     mAngularVelocity += turnTorque / mInertia;
     mAngularVelocity *= 0.85f;
     mTransform->rotation += mAngularVelocity * dt;

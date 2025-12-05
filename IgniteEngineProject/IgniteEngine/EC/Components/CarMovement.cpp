@@ -32,18 +32,6 @@ void CarMovement::Update(const float dt)
         return;
     }
 
-    const float rotation = mTransform->rotation;
-    const float cosRot   = std::cos(Math::DegToRads(rotation));
-    const float sinRot   = std::sin(Math::DegToRads(rotation));
-    const Mat2 rotMat
-    {
-        .m11 =  cosRot,
-        .m12 = -sinRot,
-        .m21 =  sinRot,
-        .m22 =  cosRot
-    };
-    const Vec2 forwardVector = rotMat * Vec2{ 1.0f, 0.0f };
-
     Vec2 direction;
     if (mInputManagerRef->IsKeyDown(Keycode::KEY_W))
     {
@@ -53,19 +41,6 @@ void CarMovement::Update(const float dt)
     {
         direction -= Vec2{ 1.0f, 0.0f };
     }
-    if (mInputManagerRef->IsKeyDown(Keycode::KEY_D))
-    {
-        direction += Vec2{ 0.0f, 1.0f };
-    }
-    if (mInputManagerRef->IsKeyDown(Keycode::KEY_A))
-    {
-        direction -= Vec2{ 0.0f, 1.0f };
-    }
-
-    const float reverseMultiplier = direction.x < 0.0f ? 0.5f : 1.0f;
-
-    //mTransform->translation += forwardVector * direction.x * mSpeed * reverseMultiplier * dt;
-    //mTransform->rotation    += direction.y * mSpeed * mTurnSpeed * direction.x * dt;
 
     mMoving = direction.x != 0.0f;
 }
